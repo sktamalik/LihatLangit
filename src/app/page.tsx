@@ -16,13 +16,19 @@ import CommunityReports from "@/components/CommunityReports";
 import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
+import WarningBanner from "@/components/WarningBanner";
 import type { ErrorCode } from "@/types/weather";
 
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
+
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="flex-1 flex flex-col">
-      {/* ═══ NAVBAR (paling atas, sticky) ═══ */}
+      {/* ═══ NAVBAR ═══ */}
       <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/50 shadow-[0_8px_30px_rgb(14,165,233,0.08)]">
         <div className="flex justify-between items-center w-full px-mobile-margin md:px-gutter max-w-container-max mx-auto h-16">
           <div className="flex items-center gap-2">
@@ -30,27 +36,31 @@ export default function DashboardPage() {
             <span className="font-geist text-headline-md font-bold text-primary">LihatLangit</span>
           </div>
           <nav className="hidden md:flex gap-6 items-center">
-            <a className="text-primary border-b-2 border-primary pb-1 font-label-sm text-label-sm" href="#">Dashboard</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Map</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">History</a>
+            <button onClick={() => scrollTo("hero")} className="text-primary border-b-2 border-primary pb-1 font-label-sm cursor-pointer">Dashboard</button>
+            <button onClick={() => scrollTo("prakiraan-hari-ini")} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm cursor-pointer">Prakiraan</button>
+            <button onClick={() => scrollTo("peta-cuaca")} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm cursor-pointer">Peta Cuaca</button>
+            <button onClick={() => scrollTo("peringatan-dini")} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm cursor-pointer">Peringatan Dini</button>
           </nav>
-          <div className="flex items-center gap-4 text-primary">
-            <button className="hover:text-primary-container transition-colors"><span className="material-symbols-outlined">location_on</span></button>
-            <button className="hover:text-primary-container transition-colors"><span className="material-symbols-outlined">settings</span></button>
+          <div className="flex items-center gap-4">
+            {state.status === "ready" && (
+              <span className="hidden sm:block text-xs text-text-muted font-geist">
+                📍 {state.forecast.region.city}
+              </span>
+            )}
+            <button className="text-primary hover:text-primary-container transition-colors" onClick={requestGeolocation} disabled={state.status === "geolocating"} title="Gunakan lokasi">
+              <span className="material-symbols-outlined">my_location</span>
+            </button>
           </div>
         </div>
       </header>
 
-      {/* ═══ MAIN ═══ */}
       <main className="flex-1 w-full pb-24 md:pb-8 pt-6">
         <div className="max-w-container-max mx-auto px-mobile-margin md:px-gutter flex flex-col gap-6">
 
-          {/* ─── HERO + WELCOME (satu section, tanpa overflow-hidden biar dropdown tembus) ─── */}
-          <section className="relative rounded-3xl bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 text-center">
-            {/* Sun */}
+          {/* ─── HERO + WELCOME ─── */}
+          <section id="hero" className="relative rounded-3xl bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 text-center">
             <div className="absolute top-6 right-[12%] w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-400 shadow-lg animate-float-slow pointer-events-none" />
             <div className="absolute top-8 right-[12.5%] w-20 h-20 rounded-full bg-amber-200/30 blur-xl pointer-events-none" />
-            {/* Clouds */}
             <div className="absolute top-8 left-[4%] opacity-60 animate-float-delayed pointer-events-none">
               <svg width="120" height="50" viewBox="0 0 140 55" fill="none">
                 <ellipse cx="40" cy="35" rx="38" ry="15" fill="white" opacity="0.9" />
@@ -65,7 +75,6 @@ export default function DashboardPage() {
                 <circle cx="48" cy="18" r="11" fill="white" opacity="0.85" />
               </svg>
             </div>
-
             <div className="relative z-10">
               <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-md shadow-md flex items-center justify-center mx-auto mb-4">
                 <span className="text-4xl">☁️</span>
@@ -76,18 +85,22 @@ export default function DashboardPage() {
               <p className="text-text-muted max-w-xl mx-auto mb-6 text-sm md:text-base">
                 Prakiraan cuaca Indonesia dari BMKG. Cari desa/kelurahan, pantau cuaca 3 hari ke depan.
               </p>
-
               <div className="max-w-xl mx-auto">
                 <div className="glass-panel flex items-center rounded-full px-5 py-3 sky-shadow-sm">
                   <span className="material-symbols-outlined text-outline mr-2">search</span>
                   <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
                 </div>
               </div>
-
-              <button onClick={requestGeolocation} disabled={state.status === "geolocating"}
-                className="mt-4 px-5 py-2 bg-white/70 text-primary rounded-full text-sm font-geist font-medium border border-white/60 hover:bg-white/90 transition-all disabled:opacity-50">
-                📍 Gunakan Lokasi Saya
-              </button>
+              <div className="flex flex-wrap justify-center gap-3 mt-5">
+                <button onClick={() => scrollTo("prakiraan-hari-ini")}
+                  className="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-geist font-semibold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+                  Mulai Jelajahi
+                </button>
+                <button onClick={requestGeolocation} disabled={state.status === "geolocating"}
+                  className="px-5 py-2.5 bg-white/70 text-primary rounded-full text-sm font-geist font-medium border border-white/60 hover:bg-white/90 transition-all disabled:opacity-50">
+                  📍 Pakai Lokasi Saya
+                </button>
+              </div>
             </div>
           </section>
 
@@ -97,6 +110,11 @@ export default function DashboardPage() {
           {state.status === "geo-no-match" && (
             <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">Lokasi tidak ditemukan.</div>
           )}
+
+          {/* ─── PERINGATAN DINI — data asli BMKG ─── */}
+          <div id="peringatan-dini">
+            <WarningBanner />
+          </div>
 
           {state.status === "loading" && <WeatherLoadingState />}
           {state.status === "error" && <WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} />}
@@ -116,7 +134,9 @@ export default function DashboardPage() {
                 <div className="md:col-span-8 flex flex-col gap-6">
                   <HourlyForecast forecast={state.forecast} />
                   <SmartTips forecast={state.forecast} />
-                  <WeatherMap forecast={state.forecast} />
+                  <div id="peta-cuaca">
+                    <WeatherMap forecast={state.forecast} />
+                  </div>
                   <WeekForecast forecast={state.forecast} />
                   <CommunityReports forecast={state.forecast} />
                 </div>
@@ -136,17 +156,79 @@ export default function DashboardPage() {
 
       {/* Bottom Nav Mobile */}
       <nav className="md:hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-lg border-t border-white/50 flex justify-around py-2 px-4 z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.12)]">
-        {["home","map","warning","menu"].map((icon,i) => (
-          <a key={icon} href="#" className={`flex flex-col items-center text-xs font-geist ${i===0?"text-primary":"text-outline"}`}>
-            <span className="material-symbols-outlined text-[22px]">{icon}</span>
-            <span>{["Home","Peta","Peringatan","Menu"][i]}</span>
-          </a>
+        {[
+          { icon: "home", label: "Home", action: () => scrollTo("hero") },
+          { icon: "map", label: "Peta", action: () => scrollTo("peta-cuaca") },
+          { icon: "warning", label: "Peringatan", action: () => scrollTo("peringatan-dini") },
+          { icon: "menu", label: "Menu" },
+        ].map((item) => (
+          <button key={item.icon} onClick={"action" in item ? () => (item as any).action?.() : undefined}
+            className="flex flex-col items-center text-xs font-geist text-outline hover:text-primary transition-colors"
+          >
+            <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
+            <span>{item.label}</span>
+          </button>
         ))}
       </nav>
 
-      {/* Footer Desktop */}
-      <footer className="hidden md:block border-t border-outline-variant/30 mt-6 pt-6 pb-8 text-center text-xs text-outline/70 max-w-container-max mx-auto px-gutter">
-        ☁️ LihatLangit — Data: BMKG. Tidak untuk navigasi atau operasional kritis.
+      {/* ═══ FOOTER ═══ */}
+      <footer className="mt-10 pt-8 pb-12 border-t border-outline-variant/20 bg-white/40 backdrop-blur-sm">
+        <div className="max-w-container-max mx-auto px-gutter">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            {/* Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">☁️</span>
+                <span className="font-geist font-bold text-primary text-base">LihatLangit</span>
+              </div>
+              <p className="text-xs text-text-muted/70 leading-relaxed">
+                Dashboard prakiraan cuaca Indonesia. Data resmi dari BMKG untuk masyarakat.
+              </p>
+            </div>
+
+            {/* Navigasi */}
+            <div>
+              <h4 className="font-geist font-semibold text-xs text-text-deep uppercase tracking-wider mb-3">Navigasi</h4>
+              <div className="space-y-2">
+                {["Dashboard","Prakiraan","Peta Cuaca","Peringatan Dini"].map((item) => (
+                  <button key={item} onClick={() => scrollTo(item === "Dashboard" ? "hero" : item === "Prakiraan" ? "prakiraan-hari-ini" : item === "Peta Cuaca" ? "peta-cuaca" : "peringatan-dini")}
+                    className="block text-xs text-text-muted hover:text-primary transition-colors">
+                    {item}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sumber */}
+            <div>
+              <h4 className="font-geist font-semibold text-xs text-text-deep uppercase tracking-wider mb-3">Sumber Data</h4>
+              <div className="space-y-2 text-xs text-text-muted">
+                <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="block hover:text-primary transition-colors">BMKG ↗</a>
+                <a href="https://www.bmkg.go.id/alerts/nowcast/id" target="_blank" rel="noopener noreferrer" className="block hover:text-primary transition-colors">Peringatan Dini BMKG ↗</a>
+                <a href="https://data.bmkg.go.id/prakiraan-cuaca" target="_blank" rel="noopener noreferrer" className="block hover:text-primary transition-colors">Prakiraan Cuaca BMKG ↗</a>
+              </div>
+            </div>
+
+            {/* Kontak & Legal */}
+            <div>
+              <h4 className="font-geist font-semibold text-xs text-text-deep uppercase tracking-wider mb-3">Informasi</h4>
+              <div className="space-y-2 text-xs text-text-muted">
+                <p>Data tidak untuk navigasi atau operasional kritis.</p>
+                <p>LihatLangit bukan kanal resmi BMKG.</p>
+                <p className="text-[10px] text-text-muted/50 mt-2">© 2026 LihatLangit</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom bar */}
+          <div className="pt-4 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-2 text-[10px] text-text-muted/50">
+            <span>Dibuat dengan ☀️ untuk Indonesia</span>
+            <div className="flex gap-4">
+              <a href="#" className="hover:text-primary transition-colors">Kebijakan Privasi</a>
+              <a href="#" className="hover:text-primary transition-colors">Syarat & Ketentuan</a>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );
