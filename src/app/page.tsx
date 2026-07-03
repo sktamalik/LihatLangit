@@ -1,8 +1,3 @@
-/**
- * LihatLangit — layout persis seperti code.html
- * Urutan: Hero → Tren Chart → Grid 4+8 → Metadata → Mobile Nav → Footer
- */
-
 "use client";
 
 import { useWeather } from "@/lib/useWeather";
@@ -25,11 +20,16 @@ import type { ErrorCode } from "@/types/weather";
 
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
+  const defaultRegion = {
+    adm4: "73.71.01.1001", province: "Sulawesi Selatan", city: "Makassar",
+    district: "Mariso", village: "Mariso", latitude: -5.15, longitude: 119.407,
+    timezone: "Asia/Makassar",
+  };
 
   return (
-    <div className="flex-1 flex flex-col relative">
-      {/* ═══ TOP NAVBAR ═══ */}
-      <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/50 shadow-[0_8px_30px_rgb(14,165,233,0.1)]">
+    <div className="flex-1 flex flex-col">
+      {/* ═══ NAVBAR (paling atas, sticky) ═══ */}
+      <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/50 shadow-[0_8px_30px_rgb(14,165,233,0.08)]">
         <div className="flex justify-between items-center w-full px-mobile-margin md:px-gutter max-w-container-max mx-auto h-16">
           <div className="flex items-center gap-2">
             <span className="text-2xl">☁️</span>
@@ -48,48 +48,76 @@ export default function DashboardPage() {
       </header>
 
       {/* ═══ MAIN ═══ */}
-      <main className="flex-grow flex flex-col items-center w-full pb-24 md:pb-8 pt-6">
-        <div className="w-full max-w-container-max px-mobile-margin md:px-gutter mx-auto flex flex-col gap-6">
+      <main className="flex-1 w-full pb-24 md:pb-8 pt-6">
+        <div className="max-w-container-max mx-auto px-mobile-margin md:px-gutter flex flex-col gap-6">
 
-          {/* ─── HERO SEARCH ─── */}
-          <section className="w-full relative rounded-3xl bg-sky-surface overflow-hidden p-10 md:p-12 flex flex-col items-center justify-center text-center">
-            <div className="absolute left-0 top-1/2 -translate-x-1/4 -translate-y-1/2 pointer-events-none opacity-30 z-0">
-              <svg width="200" height="120" viewBox="0 0 200 120" fill="none"><path d="M30 90C13.43 90 0 76.57 0 60C0 43.43 13.43 30 30 30C31.5 30 33 30.1 34.5 30.3C40.5 12.5 57.5 0 77.5 0C97.5 0 114.5 12.5 120.5 30.3C122 30.1 123.5 30 125 30C144.33 30 160 45.67 160 65C160 84.33 144.33 100 125 100H30V90Z" fill="white"/></svg>
+          {/* ─── WELCOME + HERO (satu section) ─── */}
+          <section className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 text-center">
+            {/* Sun */}
+            <div className="absolute top-6 right-[12%] w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-400 shadow-lg animate-float-slow" />
+            <div className="absolute top-8 right-[12.5%] w-20 h-20 rounded-full bg-amber-200/30 blur-xl" />
+            {/* Clouds */}
+            <div className="absolute top-8 left-[4%] opacity-60 animate-float-delayed">
+              <svg width="120" height="50" viewBox="0 0 140 55" fill="none">
+                <ellipse cx="40" cy="35" rx="38" ry="15" fill="white" opacity="0.9" />
+                <circle cx="32" cy="24" r="17" fill="white" opacity="0.9" />
+                <circle cx="55" cy="22" r="14" fill="white" opacity="0.9" />
+              </svg>
             </div>
-            <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.6) 0%, transparent 40%)' }} />
-            <h1 className="font-geist text-headline-lg font-semibold text-primary mb-8 relative z-10">Cuaca di sekitarmu</h1>
-            <div className="relative w-full max-w-3xl z-10 flex flex-col gap-4">
-              <div className="glass-panel flex items-center rounded-full px-6 py-4 sky-shadow">
-                <span className="material-symbols-outlined text-outline mr-3 text-[24px]">search</span>
-                <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
+            <div className="absolute bottom-8 right-[8%] opacity-50 animate-float">
+              <svg width="90" height="40" viewBox="0 0 110 45" fill="none">
+                <ellipse cx="35" cy="30" rx="32" ry="12" fill="white" opacity="0.85" />
+                <circle cx="28" cy="20" r="14" fill="white" opacity="0.85" />
+                <circle cx="48" cy="18" r="11" fill="white" opacity="0.85" />
+              </svg>
+            </div>
+
+            <div className="relative z-10">
+              <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-md shadow-md flex items-center justify-center mx-auto mb-4">
+                <span className="text-4xl">☁️</span>
               </div>
-              <div className="flex justify-center gap-3">
-                <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="flex items-center gap-2 px-4 py-2 bg-white/50 hover:bg-white/80 transition-colors rounded-full text-primary font-label-sm border border-white/60 disabled:opacity-50">
-                  <span className="material-symbols-outlined text-[18px]">my_location</span>
-                  {state.status === "geolocating" ? "Mencari..." : "Gunakan Lokasi Saat Ini"}
+              <h1 className="font-geist text-3xl md:text-4xl font-bold text-text-deep mb-2">
+                Selamat Datang di <span className="text-primary">LihatLangit</span>
+              </h1>
+              <p className="text-text-muted max-w-xl mx-auto mb-6 text-sm md:text-base">
+                Prakiraan cuaca Indonesia dari BMKG. Cari desa/kelurahan, pantau cuaca 3 hari ke depan.
+              </p>
+
+              <div className="flex flex-wrap justify-center gap-3 mb-6">
+                <button onClick={() => searchAndSelect(defaultRegion)}
+                  className="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-geist font-semibold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
+                  Mulai Jelajahi
+                </button>
+                <button onClick={requestGeolocation} disabled={state.status === "geolocating"}
+                  className="px-6 py-2.5 bg-white/70 text-primary rounded-full text-sm font-geist font-semibold border border-white/60 hover:bg-white/90 active:scale-95 transition-all disabled:opacity-50">
+                  📍 Pakai Lokasi Saya
                 </button>
               </div>
-            </div>
-            <div className="absolute right-0 top-1/4 translate-x-1/4 pointer-events-none z-0">
-              <svg width="180" height="120" viewBox="0 0 200 120" fill="none"><path d="M45 100C25.67 100 10 84.33 10 65C10 47.5 22.8 33 39.5 30.5C44.5 15.5 58.5 5 75 5C91.5 5 105.5 15.5 110.5 30.5C115.5 28.5 121 27.5 126.5 27.5C146.5 27.5 162.5 43.5 162.5 63.5C162.5 65.5 162.5 67.5 162 69.5C178 72.5 190 86.5 190 103C190 112.5 182.5 120 173 120H45V100Z" fill="white"/></svg>
+
+              <div className="max-w-xl mx-auto">
+                <div className="glass-panel flex items-center rounded-full px-5 py-3 sky-shadow-sm">
+                  <span className="material-symbols-outlined text-outline mr-2">search</span>
+                  <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
+                </div>
+              </div>
             </div>
           </section>
 
-          {state.status === "geo-denied" && <GeoMsg msg="Izin lokasi ditolak. Anda tetap bisa mencari wilayah secara manual." />}
-          {state.status === "geo-no-match" && <GeoMsg msg="Lokasi tidak ditemukan di dataset. Silakan cari manual." />}
+          {state.status === "geo-denied" && (
+            <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">Izin lokasi ditolak. Cari manual.</div>
+          )}
+          {state.status === "geo-no-match" && (
+            <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">Lokasi tidak ditemukan.</div>
+          )}
 
           {state.status === "loading" && <WeatherLoadingState />}
           {state.status === "error" && <WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} />}
 
           {state.status === "ready" && (
             <>
-              {/* ─── TREND CHART ─── */}
               <TrendChart forecast={state.forecast} />
 
-              {/* ─── 4+8 GRID ─── */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full">
-
-                {/* LEFT COL (4) — Current Weather, Metrik, Edukasi, Laut, Matahari */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
                 <div className="md:col-span-4 flex flex-col gap-4">
                   <WeatherSummary forecast={state.forecast} />
                   <EnviroMetrics forecast={state.forecast} />
@@ -97,8 +125,6 @@ export default function DashboardPage() {
                   <SeaConditions forecast={state.forecast} />
                   <SunMoon forecast={state.forecast} />
                 </div>
-
-                {/* RIGHT COL (8) — Prakiraan, Tips, Peta, 7-Hari, Laporan */}
                 <div className="md:col-span-8 flex flex-col gap-6">
                   <HourlyForecast forecast={state.forecast} />
                   <SmartTips forecast={state.forecast} />
@@ -108,7 +134,6 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* ─── METADATA ─── */}
               <SourceAttribution
                 analysisDateUtc={state.forecast.analysisDateUtc}
                 fetchedAt={state.forecast.fetchedAt}
@@ -121,47 +146,20 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* ═══ BOTTOM NAV (MOBILE) ═══ */}
-      <nav className="bg-white/90 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.15)] flex justify-around items-center px-4 py-3 md:hidden">
-        {[
-          { icon: "home", label: "Home", active: true },
-          { icon: "map", label: "Peta", active: false },
-          { icon: "warning", label: "Peringatan", active: false },
-          { icon: "menu", label: "Menu", active: false },
-        ].map((item) => (
-          <a key={item.icon} href="#" className={`flex flex-col items-center justify-center rounded-2xl px-5 py-1.5 transition-all font-label-sm font-medium ${item.active ? "bg-sky-surface text-primary" : "text-outline hover:bg-surface-container-low"}`}>
-            <span className="material-symbols-outlined" style={{ fontVariationSettings: `'FILL' ${item.active ? 1 : 0}` }}>{item.icon}</span>
-            <span className="mt-1">{item.label}</span>
+      {/* Bottom Nav Mobile */}
+      <nav className="md:hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-lg border-t border-white/50 flex justify-around py-2 px-4 z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.12)]">
+        {["home","map","warning","menu"].map((icon,i) => (
+          <a key={icon} href="#" className={`flex flex-col items-center text-xs font-geist ${i===0?"text-primary":"text-outline"}`}>
+            <span className="material-symbols-outlined text-[22px]">{icon}</span>
+            <span>{["Home","Peta","Peringatan","Menu"][i]}</span>
           </a>
         ))}
       </nav>
 
-      {/* ═══ FOOTER (DESKTOP) ═══ */}
-      <footer className="bg-white/60 backdrop-blur-md w-full mt-6 border-t border-outline-variant/30 max-w-container-max mx-auto px-mobile-margin py-8 hidden md:flex flex-col gap-6 opacity-90 rounded-t-3xl shadow-[0_-8px_30px_rgb(14,165,233,0.05)]">
-        <div className="flex flex-col md:flex-row justify-between items-center w-full">
-          <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <span className="text-lg opacity-60">☁️</span>
-            <span className="font-label-sm font-bold text-outline">LihatLangit</span>
-          </div>
-          <div className="flex gap-6 font-label-sm text-label-sm">
-            <a className="text-outline hover:text-primary transition-colors flex items-center gap-1" href="#">
-              <span className="material-symbols-outlined text-[16px]">warning</span> Peringatan Dini
-            </a>
-            <a className="text-outline hover:text-primary transition-colors" href="#">Peta Cuaca Nasional</a>
-          </div>
-        </div>
-        <div className="flex flex-col md:flex-row justify-between items-center w-full pt-4 border-t border-outline-variant/20 text-outline text-[11px]">
-          <span>Data disediakan oleh BMKG Indonesia. Tidak untuk tujuan navigasi atau operasional kritis.</span>
-          <div className="flex gap-4 mt-4 md:mt-0">
-            <a className="hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
-            <a className="hover:text-primary transition-colors" href="#">Syarat & Ketentuan</a>
-          </div>
-        </div>
+      {/* Footer Desktop */}
+      <footer className="hidden md:block border-t border-outline-variant/30 mt-6 pt-6 pb-8 text-center text-xs text-outline/70 max-w-container-max mx-auto px-gutter">
+        ☁️ LihatLangit — Data: BMKG. Tidak untuk navigasi atau operasional kritis.
       </footer>
     </div>
   );
-}
-
-function GeoMsg({ msg }: { msg: string }) {
-  return <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">{msg}</div>;
 }

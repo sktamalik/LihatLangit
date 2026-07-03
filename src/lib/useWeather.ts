@@ -1,11 +1,11 @@
 /**
  * Hook for fetching weather data and managing dashboard state.
- * On first mount, auto-loads Makassar (Mariso) as default region.
+ * Starts in "idle" — user must click explore on welcome section or search.
  */
 
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { Region, WeatherForecast, ApiError } from "@/types/weather";
 
 export type DashboardState =
@@ -18,23 +18,10 @@ export type DashboardState =
   | { status: "geo-unavailable" }
   | { status: "geo-no-match" };
 
-/** Default region: Makassar (Mariso) */
-const DEFAULT_REGION: Region = {
-  adm4: "73.71.01.1001",
-  province: "Sulawesi Selatan",
-  city: "Makassar",
-  district: "Mariso",
-  village: "Mariso",
-  latitude: -5.15,
-  longitude: 119.407,
-  timezone: "Asia/Makassar",
-};
-
 export function useWeather() {
-  const [state, setState] = useState<DashboardState>({ status: "loading" });
+  const [state, setState] = useState<DashboardState>({ status: "idle" });
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const initialFetchDone = useRef(false);
 
   const fetchWeather = useCallback(async (adm4: string) => {
     abortRef.current?.abort();
@@ -67,15 +54,6 @@ export function useWeather() {
       });
     }
   }, []);
-
-  // Auto-fetch default Makassar data on first mount
-  useEffect(() => {
-    if (!initialFetchDone.current) {
-      initialFetchDone.current = true;
-      setSelectedRegion(DEFAULT_REGION);
-      fetchWeather(DEFAULT_REGION.adm4);
-    }
-  }, [fetchWeather]);
 
   const searchAndSelect = useCallback(
     async (region: Region) => {
