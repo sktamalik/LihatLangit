@@ -63,7 +63,28 @@ export type ApiError = {
 
 export type WeatherApiResponse = WeatherForecast | ApiError;
 
-/** BMKG raw API response shape (partial — only fields we use) */
+/** A single forecast slot from BMKG raw response */
+export type BmkgSlot = {
+  utc_datetime?: string;
+  local_datetime?: string;
+  t?: string | number | null;
+  hu?: string | number | null;
+  weather?: number;
+  weather_desc?: string;
+  weather_desc_en?: string;
+  ws?: string | number | null;
+  wd?: string | number | null;
+  wd_deg?: number;
+  tcc?: string | number | null;
+  vs_text?: string;
+  image?: string;
+  datetime?: string;
+  tp?: number;
+  time_index?: string;
+  analysis_date?: string;
+};
+
+/** BMKG raw API response shape (only fields we use) */
 export type BmkgRawResponse = {
   lokasi: {
     provinsi?: string;
@@ -73,21 +94,19 @@ export type BmkgRawResponse = {
     latitude?: string | number;
     longitude?: string | number;
     timezone?: string;
+    adm1?: string;
+    adm2?: string;
+    adm3?: string;
+    adm4?: string;
+    kotkab?: string;
+    lon?: number;
+    lat?: number;
+    type?: string;
   };
   data?: Array<{
-    cuaca?: Array<{
-      utc_datetime?: string;
-      local_datetime?: string;
-      t?: string | number | null;
-      hu?: string | number | null;
-      weather_desc?: string;
-      weather_desc_en?: string;
-      ws?: string | number | null;
-      wd?: string | number | null;
-      tcc?: string | number | null;
-      vs_text?: string;
-      image?: string;
-    }>;
+    lokasi?: Record<string, unknown>;
+    /** IMPORTANT: cuaca is an array of arrays — each sub-array contains slots grouped by time period */
+    cuaca?: BmkgSlot[][];
   }>;
   analysis_date?: string;
 };

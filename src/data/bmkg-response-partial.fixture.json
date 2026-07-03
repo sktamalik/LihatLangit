@@ -1,31 +1,34 @@
 {
   "lokasi": {
     "provinsi": "DKI Jakarta",
-    "kota": "Jakarta Pusat",
+    "kotkab": "Jakarta Pusat",
     "kecamatan": "Kemayoran",
     "desa": "Kemayoran",
     "latitude": "-6.162",
     "longitude": "106.856",
-    "timezone": "Asia/Jakarta"
+    "timezone": "Asia/Jakarta",
+    "adm4": "31.71.03.1001"
   },
   "data": [
     {
       "cuaca": [
-        {
-          "utc_datetime": "2026-07-03T03:00:00Z",
-          "local_datetime": "2026-07-03T10:00:00+07:00",
-          "t": null,
-          "hu": null,
-          "weather_desc": "Cerah Berawan",
-          "weather_desc_en": "Partly Cloudy",
-          "ws": null,
-          "wd": null,
-          "tcc": null,
-          "vs_text": "",
-          "image": ""
-        }
+        [
+          {
+            "utc_datetime": "2026-07-03 03:00:00",
+            "local_datetime": "2026-07-03 10:00:00",
+            "t": null,
+            "hu": null,
+            "weather_desc": "Cerah Berawan",
+            "weather_desc_en": "Partly Cloudy",
+            "ws": null,
+            "wd": null,
+            "tcc": null,
+            "vs_text": "",
+            "image": ""
+          }
+        ]
       ]
     }
   ],
-  "analysis_date": "2026-07-03T00:00:00Z"
+  "analysis_date": "2026-07-03T00:00:00"
 }

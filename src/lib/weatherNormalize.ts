@@ -1,5 +1,9 @@
 /**
  * Normalize raw BMKG API response into our internal WeatherForecast model.
+ *
+ * The BMKG API returns cuaca as an array of arrays. Each day's data contains
+ * multiple sub-arrays, each with several 3-hour slots. We flatten all slots,
+ * sort by local_datetime, group by date, and build the forecast model.
  */
 
 import type {
@@ -24,7 +28,21 @@ function safeString(val: string | number | null | undefined): string {
   return val;
 }
 
-/** Indonesian-ish day label for a date string */
+/**
+ * Normalize local_datetime from BMKG.
+ * BMKG returns space-separated format: "2026-07-03 16:00:00"
+ * We need ISO-like format for comparison: "2026-07-03T16:00:00"
+ */
+function normalizeLocalDateTime(dt: string): string {
+  return dt.replace(" ", "T");
+}
+
+/** Extract date portion (YYYY-MM-DD) from local_datetime */
+function extractDate(localDateTime: string): string {
+  return localDateTime.slice(0, 10);
+}
+
+/** Indonesian day label for a date string */
 function dayLabel(dateStr: string): string {
   const date = new Date(dateStr + "T00:00:00");
   const today = new Date();
@@ -42,10 +60,6 @@ function dayLabel(dateStr: string): string {
 
 /**
  * Normalize raw BMKG response into WeatherForecast.
- *
- * @param raw - Raw response from BMKG API
- * @param fallbackRegion - Optional region data from local dataset
- * @returns Normalized forecast or null if data is unusable
  */
 export function normalizeBmkgForecast(
   raw: BmkgRawResponse,
@@ -58,11 +72,11 @@ export function normalizeBmkgForecast(
   const region: Region = fallbackRegion ?? {
     adm4: "",
     province: safeString(lokasi.provinsi),
-    city: safeString(lokasi.kota),
+    city: safeString(lokasi.kotkab || lokasi.kota),
     district: safeString(lokasi.kecamatan),
     village: safeString(lokasi.desa),
-    latitude: safeNumber(lokasi.latitude) ?? undefined,
-    longitude: safeNumber(lokasi.longitude) ?? undefined,
+    latitude: safeNumber(lokasi.latitude ?? lokasi.lat) ?? undefined,
+    longitude: safeNumber(lokasi.longitude ?? lokasi.lon) ?? undefined,
     timezone: lokasi.timezone,
   };
 
@@ -84,31 +98,56 @@ export function normalizeBmkgForecast(
   }
 
   // ── Flatten all forecast points ──
+  // BMKG returns cuaca as Array<Array<slot>> — flatten the nested arrays
   const allPoints: WeatherPoint[] = [];
 
   for (const dayData of raw.data) {
     if (!dayData.cuaca || !Array.isArray(dayData.cuaca)) continue;
 
-    for (const slot of dayData.cuaca) {
-      const localDateTime = safeString(slot.local_datetime);
-      if (!localDateTime) continue;
+    for (const slotArray of dayData.cuaca) {
+      // slotArray is itself an array of slot objects
+      if (!Array.isArray(slotArray)) continue;
 
-      const point: WeatherPoint = {
-        utcDateTime: safeString(slot.utc_datetime),
-        localDateTime,
-        temperatureC: safeNumber(slot.t),
-        humidityPct: safeNumber(slot.hu),
-        weatherDescription: safeString(slot.weather_desc),
-        weatherDescriptionEn: safeString(slot.weather_desc_en) || undefined,
-        windSpeedKmh: safeNumber(slot.ws),
-        windDirection: safeString(slot.wd) || null,
-        cloudCoverPct: safeNumber(slot.tcc),
-        visibilityText: safeString(slot.vs_text) || null,
-        iconUrl: slot.image || undefined,
-      };
+      for (const slot of slotArray) {
+        if (!slot || typeof slot !== "object") continue;
 
-      allPoints.push(point);
+        // BMKG local_datetime uses space separator: "2026-07-03 16:00:00"
+        const rawLocalDateTime = safeString(slot.local_datetime);
+        if (!rawLocalDateTime) continue;
+
+        const localDateTime = normalizeLocalDateTime(rawLocalDateTime);
+
+        const point: WeatherPoint = {
+          utcDateTime: safeString(slot.utc_datetime || slot.datetime),
+          localDateTime,
+          temperatureC: safeNumber(slot.t),
+          humidityPct: safeNumber(slot.hu),
+          weatherDescription: safeString(slot.weather_desc),
+          weatherDescriptionEn: safeString(slot.weather_desc_en) || undefined,
+          windSpeedKmh: safeNumber(slot.ws),
+          windDirection: safeString(slot.wd) || null,
+          cloudCoverPct: safeNumber(slot.tcc),
+          visibilityText: safeString(slot.vs_text) || null,
+          iconUrl: slot.image || undefined,
+        };
+
+        allPoints.push(point);
+      }
     }
+  }
+
+  // ── If no valid points found ──
+  if (allPoints.length === 0) {
+    return {
+      source: "BMKG",
+      region,
+      analysisDateUtc,
+      fetchedAt: now,
+      fromCache: false,
+      isStale: false,
+      nearestPoint: null,
+      days: [],
+    };
   }
 
   // ── Sort by local_datetime ──
@@ -120,7 +159,7 @@ export function normalizeBmkgForecast(
   const dayMap = new Map<string, WeatherPoint[]>();
 
   for (const point of allPoints) {
-    const dateKey = point.localDateTime.slice(0, 10); // "2026-07-03"
+    const dateKey = extractDate(point.localDateTime);
     const existing = dayMap.get(dateKey) ?? [];
     existing.push(point);
     dayMap.set(dateKey, existing);

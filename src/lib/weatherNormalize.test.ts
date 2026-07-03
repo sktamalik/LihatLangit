@@ -25,7 +25,7 @@ describe("normalizeBmkgForecast", () => {
 
   it("has analysis_date from fixture", () => {
     const result = normalizeBmkgForecast(fullFixture as unknown as BmkgRawResponse);
-    expect(result!.analysisDateUtc).toBe("2026-07-03T00:00:00Z");
+    expect(result!.analysisDateUtc).toBe("2026-07-03T00:00:00");
   });
 
   it("sorts points by localDateTime", () => {

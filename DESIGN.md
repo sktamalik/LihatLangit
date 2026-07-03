@@ -196,3 +196,765 @@ The shape language is "Soft-Organic." By using a **Rounded** (0.5rem) base, we a
 
 **Empty State:**
 - Centered illustration of a soft, stylized sun hiding behind a cloud. Large, friendly Geist heading inviting the user to "Cari wilayahmu untuk memulai."
+
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>LihatLangit - Dashboard</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-lowest": "#ffffff",
+                      "outline": "#6e7881",
+                      "on-tertiary-fixed": "#2c1600",
+                      "text-muted": "#64748B",
+                      "on-secondary-fixed": "#001f2a",
+                      "surface-dim": "#d6dae0",
+                      "inverse-on-surface": "#edf1f7",
+                      "text-deep": "#0C4A6E",
+                      "cloud-white": "#FFFFFF",
+                      "surface-container-highest": "#dee3e9",
+                      "secondary-container": "#bae6fd",
+                      "primary-fixed-dim": "#89ceff",
+                      "surface-bright": "#f6faff",
+                      "background": "#f6faff",
+                      "tertiary-fixed": "#ffdcbd",
+                      "primary": "#006591",
+                      "inverse-primary": "#89ceff",
+                      "surface-container-low": "#f0f4fa",
+                      "secondary-fixed-dim": "#a1cde3",
+                      "outline-variant": "#bec8d2",
+                      "surface-variant": "#dee3e9",
+                      "on-secondary-fixed-variant": "#1e4c5f",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#c9e6ff",
+                      "on-background": "#171c20",
+                      "on-surface-variant": "#3e4850",
+                      "error": "#ba1a1a",
+                      "tertiary": "#8a5100",
+                      "secondary": "#396477",
+                      "surface-container": "#eaeef4",
+                      "on-surface": "#171c20",
+                      "on-error": "#ffffff",
+                      "inverse-surface": "#2c3135",
+                      "on-primary-container": "#003751",
+                      "surface-container-high": "#e4e8ee",
+                      "on-secondary-container": "#3d687c",
+                      "secondary-fixed": "#bee9ff",
+                      "surface": "#f6faff",
+                      "sky-surface": "#E0F2FE",
+                      "surface-tint": "#006591",
+                      "on-primary-fixed": "#001e2f",
+                      "on-tertiary-container": "#4d2b00",
+                      "tertiary-container": "#de8712",
+                      "on-primary": "#ffffff",
+                      "sun-accent": "#F59E0B",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed-variant": "#004c6e",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed-variant": "#693c00",
+                      "primary-container": "#0ea5e9",
+                      "tertiary-fixed-dim": "#ffb86e"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px",
+                      "2xl": "1rem",
+                      "3xl": "1.5rem"
+              },
+              "spacing": {
+                      "margin-mobile": "1rem",
+                      "container-max": "1200px",
+                      "gutter": "1.5rem",
+                      "stack-gap": "2rem",
+                      "card-padding": "1.5rem"
+              },
+              "fontFamily": {
+                      "body-lg": [
+                              "Geist",
+                              "sans-serif"
+                      ],
+                      "body-md": [
+                              "Geist",
+                              "sans-serif"
+                      ],
+                      "label-sm": [
+                              "Geist",
+                              "sans-serif"
+                      ],
+                      "headline-lg": [
+                              "Geist",
+                              "sans-serif"
+                      ],
+                      "headline-md": [
+                              "Geist",
+                              "sans-serif"
+                      ],
+                      "display-temp": [
+                              "Geist",
+                              "sans-serif"
+                      ]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-temp": [
+                              "64px",
+                              {
+                                      "lineHeight": "72px",
+                                      "letterSpacing": "-0.04em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #f6faff; /* surface */
+            font-family: 'Geist', sans-serif;
+        }
+        
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        
+        .sky-shadow {
+            box-shadow: 0 12px 48px -12px rgba(14, 165, 233, 0.15);
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Graph line */
+        .trend-line {
+            stroke: #0ea5e9;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+        }
+        .trend-area {
+            fill: url(#blue-gradient);
+            opacity: 0.2;
+        }
+        .trend-line-alt {
+            stroke: #f59e0b;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 4;
+        }
+    </style>
+</head>
+<body class="text-on-surface antialiased min-h-screen flex flex-col relative"><div class="cloud-left absolute left-0 top-1/2 -translate-x-1/3 pointer-events-none opacity-30 z-0">
+<svg fill="none" height="240" viewBox="0 0 200 120" width="400" xmlns="http://www.w3.org/2000/svg">
+<path d="M30 90C13.43 90 0 76.57 0 60C0 43.43 13.43 30 30 30C31.5 30 33 30.1 34.5 30.3C40.5 12.5 57.5 0 77.5 0C97.5 0 114.5 12.5 120.5 30.3C122 30.1 123.5 30 125 30C144.33 30 160 45.67 160 65C160 84.33 144.33 100 125 100H30V90Z" fill="#FFFFFF"></path>
+</svg>
+</div><div class="cloud-right absolute right-0 top-1/4 translate-x-1/4 pointer-events-none opacity-40 z-0">
+<svg fill="none" height="180" viewBox="0 0 200 120" width="300" xmlns="http://www.w3.org/2000/svg">
+<path d="M45 100C25.67 100 10 84.33 10 65C10 47.5 22.8 33 39.5 30.5C44.5 15.5 58.5 5 75 5C91.5 5 105.5 15.5 110.5 30.5C115.5 28.5 121 27.5 126.5 27.5C146.5 27.5 162.5 43.5 162.5 63.5C162.5 65.5 162.5 67.5 162 69.5C178 72.5 190 86.5 190 103C190 112.5 182.5 120 173 120H45V100Z" fill="#E0F2FE"></path>
+</svg>
+</div><div class="cloud-right absolute right-0 top-2/3 translate-x-1/3 pointer-events-none opacity-20 z-10">
+<svg fill="none" height="240" viewBox="0 0 200 120" width="400" xmlns="http://www.w3.org/2000/svg">
+<path d="M45 100C25.67 100 10 84.33 10 65C10 47.5 22.8 33 39.5 30.5C44.5 15.5 58.5 5 75 5C91.5 5 105.5 15.5 110.5 30.5C115.5 28.5 121 27.5 126.5 27.5C146.5 27.5 162.5 43.5 162.5 63.5C162.5 65.5 162.5 67.5 162 69.5C178 72.5 190 86.5 190 103C190 112.5 182.5 120 173 120H45V100Z" fill="#E0F2FE"></path>
+</svg>
+</div><div class="cloud-left absolute left-0 top-1/3 -translate-x-1/2 pointer-events-none opacity-20 z-10">
+<svg fill="none" height="180" viewBox="0 0 200 120" width="300" xmlns="http://www.w3.org/2000/svg">
+<path d="M45 100C25.67 100 10 84.33 10 65C10 47.5 22.8 33 39.5 30.5C44.5 15.5 58.5 5 75 5C91.5 5 105.5 15.5 110.5 30.5C115.5 28.5 121 27.5 126.5 27.5C146.5 27.5 162.5 43.5 162.5 63.5C162.5 65.5 162.5 67.5 162 69.5C178 72.5 190 86.5 190 103C190 112.5 182.5 120 173 120H45V100Z" fill="#E0F2FE"></path>
+</svg>
+</div>
+<!-- TopNavBar -->
+<header class="bg-white/80 dark:bg-surface-container/80 backdrop-blur-xl docked full-width top-0 sticky z-50 border-b border-white/50 dark:border-outline-variant/30 shadow-[0_8px_30px_rgb(14,165,233,0.1)]">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-gutter max-w-container-max mx-auto h-16">
+<!-- Brand -->
+<div class="flex items-center gap-2">
+<img alt="LihatLangit Logo" class="h-8 w-8 object-contain" src="https://lh3.googleusercontent.com/aida/AP1WRLs57ZSjD2SnQyhJ20arxy7wTEJBDH7jUS-u9TZ9iTv2ZXmgZdjuk2WTKmmlH60qb3HzxXqmgHauT4WUH1tJwgf_CG4fAWEfCf670z11tg6-YogN8kJYSVVZSZfWISBLzm8_EB9FWVeuGnx0p68xmp-a4BuaPy2NQLmtAQ9rxr1K4SCMBRfcW1DWpVRlKVMwTdjERUIZj1WVlsyMMe-ORParkb1TJcVCA3MgEjLO26Rlw57eanIk">
+<span class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim">LihatLangit</span>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary pb-1 active:scale-95 transition-transform hover:text-primary-container transition-colors duration-300 font-label-sm text-label-sm" href="#">Dashboard</a>
+<a class="text-on-surface-variant dark:text-surface-variant active:scale-95 transition-transform hover:text-primary-container transition-colors duration-300 font-label-sm text-label-sm" href="#">Map</a>
+<a class="text-on-surface-variant dark:text-surface-variant active:scale-95 transition-transform hover:text-primary-container transition-colors duration-300 font-label-sm text-label-sm" href="#">History</a>
+</nav>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-4 text-primary dark:text-primary-fixed-dim">
+<button class="hover:text-primary-container transition-colors duration-300"><span class="material-symbols-outlined">location_on</span></button>
+<button class="hover:text-primary-container transition-colors duration-300"><span class="material-symbols-outlined">settings</span></button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center w-full pb-24 md:pb-8 pt-6">
+<div class="w-full max-w-container-max px-margin-mobile md:px-gutter mx-auto flex flex-col gap-stack-gap">
+<!-- Hero Search Section -->
+<section class="w-full relative rounded-3xl bg-sky-surface overflow-hidden p-10 md:p-12 flex flex-col items-center justify-center text-center"><div class="absolute left-0 top-1/2 -translate-x-1/4 -translate-y-1/2 pointer-events-none z-0">
+  <svg width="300" height="180" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 90C13.43 90 0 76.57 0 60C0 43.43 13.43 30 30 30C31.5 30 33 30.1 34.5 30.3C40.5 12.5 57.5 0 77.5 0C97.5 0 114.5 12.5 120.5 30.3C122 30.1 123.5 30 125 30C144.33 30 160 45.67 160 65C160 84.33 144.33 100 125 100H30V90Z" fill="#FFFFFF" class=""></path>
+  </svg>
+</div>
+<!-- Background Decoration -->
+<div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.6) 0%, transparent 40%);"></div>
+<h1 class="font-headline-lg text-headline-lg text-primary mb-8 relative z-10">Cuaca di sekitarmu</h1>
+<div class="relative w-full max-w-3xl z-10 flex flex-col gap-4">
+<div class="glass-panel flex items-center rounded-full px-6 py-4 sky-shadow">
+<span class="material-symbols-outlined text-outline mr-3 text-[24px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-lg text-body-lg text-on-surface placeholder-outline/70 outline-none" placeholder="Cari Desa atau Kecamatan..." type="text">
+<button aria-label="Search" class="ml-3 p-3 bg-primary text-white rounded-full hover:bg-primary-container transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+</div>
+<div class="flex justify-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 bg-white/50 hover:bg-white/80 transition-colors rounded-full text-primary font-label-sm border border-white/60">
+<span class="material-symbols-outlined text-[18px]">my_location</span>
+Gunakan Lokasi Saat Ini
+</button>
+</div>
+</div>
+<div class="absolute right-0 top-1/4 translate-x-1/4 pointer-events-none z-0">
+  <svg width="250" height="150" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M45 100C25.67 100 10 84.33 10 65C10 47.5 22.8 33 39.5 30.5C44.5 15.5 58.5 5 75 5C91.5 5 105.5 15.5 110.5 30.5C115.5 28.5 121 27.5 126.5 27.5C146.5 27.5 162.5 43.5 162.5 63.5C162.5 65.5 162.5 67.5 162 69.5C178 72.5 190 86.5 190 103C190 112.5 182.5 120 173 120H45V100Z" fill="#FFFFFF" class=""></path>
+  </svg>
+</div></section>
+<!-- Interactive Weather Trends (Chart) -->
+<section class="w-full glass-panel rounded-3xl p-card-padding sky-shadow">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-headline-md text-headline-md text-primary">Tren Cuaca 24 Jam</h2>
+<div class="flex gap-4 font-label-sm">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-primary-container"></span> Suhu</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-sun-accent"></span> Kelembapan</div>
+</div>
+</div>
+<div class="w-full h-[200px] relative overflow-hidden flex items-end">
+<svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 200">
+<defs>
+<linearGradient id="blue-gradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0ea5e9"></stop>
+<stop offset="100%" stop-color="transparent"></stop>
+</linearGradient>
+</defs>
+<path class="trend-area" d="M0,150 L100,140 L200,120 L300,100 L400,90 L500,100 L600,120 L700,140 L800,150 L900,160 L1000,160 L1000,200 L0,200 Z"></path>
+<path class="trend-line" d="M0,150 L100,140 L200,120 L300,100 L400,90 L500,100 L600,120 L700,140 L800,150 L900,160 L1000,160"></path>
+<path class="trend-line-alt" d="M0,120 L100,130 L200,140 L300,150 L400,140 L500,130 L600,120 L700,110 L800,100 L900,110 L1000,120"></path>
+</svg>
+<div class="absolute bottom-0 w-full flex justify-between px-4 pb-2 text-outline font-label-sm">
+<span class="">09:00</span><span class="">12:00</span><span class="">15:00</span><span class="">18:00</span><span class="">21:00</span><span class="">00:00</span>
+</div>
+</div>
+</section>
+<!-- Grid Layout for Weather Content -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter w-full">
+<!-- Left Column: Current Weather (md:col-span-4) -->
+<div class="md:col-span-4 flex flex-col gap-4">
+<!-- Current Weather Card -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col items-center text-center relative overflow-hidden"><!-- Decorative Clouds for Hero Card -->
+<div class="absolute left-0 top-1/4 -translate-x-1/2 pointer-events-none opacity-30 z-0">
+  <svg width="120" height="80" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 90C13.43 90 0 76.57 0 60C0 43.43 13.43 30 30 30C31.5 30 33 30.1 34.5 30.3C40.5 12.5 57.5 0 77.5 0C97.5 0 114.5 12.5 120.5 30.3C122 30.1 123.5 30 125 30C144.33 30 160 45.67 160 65C160 84.33 144.33 100 125 100H30V90Z" fill="#FFFFFF"></path>
+  </svg>
+</div>
+<div class="absolute top-3 right-3 flex items-center gap-1 text-primary bg-sky-surface px-2 py-1 rounded-full border border-white/50">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+<span class="font-label-sm text-[11px]">Jakarta Selatan</span>
+</div>
+<div class="mt-6 mb-1">
+<span class="material-symbols-outlined text-[72px] text-sun-accent drop-shadow-md" style="font-variation-settings: 'FILL' 1;">early_on</span>
+</div>
+<div class="font-display-temp text-[48px] leading-tight text-text-deep mb-0">32°</div>
+<div class="font-headline-md text-[18px] text-primary mb-4">Cerah Berawan</div>
+<div class="w-full grid grid-cols-2 gap-y-3 gap-x-2 border-t border-outline-variant/20 pt-4">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-outline mb-0.5 text-[20px]">humidity_percentage</span>
+<span class="text-[10px] text-outline">Kelembapan</span>
+<span class="text-[14px] text-on-surface font-semibold">65%</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-outline mb-0.5 text-[20px]">air</span>
+<span class="text-[10px] text-outline">Angin</span>
+<span class="text-[14px] text-on-surface font-semibold">12 km/h</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-outline mb-0.5 text-[20px]">visibility</span>
+<span class="text-[10px] text-outline">Jarak Pandang</span>
+<span class="text-[14px] text-on-surface font-semibold">10 km</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-outline mb-0.5 text-[20px]">compress</span>
+<span class="text-[10px] text-outline">Tekanan</span>
+<span class="text-[14px] text-on-surface font-semibold">1012 hPa</span>
+</div>
+</div></div>
+<!-- Detailed Environmental Metrics -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col gap-4"><h2 class="font-headline-md text-[18px] font-semibold text-primary mb-1">Metrik Lingkungan</h2>
+<div class="grid grid-cols-1 gap-2">
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl border border-white/60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-green-600 text-[20px]">air</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-outline leading-none">AQI</span>
+<span class="text-[13px] font-semibold text-green-700">45 (Baik)</span>
+</div>
+</div>
+<div class="text-[10px] text-outline text-right">
+PM2.5: 12<br>PM10: 20
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl border border-white/60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-orange-500 text-[20px]">light_mode</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-outline leading-none">Indeks UV</span>
+<span class="text-[13px] font-semibold text-orange-600">6 (Sedang)</span>
+</div>
+</div>
+<span class="text-[10px] text-outline max-w-[80px] text-right">Gunakan tabir surya.</span>
+</div>
+<div class="flex items-center justify-between p-3 bg-surface-container-low rounded-xl border border-white/60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-500 text-[20px]">routine</span>
+<div class="flex flex-col">
+<span class="text-[10px] text-outline leading-none">Fase Bulan</span>
+<span class="text-[13px] font-semibold text-on-surface">Crescent</span>
+</div>
+</div>
+<div class="text-[10px] text-outline text-right">
+05:45 ↑<br>17:50 ↓
+</div>
+</div>
+</div></div>
+<!-- Weather Education & News -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col"><h2 class="font-headline-md text-[18px] font-semibold text-primary mb-3 flex items-center gap-2"><span class="material-symbols-outlined text-[20px]">school</span> Edukasi &amp; Berita</h2>
+<div class="flex flex-col gap-3">
+<div class="p-3 bg-blue-50/50 rounded-xl border border-blue-100">
+<h3 class="text-[12px] font-semibold text-primary-container mb-0.5">Kenapa sangat lembap?</h3>
+<p class="text-[12px] text-on-surface-variant leading-snug">Angin monsun membawa uap air dari lautan ke wilayah Anda.</p>
+</div>
+<div class="p-3 bg-green-100/20 rounded-xl border border-green-100/30">
+<h3 class="text-[12px] font-semibold text-green-700 mb-0.5">Tips Cuaca Panas</h3>
+<p class="text-[12px] text-on-surface-variant leading-snug">Pastikan hidrasi cukup saat indeks UV mencapai level sedang.</p>
+</div>
+<a href="#" class="text-[11px] text-primary font-medium hover:underline self-end px-1">Lihat Semua Berita →</a>
+</div></div><!-- Sea Conditions Card -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+  <h2 class="font-headline-md text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
+    <span class="material-symbols-outlined text-[20px]">waves</span> Kondisi Laut
+  </h2>
+  <div class="flex flex-col gap-3">
+    <div class="p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex justify-between items-center">
+      <div class="flex flex-col">
+        <span class="text-[10px] text-outline leading-none mb-1">Gelombang</span>
+        <span class="text-[13px] font-semibold text-on-surface">0.5 - 1.25m (Rendah)</span>
+      </div>
+      <span class="material-symbols-outlined text-primary opacity-40">water</span>
+    </div>
+    <div class="p-3 bg-blue-50/50 rounded-xl border border-blue-100 flex justify-between items-center">
+      <div class="flex flex-col">
+        <span class="text-[10px] text-outline leading-none mb-1">Suhu Laut</span>
+        <span class="text-[13px] font-semibold text-on-surface">29°C</span>
+      </div>
+      <span class="material-symbols-outlined text-primary opacity-40">thermostat</span>
+    </div>
+  </div>
+</div>
+
+<!-- Sun & Moon Timeline Card -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col flex-grow">
+  <h2 class="font-headline-md text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
+    <span class="material-symbols-outlined text-[20px]">brightness_low</span> Matahari &amp; Bulan
+  </h2>
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between py-2 border-b border-outline-variant/20">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-sun-accent text-[18px]">wb_sunny</span>
+        <span class="text-[13px] text-on-surface">Terbit</span>
+      </div>
+      <span class="text-[13px] font-bold text-on-surface">05:45</span>
+    </div>
+    <div class="flex items-center justify-between py-2 border-b border-outline-variant/20">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-orange-500 text-[18px]">wb_twilight</span>
+        <span class="text-[13px] text-on-surface">Terbenam</span>
+      </div>
+      <span class="text-[13px] font-bold text-on-surface">17:50</span>
+    </div>
+    <div class="flex items-center justify-between py-2">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-indigo-500 text-[18px]">dark_mode</span>
+        <span class="text-[13px] text-on-surface">Bulan</span>
+      </div>
+      <div class="text-right">
+        <div class="text-[13px] font-bold text-on-surface">Sabit Awal</div>
+        <div class="text-[10px] text-outline">12% Iluminasi</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<!-- Right Column: Forecasts & More (md:col-span-8) -->
+<div class="md:col-span-8 flex flex-col gap-gutter">
+<!-- Hourly Forecast Timeline -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Prakiraan Hari Ini</h2>
+<div class="flex gap-4 overflow-x-auto hide-scrollbar pb-4 pt-2 px-2">
+<!-- Time Slot (Past) -->
+<div class="flex-shrink-0 flex flex-col items-center p-4 rounded-2xl min-w-[90px] opacity-60 hover:bg-white/40 transition-colors">
+<span class="font-label-sm text-label-sm text-outline mb-3">09:00</span>
+<span class="material-symbols-outlined text-sun-accent mb-3 text-[28px]" style="font-variation-settings: 'FILL' 1;">sunny</span>
+<span class="font-body-md text-body-md font-semibold">29°</span>
+</div>
+<!-- Time Slot (Current) -->
+<div class="flex-shrink-0 flex flex-col items-center p-4 rounded-2xl min-w-[90px] bg-secondary-container/60 border border-primary/20 shadow-sm relative transform -translate-y-2">
+
+<span class="font-label-sm text-label-sm text-primary font-bold mb-3 mt-1">12:00</span>
+<span class="material-symbols-outlined text-sun-accent mb-3 text-[32px]" style="font-variation-settings: 'FILL' 1;">early_on</span>
+<span class="font-body-md text-body-md font-bold text-primary text-[18px]">32°</span>
+</div>
+<!-- Time Slot (Future) -->
+<div class="flex-shrink-0 flex flex-col items-center p-4 rounded-2xl min-w-[90px] hover:bg-white/60 transition-colors cursor-pointer">
+<span class="font-label-sm text-label-sm text-outline mb-3">15:00</span>
+<span class="material-symbols-outlined text-outline mb-3 text-[28px]" style="font-variation-settings: 'FILL' 1;">cloud</span>
+<span class="font-body-md text-body-md font-semibold">30°</span>
+</div>
+<!-- Time Slot (Future) -->
+<div class="flex-shrink-0 flex flex-col items-center p-4 rounded-2xl min-w-[90px] hover:bg-white/60 transition-colors cursor-pointer">
+<span class="font-label-sm text-label-sm text-outline mb-3">18:00</span>
+<span class="material-symbols-outlined text-text-deep mb-3 text-[28px]" style="font-variation-settings: 'FILL' 1;">rainy</span>
+<span class="font-body-md text-body-md font-semibold text-primary">26°</span>
+<div class="text-[10px] text-primary font-medium mt-1">40%</div>
+</div>
+<!-- Time Slot (Future) -->
+<div class="flex-shrink-0 flex flex-col items-center p-4 rounded-2xl min-w-[90px] hover:bg-white/60 transition-colors cursor-pointer">
+<span class="font-label-sm text-label-sm text-outline mb-3">21:00</span>
+<span class="material-symbols-outlined text-text-deep mb-3 text-[28px]" style="font-variation-settings: 'FILL' 1;">cloud</span>
+<span class="font-body-md text-body-md font-semibold">25°</span>
+</div>
+<!-- Time Slot (Future) -->
+<div class="flex-shrink-0 flex flex-col items-center p-4 rounded-2xl min-w-[90px] hover:bg-white/60 transition-colors cursor-pointer">
+<span class="font-label-sm text-label-sm text-outline mb-3">00:00</span>
+<span class="material-symbols-outlined text-text-deep mb-3 text-[28px]" style="font-variation-settings: 'FILL' 1;">clear_night</span>
+<span class="font-body-md text-body-md font-semibold">24°</span>
+</div>
+</div>
+</div>
+<!-- Smart Daily Recommendations -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+<h2 class="font-headline-md text-[20px] font-semibold text-primary mb-4">Rekomendasi Pintar</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="flex flex-col items-center text-center p-4 rounded-2xl bg-white/50 border border-white/60 hover:bg-white/80 transition-colors">
+<div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">directions_run</span>
+</div>
+<h3 class="font-label-sm font-semibold mb-1">Kesehatan</h3>
+<p class="font-body-md text-sm text-on-surface">Waktu tepat untuk olahraga outdoor (Sore hari).</p>
+</div>
+<div class="flex flex-col items-center text-center p-4 rounded-2xl bg-white/50 border border-white/60 hover:bg-white/80 transition-colors">
+<div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">laundry</span>
+</div>
+<h3 class="font-label-sm font-semibold mb-1">Rumah</h3>
+<p class="font-body-md text-sm text-on-surface">Cocok untuk menjemur pakaian hari ini.</p>
+</div>
+<div class="flex flex-col items-center text-center p-4 rounded-2xl bg-orange-50 border border-orange-100 hover:bg-orange-100/80 transition-colors">
+<div class="w-12 h-12 rounded-full bg-orange-200 text-orange-600 flex items-center justify-center mb-3">
+<span class="material-symbols-outlined">umbrella</span>
+</div>
+<h3 class="font-label-sm font-semibold mb-1">Aktivitas</h3>
+<p class="font-body-md text-sm text-on-surface">Siapkan payung jika keluar setelah jam 18:00.</p>
+</div>
+</div>
+</div>
+<!-- Enhanced Map Section -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-md text-[20px] font-semibold text-primary">Peta Cuaca Interaktif</h2>
+<div class="flex gap-2">
+<button class="px-3 py-1 bg-primary text-white rounded-full font-label-sm text-xs">Hujan</button>
+<button class="px-3 py-1 bg-white border border-outline/30 text-outline rounded-full font-label-sm text-xs hover:bg-surface-container-low">Awan</button>
+<button class="px-3 py-1 bg-white border border-outline/30 text-outline rounded-full font-label-sm text-xs hover:bg-surface-container-low">Suhu</button>
+</div>
+</div>
+<div class="w-full flex-grow bg-surface-container-low rounded-2xl border border-white/60 overflow-hidden relative min-h-[300px] flex items-center justify-center">
+<!-- Placeholder for Map -->
+<div class="absolute inset-0 bg-blue-50/50"></div>
+<span class="material-symbols-outlined text-outline/30 text-[64px] absolute">map</span>
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<svg class="w-full h-full opacity-20" fill="none" stroke="currentColor" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<path d="M10,50 Q30,20 50,50 T90,50" stroke-width="2"></path>
+<path d="M10,70 Q30,40 50,70 T90,70" stroke-width="2"></path>
+<path d="M50,10 Q20,30 50,50 T50,90" stroke-width="2"></path>
+</svg>
+</div>
+<!-- Mock Radar Overlay -->
+<div class="absolute top-1/2 left-1/2 w-24 h-24 bg-blue-400/40 rounded-full blur-xl transform -translate-x-1/2 -translate-y-1/2 animate-pulse"></div>
+<div class="absolute top-1/3 left-1/3 w-20 h-20 bg-green-400/30 rounded-full blur-xl"></div>
+<div class="absolute top-2/3 left-2/3 w-32 h-32 bg-yellow-400/20 rounded-full blur-2xl"></div>
+<!-- Map Controls -->
+<div class="absolute right-4 bottom-4 flex flex-col gap-2">
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center hover:bg-gray-50"><span class="material-symbols-outlined text-[20px]">add</span></button>
+<button class="w-8 h-8 bg-white rounded-full shadow flex items-center justify-center hover:bg-gray-50"><span class="material-symbols-outlined text-[20px]">remove</span></button>
+</div>
+</div>
+</div>
+<!-- 7-Day Extended Outlook -->
+<div class="glass-panel rounded-3xl p-card-padding sky-shadow">
+<h2 class="font-headline-md text-headline-md text-primary mb-4">Perkiraan 7 Hari</h2>
+<div class="flex flex-col gap-2">
+<!-- Day 1 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-semibold w-24 text-primary">Hari Ini</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-sun-accent text-[24px]" style="font-variation-settings: 'FILL' 1;">early_on</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-primary font-label-sm text-xs">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 10%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">24°</span>
+<span class="font-body-md text-body-md font-bold text-on-surface">32°</span>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/20 mx-auto w-[95%]"></div>
+<!-- Day 2 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-medium w-24 text-on-surface-variant">Besok</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-text-deep text-[24px]" style="font-variation-settings: 'FILL' 1;">rainy</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-primary font-label-sm text-xs">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 60%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">25°</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">29°</span>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/20 mx-auto w-[95%]"></div>
+<!-- Day 3 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-medium w-24 text-on-surface-variant">Senin</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-sun-accent text-[24px]" style="font-variation-settings: 'FILL' 1;">sunny</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-outline font-label-sm text-xs">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 5%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">26°</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">33°</span>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/20 mx-auto w-[95%]"></div>
+<!-- Day 4 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-medium w-24 text-on-surface-variant">Selasa</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-outline text-[24px]" style="font-variation-settings: 'FILL' 1;">cloud</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-primary font-label-sm text-xs">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 30%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">25°</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">31°</span>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/20 mx-auto w-[95%]"></div>
+<!-- Day 5 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-medium w-24 text-on-surface-variant">Rabu</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-sun-accent text-[24px]" style="font-variation-settings: 'FILL' 1;">early_on</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-outline font-label-sm text-xs">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 10%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">25°</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">32°</span>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/20 mx-auto w-[95%]"></div>
+<!-- Day 6 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-medium w-24 text-on-surface-variant">Kamis</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-text-deep text-[24px]" style="font-variation-settings: 'FILL' 1;">thunderstorm</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-primary font-label-sm text-xs font-bold">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 80%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">24°</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">28°</span>
+</div>
+</div>
+<div class="h-px w-full bg-outline-variant/20 mx-auto w-[95%]"></div>
+<!-- Day 7 -->
+<div class="flex items-center justify-between p-3 rounded-2xl hover:bg-white/60 transition-colors cursor-pointer border border-transparent hover:border-white/80">
+<span class="font-body-md text-body-md font-medium w-24 text-on-surface-variant">Jumat</span>
+<div class="flex items-center gap-2 w-16">
+<span class="material-symbols-outlined text-text-deep text-[24px]" style="font-variation-settings: 'FILL' 1;">rainy</span>
+</div>
+<div class="flex items-center gap-2 w-16 text-primary font-label-sm text-xs">
+<span class="material-symbols-outlined text-[14px]">water_drop</span> 50%
+</div>
+<div class="flex items-center gap-4 w-32 justify-end">
+<span class="font-body-md text-body-md text-outline">24°</span>
+<span class="font-body-md text-body-md font-semibold text-on-surface">29°</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Local Community Report -->
+
+</div>
+</div><div class="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col border border-primary-container/20">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-headline-md text-[20px] font-semibold text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">forum</span> Laporan Warga
+        </h2>
+<button class="text-label-sm text-primary hover:underline font-medium">Laporkan Cuaca</button>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex gap-3 p-3 bg-white/40 rounded-xl">
+<div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold text-xs">A</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-sm font-semibold text-on-surface">Andi</span>
+<span class="text-[10px] text-outline">10 mnt lalu • Kemayoran</span>
+</div>
+<p class="font-body-md text-sm text-on-surface-variant">Hujan deras mulai turun di daerah Kemayoran, hati-hati yang sedang berkendara.</p>
+</div>
+</div>
+<div class="flex gap-3 p-3 bg-white/40 rounded-xl">
+<div class="w-8 h-8 rounded-full bg-blue-200 flex items-center justify-center text-blue-600 font-bold text-xs">S</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-sm font-semibold text-on-surface">Siti</span>
+<span class="text-[10px] text-outline">45 mnt lalu • Tebet</span>
+</div>
+<p class="font-body-md text-sm text-on-surface-variant">Gerimis rintik-rintik saja di sini, lumayan sejuk.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Metadata Info -->
+<div class="w-full flex flex-col md:flex-row justify-between items-center opacity-70 p-4 font-label-sm text-label-sm text-outline mt-6 bg-surface-container-low/50 rounded-2xl">
+<div class="flex items-center gap-2 mb-2 md:mb-0">
+<span class="material-symbols-outlined text-[16px]">info</span>
+<span class="">Sumber data: Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)</span>
+</div>
+<div class="flex gap-4">
+<span class="">Update Terakhir: Hari ini, 10:30 WIB</span>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="bg-white/90 dark:bg-surface-container-high/90 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.15)] shadow-lg fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 md:hidden">
+<a class="flex flex-col items-center justify-center bg-sky-surface dark:bg-on-secondary-fixed-variant text-primary dark:text-primary-fixed rounded-2xl px-5 py-1.5 hover:bg-surface-container-low active:scale-90 transition-all font-label-sm text-label-sm font-medium" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-container-low active:scale-90 transition-all font-label-sm text-label-sm rounded-2xl px-5 py-1.5" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="mt-1">Peta</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-container-low active:scale-90 transition-all font-label-sm text-label-sm rounded-2xl px-5 py-1.5" href="#">
+<span class="material-symbols-outlined">warning</span>
+<span class="mt-1">Peringatan</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:bg-surface-container-low active:scale-90 transition-all font-label-sm text-label-sm rounded-2xl px-5 py-1.5" href="#">
+<span class="material-symbols-outlined">menu</span>
+<span class="mt-1">Menu</span>
+</a>
+</nav>
+<!-- Footer (Desktop) -->
+<footer class="bg-white/60 backdrop-blur-md w-full mt-stack-gap border-t border-outline-variant/30 max-w-container-max mx-auto px-margin-mobile py-8 hidden md:flex flex-col gap-6 opacity-90 rounded-t-3xl shadow-[0_-8px_30px_rgb(14,165,233,0.05)]">
+<div class="flex flex-col md:flex-row justify-between items-center w-full">
+<div class="flex items-center gap-2 mb-4 md:mb-0">
+<img alt="LihatLangit Logo" class="h-6 w-6 object-contain grayscale opacity-60" src="https://lh3.googleusercontent.com/aida/AP1WRLs57ZSjD2SnQyhJ20arxy7wTEJBDH7jUS-u9TZ9iTv2ZXmgZdjuk2WTKmmlH60qb3HzxXqmgHauT4WUH1tJwgf_CG4fAWEfCf670z11tg6-YogN8kJYSVVZSZfWISBLzm8_EB9FWVeuGnx0p68xmp-a4BuaPy2NQLmtAQ9rxr1K4SCMBRfcW1DWpVRlKVMwTdjERUIZj1WVlsyMMe-ORParkb1TJcVCA3MgEjLO26Rlw57eanIk">
+<div class="font-label-sm font-bold text-outline">LihatLangit</div>
+</div>
+<div class="flex gap-6 font-label-sm text-label-sm">
+<a class="text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors font-medium flex items-center gap-1" href="#">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+Peringatan Dini
+</a>
+<a class="text-outline hover:text-primary dark:hover:text-primary-fixed transition-colors font-medium" href="#">Peta Cuaca Nasional</a>
+</div>
+</div>
+<div class="flex flex-col md:flex-row justify-between items-center w-full pt-4 border-t border-outline-variant/20 text-outline text-[11px]">
+<div class="flex flex-col gap-1">
+<div class="">Data disediakan oleh BMKG Indonesia. Tidak untuk tujuan navigasi atau operasional kritis.</div>
+<div class="text-[10px] opacity-70">Analysis Date: 2023-10-27 03:00 UTC | Fetched At: 2023-10-27 10:30 WIB</div>
+</div>
+<div class="flex gap-4 mt-4 md:mt-0">
+<a class="hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
+<a class="hover:text-primary transition-colors" href="#">Syarat &amp; Ketentuan</a>
+<a class="hover:text-primary transition-colors" href="#">Hubungi Kami</a>
+</div>
+</div>
+</footer>
+
+
+</body></html>
