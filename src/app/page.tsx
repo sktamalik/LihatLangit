@@ -17,14 +17,40 @@ import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
+import { useState, useEffect } from "react";
 import type { ErrorCode } from "@/types/weather";
+
+const NAV_ITEMS = [
+  { id: "hero", label: "Dashboard" },
+  { id: "prakiraan-hari-ini", label: "Prakiraan" },
+  { id: "peta-cuaca", label: "Peta Cuaca" },
+  { id: "peringatan-dini", label: "Peringatan Dini" },
+];
 
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
+  const [activeNav, setActiveNav] = useState("hero");
 
   const scrollTo = (id: string) => {
+    setActiveNav(id);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  // Update active nav based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY + 120;
+      for (const item of NAV_ITEMS) {
+        const el = document.getElementById(item.id);
+        if (el && el.offsetTop <= scrollPos && el.offsetTop + el.offsetHeight > scrollPos) {
+          setActiveNav(item.id);
+          break;
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col">
@@ -36,10 +62,19 @@ export default function DashboardPage() {
             <span className="font-geist text-headline-md font-bold text-primary">LihatLangit</span>
           </div>
           <nav className="hidden md:flex gap-6 items-center">
-            <button onClick={() => scrollTo("hero")} className="text-primary border-b-2 border-primary pb-1 font-label-sm cursor-pointer">Dashboard</button>
-            <button onClick={() => scrollTo("prakiraan-hari-ini")} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm cursor-pointer">Prakiraan</button>
-            <button onClick={() => scrollTo("peta-cuaca")} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm cursor-pointer">Peta Cuaca</button>
-            <button onClick={() => scrollTo("peringatan-dini")} className="text-on-surface-variant hover:text-primary transition-colors font-label-sm cursor-pointer">Peringatan Dini</button>
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => scrollTo(item.id)}
+                className={`font-label-sm cursor-pointer pb-1 transition-colors ${
+                  activeNav === item.id
+                    ? "text-primary border-b-2 border-primary"
+                    : "text-on-surface-variant hover:text-primary"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
           <div className="flex items-center gap-4">
             {state.status === "ready" && (
@@ -58,7 +93,7 @@ export default function DashboardPage() {
         <div className="max-w-container-max mx-auto px-mobile-margin md:px-gutter flex flex-col gap-6">
 
           {/* ─── HERO + WELCOME ─── */}
-          <section id="hero" className="relative rounded-3xl bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 text-center">
+          <section id="hero" className="relative rounded-3xl bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 flex flex-col items-center justify-center text-center" style={{ minHeight: "80vh" }}>
             <div className="absolute top-6 right-[12%] w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-400 shadow-lg animate-float-slow pointer-events-none" />
             <div className="absolute top-8 right-[12.5%] w-20 h-20 rounded-full bg-amber-200/30 blur-xl pointer-events-none" />
             <div className="absolute top-8 left-[4%] opacity-60 animate-float-delayed pointer-events-none">
@@ -157,18 +192,22 @@ export default function DashboardPage() {
       {/* Bottom Nav Mobile */}
       <nav className="md:hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-lg border-t border-white/50 flex justify-around py-2 px-4 z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.12)]">
         {[
-          { icon: "home", label: "Home", action: () => scrollTo("hero") },
-          { icon: "map", label: "Peta", action: () => scrollTo("peta-cuaca") },
-          { icon: "warning", label: "Peringatan", action: () => scrollTo("peringatan-dini") },
-          { icon: "menu", label: "Menu" },
+          { icon: "home", label: "Home", id: "hero" },
+          { icon: "map", label: "Peta", id: "peta-cuaca" },
+          { icon: "warning", label: "Peringatan", id: "peringatan-dini" },
         ].map((item) => (
-          <button key={item.icon} onClick={"action" in item ? () => (item as any).action?.() : undefined}
+          <button key={item.icon} onClick={() => scrollTo(item.id)}
             className="flex flex-col items-center text-xs font-geist text-outline hover:text-primary transition-colors"
           >
             <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
             <span>{item.label}</span>
           </button>
         ))}
+        <button onClick={() => scrollTo("prakiraan-hari-ini")}
+          className="flex flex-col items-center text-xs font-geist text-outline hover:text-primary transition-colors">
+          <span className="material-symbols-outlined text-[22px]">calendar_month</span>
+          <span>Prakiraan</span>
+        </button>
       </nav>
 
       {/* ═══ FOOTER ═══ */}
@@ -190,7 +229,7 @@ export default function DashboardPage() {
             <div>
               <h4 className="font-geist font-semibold text-xs text-text-deep uppercase tracking-wider mb-3">Navigasi</h4>
               <div className="space-y-2">
-                {["Dashboard","Prakiraan","Peta Cuaca","Peringatan Dini"].map((item) => (
+                {["Dashboard", "Prakiraan", "Peta Cuaca", "Peringatan Dini"].map((item) => (
                   <button key={item} onClick={() => scrollTo(item === "Dashboard" ? "hero" : item === "Prakiraan" ? "prakiraan-hari-ini" : item === "Peta Cuaca" ? "peta-cuaca" : "peringatan-dini")}
                     className="block text-xs text-text-muted hover:text-primary transition-colors">
                     {item}
