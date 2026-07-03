@@ -19,8 +19,8 @@ export type DashboardState =
   | { status: "geo-no-match" };
 
 const DEFAULT_REGION: Region = {
-  adm4: "73.71.01.1001", province: "Sulawesi Selatan", city: "Makassar",
-  district: "Mariso", village: "Mariso", latitude: -5.15, longitude: 119.407,
+  adm4: "73.71.01.0005", province: "SULAWESI SELATAN", city: "KOTA MAKASSAR",
+  district: "MARISO", village: "MARISO",
   timezone: "Asia/Makassar",
 };
 

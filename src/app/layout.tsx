@@ -15,9 +15,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "LihatLangit — Prakiraan Cuaca Indonesia",
+  title: "LihatLangit | Prakiraan Cuaca Indonesia",
   description:
     "Dashboard prakiraan cuaca Indonesia berdasarkan data resmi BMKG. Cari wilayah hingga level desa/kelurahan dan dapatkan prakiraan 3 hari.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

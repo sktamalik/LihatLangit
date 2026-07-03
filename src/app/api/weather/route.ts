@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { isValidAdm4 } from "@/lib/adm4";
-import { getRegionByAdm4 } from "@/lib/regionSearch";
+import { getRegionByAdm4, toBmkgAdm4 } from "@/lib/regionSearch";
 import { fetchForecast } from "@/lib/bmkgClient";
 import { normalizeBmkgForecast } from "@/lib/weatherNormalize";
 import { getCache, setCache } from "@/lib/cache";
@@ -66,20 +66,9 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // ── Check region in local dataset ──
-  const region = getRegionByAdm4(adm4);
-  if (!region) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "REGION_NOT_FOUND",
-          message:
-            "Wilayah dengan kode adm4 tersebut belum tersedia di dataset.",
-        },
-      } satisfies ApiError,
-      { status: 404 }
-    );
-  }
+  // ── Check region in local dataset (soft check — BMKG may still have data) ──
+  let region = getRegionByAdm4(adm4);
+  const bmkgAdm4 = toBmkgAdm4(adm4);
 
   // ── Rate limit ──
   const ip =
@@ -113,7 +102,13 @@ export async function GET(request: NextRequest) {
   }
 
   // ── Fetch from BMKG ──
-  const result = await fetchForecast(adm4);
+  // Try BMKG-compatible code first (converted to 1XXX format), then original
+  const bmkgResult = await fetchForecast(bmkgAdm4);
+  const result = bmkgResult.ok
+    ? bmkgResult
+    : bmkgAdm4 !== adm4
+      ? await fetchForecast(adm4)
+      : bmkgResult;
 
   if (result.ok) {
     const normalized = normalizeBmkgForecast(result.data, region);

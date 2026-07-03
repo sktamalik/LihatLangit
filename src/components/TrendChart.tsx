@@ -19,6 +19,9 @@ export default function TrendChart({ forecast }: TrendChartProps) {
   const points = today.points;
   const n = points.length;
 
+  // Guard against single-point data to avoid division by zero
+  const xScale = n > 1 ? (i: number) => (i / (n - 1)) * W : (_: number) => W / 2;
+
   // Extract values with defaults
   const temps: number[] = [];
   const hums: number[] = [];
@@ -48,7 +51,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
 
   const tempPath = points
     .map((_, i) => {
-      const x = (i / (n - 1)) * W;
+      const x = xScale(i);
       const y = toY(temps[i], tempMin, tempRange);
       return `${i === 0 ? "M" : "L"}${x},${y}`;
     })
@@ -56,7 +59,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
 
   const humPath = points
     .map((_, i) => {
-      const x = (i / (n - 1)) * W;
+      const x = xScale(i);
       const y = toY(hums[i], humMin, humRange);
       return `${i === 0 ? "M" : "L"}${x},${y}`;
     })
@@ -123,7 +126,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
 
           {/* Data point dots */}
           {points.map((_, i) => {
-            const x = (i / (n - 1)) * W;
+            const x = xScale(i);
             const yTemp = toY(temps[i], tempMin, tempRange);
             return (
               <circle
@@ -132,7 +135,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
                 cy={yTemp}
                 r="3"
                 fill="#0ea5e9"
-                className="hover:r-5"
+                className="cursor-pointer"
               />
             );
           })}

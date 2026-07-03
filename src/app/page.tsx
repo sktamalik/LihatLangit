@@ -18,6 +18,7 @@ import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import type { ErrorCode } from "@/types/weather";
 
 const NAV_ITEMS = [
@@ -58,19 +59,17 @@ export default function DashboardPage() {
       <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/50 shadow-[0_8px_30px_rgb(14,165,233,0.08)]">
         <div className="flex justify-between items-center w-full px-mobile-margin md:px-gutter max-w-container-max mx-auto h-16">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">☁️</span>
-            <span className="font-geist text-headline-md font-bold text-primary">LihatLangit</span>
+            <Image src="/logo.jpg" alt="LihatLangit" width={200} height={60} className="h-9 w-auto object-contain" priority />
           </div>
           <nav className="hidden md:flex gap-6 items-center">
             {NAV_ITEMS.map((item) => (
               <button
                 key={item.id}
                 onClick={() => scrollTo(item.id)}
-                className={`font-label-sm cursor-pointer pb-1 transition-colors ${
-                  activeNav === item.id
-                    ? "text-primary border-b-2 border-primary"
-                    : "text-on-surface-variant hover:text-primary"
-                }`}
+                className={`font-label-sm cursor-pointer pb-1 transition-colors ${activeNav === item.id
+                  ? "text-primary border-b-2 border-primary"
+                  : "text-on-surface-variant hover:text-primary"
+                  }`}
               >
                 {item.label}
               </button>
@@ -112,7 +111,7 @@ export default function DashboardPage() {
             </div>
             <div className="relative z-10">
               <div className="w-16 h-16 rounded-2xl bg-white/80 backdrop-blur-md shadow-md flex items-center justify-center mx-auto mb-4">
-                <span className="text-4xl">☁️</span>
+                <Image src="/icon.png" alt="" width={48} height={48} className="w-14 h-14" />
               </div>
               <h1 className="font-geist text-3xl md:text-4xl font-bold text-text-deep mb-2">
                 Selamat Datang di <span className="text-primary">LihatLangit</span>
@@ -211,14 +210,13 @@ export default function DashboardPage() {
       </nav>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="mt-10 pt-8 pb-12 border-t border-outline-variant/20 bg-white/40 backdrop-blur-sm">
+      <footer className="mt-10 pt-8 pb-12 border-t border-outline-variant/20 bg-white">
         <div className="max-w-container-max mx-auto px-gutter">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">☁️</span>
-                <span className="font-geist font-bold text-primary text-base">LihatLangit</span>
+                <Image src="/logo.jpg" alt="LihatLangit" width={200} height={60} className="h-12 w-auto" />
               </div>
               <p className="text-xs text-text-muted/70 leading-relaxed">
                 Dashboard prakiraan cuaca Indonesia. Data resmi dari BMKG untuk masyarakat.
@@ -261,7 +259,7 @@ export default function DashboardPage() {
 
           {/* Bottom bar */}
           <div className="pt-4 border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-2 text-[10px] text-text-muted/50">
-            <span>Dibuat dengan ☀️ untuk Indonesia</span>
+            <span>Dibuat oleh sktafolio untuk Indonesia</span>
             <div className="flex gap-4">
               <a href="#" className="hover:text-primary transition-colors">Kebijakan Privasi</a>
               <a href="#" className="hover:text-primary transition-colors">Syarat & Ketentuan</a>

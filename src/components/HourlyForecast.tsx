@@ -35,7 +35,7 @@ export default function HourlyForecast({ forecast }: HourlyForecastProps) {
     <div id="prakiraan-hari-ini" className="glass-panel rounded-3xl p-card-padding sky-shadow">
       <h2 className="font-geist text-headline-md font-semibold text-primary mb-4">Prakiraan Hari Ini</h2>
       <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2">
-        {today.points.map((point, i) => {
+        {today.points.map((point) => {
           const isNow = forecast.nearestPoint?.localDateTime === point.localDateTime;
           return (
             <div

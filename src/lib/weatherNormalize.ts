@@ -69,15 +69,21 @@ export function normalizeBmkgForecast(
 
   // ── Build region from BMKG lokasi, fallback to local dataset ──
   const lokasi = raw.lokasi ?? {};
-  const region: Region = fallbackRegion ?? {
-    adm4: "",
-    province: safeString(lokasi.provinsi),
-    city: safeString(lokasi.kotkab || lokasi.kota),
-    district: safeString(lokasi.kecamatan),
-    village: safeString(lokasi.desa),
-    latitude: safeNumber(lokasi.latitude ?? lokasi.lat) ?? undefined,
-    longitude: safeNumber(lokasi.longitude ?? lokasi.lon) ?? undefined,
-    timezone: lokasi.timezone,
+  
+  // BMKG provides authoritative coordinates — prefer them over local dataset
+  const bmkgLat = safeNumber(lokasi.latitude ?? lokasi.lat);
+  const bmkgLon = safeNumber(lokasi.longitude ?? lokasi.lon);
+  
+  const region: Region = {
+    adm4: safeString(lokasi.adm4) || (fallbackRegion?.adm4 ?? ""),
+    province: safeString(lokasi.provinsi) || (fallbackRegion?.province ?? ""),
+    city: safeString(lokasi.kotkab || lokasi.kota) || (fallbackRegion?.city ?? ""),
+    district: safeString(lokasi.kecamatan) || (fallbackRegion?.district ?? ""),
+    village: safeString(lokasi.desa) || (fallbackRegion?.village ?? ""),
+    // Prefer BMKG's authoritative coordinates
+    latitude: bmkgLat ?? fallbackRegion?.latitude,
+    longitude: bmkgLon ?? fallbackRegion?.longitude,
+    timezone: lokasi.timezone || fallbackRegion?.timezone,
   };
 
   // ── Analysis date ──
