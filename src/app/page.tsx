@@ -20,12 +20,6 @@ import type { ErrorCode } from "@/types/weather";
 
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
-  const defaultRegion = {
-    adm4: "73.71.01.1001", province: "Sulawesi Selatan", city: "Makassar",
-    district: "Mariso", village: "Mariso", latitude: -5.15, longitude: 119.407,
-    timezone: "Asia/Makassar",
-  };
-
   return (
     <div className="flex-1 flex flex-col">
       {/* ═══ NAVBAR (paling atas, sticky) ═══ */}
@@ -51,20 +45,20 @@ export default function DashboardPage() {
       <main className="flex-1 w-full pb-24 md:pb-8 pt-6">
         <div className="max-w-container-max mx-auto px-mobile-margin md:px-gutter flex flex-col gap-6">
 
-          {/* ─── WELCOME + HERO (satu section) ─── */}
-          <section className="relative rounded-3xl overflow-hidden bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 text-center">
+          {/* ─── HERO + WELCOME (satu section, tanpa overflow-hidden biar dropdown tembus) ─── */}
+          <section className="relative rounded-3xl bg-gradient-to-b from-[#fef9c3] via-[#dbeafe] to-[#e0f2fe] p-8 md:p-12 text-center">
             {/* Sun */}
-            <div className="absolute top-6 right-[12%] w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-400 shadow-lg animate-float-slow" />
-            <div className="absolute top-8 right-[12.5%] w-20 h-20 rounded-full bg-amber-200/30 blur-xl" />
+            <div className="absolute top-6 right-[12%] w-24 h-24 rounded-full bg-gradient-to-br from-amber-300 to-amber-400 shadow-lg animate-float-slow pointer-events-none" />
+            <div className="absolute top-8 right-[12.5%] w-20 h-20 rounded-full bg-amber-200/30 blur-xl pointer-events-none" />
             {/* Clouds */}
-            <div className="absolute top-8 left-[4%] opacity-60 animate-float-delayed">
+            <div className="absolute top-8 left-[4%] opacity-60 animate-float-delayed pointer-events-none">
               <svg width="120" height="50" viewBox="0 0 140 55" fill="none">
                 <ellipse cx="40" cy="35" rx="38" ry="15" fill="white" opacity="0.9" />
                 <circle cx="32" cy="24" r="17" fill="white" opacity="0.9" />
                 <circle cx="55" cy="22" r="14" fill="white" opacity="0.9" />
               </svg>
             </div>
-            <div className="absolute bottom-8 right-[8%] opacity-50 animate-float">
+            <div className="absolute bottom-8 right-[8%] opacity-50 animate-float pointer-events-none">
               <svg width="90" height="40" viewBox="0 0 110 45" fill="none">
                 <ellipse cx="35" cy="30" rx="32" ry="12" fill="white" opacity="0.85" />
                 <circle cx="28" cy="20" r="14" fill="white" opacity="0.85" />
@@ -83,23 +77,17 @@ export default function DashboardPage() {
                 Prakiraan cuaca Indonesia dari BMKG. Cari desa/kelurahan, pantau cuaca 3 hari ke depan.
               </p>
 
-              <div className="flex flex-wrap justify-center gap-3 mb-6">
-                <button onClick={() => searchAndSelect(defaultRegion)}
-                  className="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-geist font-semibold shadow-md hover:bg-primary/90 active:scale-95 transition-all">
-                  Mulai Jelajahi
-                </button>
-                <button onClick={requestGeolocation} disabled={state.status === "geolocating"}
-                  className="px-6 py-2.5 bg-white/70 text-primary rounded-full text-sm font-geist font-semibold border border-white/60 hover:bg-white/90 active:scale-95 transition-all disabled:opacity-50">
-                  📍 Pakai Lokasi Saya
-                </button>
-              </div>
-
               <div className="max-w-xl mx-auto">
                 <div className="glass-panel flex items-center rounded-full px-5 py-3 sky-shadow-sm">
                   <span className="material-symbols-outlined text-outline mr-2">search</span>
                   <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
                 </div>
               </div>
+
+              <button onClick={requestGeolocation} disabled={state.status === "geolocating"}
+                className="mt-4 px-5 py-2 bg-white/70 text-primary rounded-full text-sm font-geist font-medium border border-white/60 hover:bg-white/90 transition-all disabled:opacity-50">
+                📍 Gunakan Lokasi Saya
+              </button>
             </div>
           </section>
 
