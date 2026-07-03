@@ -100,10 +100,6 @@
   box-shadow: 0 12px 48px -12px rgba(14, 165, 233, 0.15);
 }
 
-@utility sky-shadow-sm {
-  box-shadow: 0 4px 20px -8px rgba(14, 165, 233, 0.10);
-}
-
 /* ─── Animations ─── */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(12px); }
@@ -123,7 +119,14 @@
   animation: pulse-soft 2s ease-in-out infinite;
 }
 
-/* ─── Trend chart ─── */
-.trend-line { stroke: #0ea5e9; stroke-width: 3; fill: none; stroke-linecap: round; }
-.trend-area { fill: url(#blue-gradient); opacity: 0.2; }
-.trend-line-alt { stroke: #f59e0b; stroke-width: 2; fill: none; stroke-dasharray: 4; }
+/* ─── Leaflet overrides ─── */
+.leaflet-container {
+  font-family: var(--font-inter), sans-serif !important;
+  border-radius: 1rem !important;
+}
+.weather-tooltip {
+  background: rgba(255,255,255,0.9) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+  font-weight: 600 !important;
+}

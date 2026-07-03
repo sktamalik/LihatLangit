@@ -5,7 +5,6 @@
 
 /** Estimate AQI from humidity and temperature (simplified model) */
 export function estimateAQI(temperatureC: number, humidityPct: number): { value: number; label: string; color: string } {
-  // Simplified PM2.5 estimation based on humidity and temp inversion patterns
   const basePM25 = 15 + (humidityPct > 80 ? 20 : humidityPct > 60 ? 8 : 0) - (temperatureC > 32 ? 5 : 0);
   const aqi = Math.round(basePM25);
   if (aqi <= 50) return { value: aqi, label: "Baik", color: "text-green-600" };
@@ -23,7 +22,6 @@ export function estimateUVIndex(
   const hour = new Date(localDateTime).getHours();
   const lat = Math.abs(latitude ?? -5);
 
-  // Base UV: peak at noon, varies by latitude
   let baseUV = 0;
   if (hour >= 10 && hour <= 14) {
     baseUV = lat < 10 ? 10 : lat < 30 ? 8 : 6;
@@ -33,12 +31,11 @@ export function estimateUVIndex(
     baseUV = 1;
   }
 
-  // Cloud cover reduces UV
   if (cloudCoverPct !== null) {
     baseUV = baseUV * (1 - (cloudCoverPct / 100) * 0.6);
   }
 
-  const uv = Math.round(baseUV);
+  const uv = Math.max(0, Math.round(baseUV));
   if (uv <= 2) return { value: uv, label: "Rendah", color: "text-green-500", tip: "Aman beraktivitas di luar." };
   if (uv <= 5) return { value: uv, label: "Sedang", color: "text-yellow-500", tip: "Gunakan sunscreen SPF 30+." };
   if (uv <= 7) return { value: uv, label: "Tinggi", color: "text-orange-500", tip: "Hindari matahari langsung 10-14." };
@@ -52,10 +49,17 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number;
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
-  // Calculate Julian date
-  const jd = 367 * year - Math.floor(7 * (year + Math.floor((month + 9) / 12)) / 4) + Math.floor(275 * month / 9) + day + 1721013.5;
-  const daysSinceNew = (jd - 2451549.5) % 29.53058867;
-  const illumination = Math.round((daysSinceNew / 29.53) * 100);
+  // Julian Date calculation (valid for years 1901-2099)
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12 * a - 3;
+  const jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+
+  const newMoon = 2451549.5;
+  const lunarCycle = 29.53058867;
+  const daysSinceNew = ((jd - newMoon) % lunarCycle + lunarCycle) % lunarCycle; // Ensure positive
+
+  const illumination = Math.round((daysSinceNew / lunarCycle) * 100);
 
   if (daysSinceNew < 1.8) return { phase: "Bulan Baru", illumination, icon: "🌑" };
   if (daysSinceNew < 5.5) return { phase: "Sabit Muda", illumination, icon: "🌒" };
@@ -72,24 +76,39 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number;
 export function getSunTimes(date: Date, latitude?: number, longitude?: number): { sunrise: string; sunset: string } {
   const lat = latitude ?? -6.2;
   const lon = longitude ?? 106.8;
-  const n = Math.floor(275 * (date.getMonth() + 1) / 9) - 2 * Math.floor((date.getMonth() + 1 + 9) / 12) + (date.getDate() - 30) + 2;
-  const dec = 23.44 * Math.sin((360 / 365) * (n - 81) * Math.PI / 180);
-  const cosHA = -Math.tan(lat * Math.PI / 180) * Math.tan(dec * Math.PI / 180);
-  const ha = Math.acos(cosHA) * 180 / Math.PI;
 
-  const sunriseMinutes = 720 - 4 * (lon + ha) + 0; // equation of time simplified
-  const sunsetMinutes = 720 - 4 * (lon - ha) + 0;
+  // Day of year
+  const start = new Date(date.getFullYear(), 0, 0);
+  const diff = date.getTime() - start.getTime();
+  const dayOfYear = Math.floor(diff / 86400000);
+
+  // Solar declination
+  const declination = 23.44 * Math.sin((360 / 365) * (dayOfYear - 81) * Math.PI / 180);
+
+  // Hour angle
+  const latRad = lat * Math.PI / 180;
+  const decRad = declination * Math.PI / 180;
+  const cosHA = -Math.tan(latRad) * Math.tan(decRad);
+
+  // Clamp cosHA to valid range [-1, 1] to avoid NaN from acos
+  const clampedCosHA = Math.max(-1, Math.min(1, cosHA));
+  const ha = Math.acos(clampedCosHA) * 180 / Math.PI;
+
+  // Equation of time (simplified)
+  const b = (360 / 365) * (dayOfYear - 81) * Math.PI / 180;
+  const eot = 9.87 * Math.sin(2 * b) - 7.53 * Math.cos(b) - 1.5 * Math.sin(b);
+
+  const sunriseMinutes = 720 - 4 * (lon + ha) - eot;
+  const sunsetMinutes = 720 - 4 * (lon - ha) - eot;
 
   const toTime = (mins: number): string => {
-    const h = Math.floor(((mins % 1440) / 60 + 7) % 24); // GMT+7 offset
-    const m = Math.floor(mins % 60);
+    const adjusted = ((mins % 1440) + 1440) % 1440; // Handle negative
+    const h = Math.floor((adjusted / 60 + 7) % 24); // WIB (UTC+7)
+    const m = Math.floor(adjusted % 60);
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
   };
 
-  return {
-    sunrise: toTime(sunriseMinutes),
-    sunset: toTime(sunsetMinutes),
-  };
+  return { sunrise: toTime(sunriseMinutes), sunset: toTime(sunsetMinutes) };
 }
 
 /** Estimate sea conditions from wind speed */
@@ -98,18 +117,21 @@ export function estimateSeaConditions(windSpeedKmh: number | null): {
   waveCategory: string;
   seaTemp: string;
 } {
-  const ws = windSpeedKmh ?? 10;
-  // Simplified wave height estimation: wave height ~ 0.02 * windSpeed^1.5
-  const waveM = Math.round(0.02 * Math.pow(ws, 1.5) * 100) / 100;
-  const waveMin = Math.max(0.1, Math.round((waveM - 0.3) * 10) / 10);
-  const waveMax = Math.round((waveM + 0.3) * 10) / 10;
+  const ws = Math.max(0, windSpeedKmh ?? 10);
+
+  // Douglas sea scale: wave height ~ 0.0208 * windSpeed^1.5 (meters)
+  const waveM = 0.0208 * Math.pow(ws, 1.5);
+  const spread = Math.min(0.5, waveM * 0.3); // Spread proportional to height, capped
+  const waveMin = Math.max(0.1, Math.round((waveM - spread) * 10) / 10);
+  const waveMax = Math.round((waveM + spread) * 10) / 10;
 
   let category = "Rendah";
-  if (waveMax > 2) category = "Sedang";
-  if (waveMax > 4) category = "Tinggi";
+  if (waveMax > 1.25) category = "Sedang";
+  if (waveMax > 2.5) category = "Tinggi";
+  if (waveMax > 4.0) category = "Berbahaya";
 
-  // Sea temperature estimation: ~27-31°C for Indonesia waters
-  const baseSeaTemp = 28 + (ws > 15 ? -1 : ws > 5 ? 0 : 1);
+  // Sea temp: base 29°C, adjusted by wind (strong wind = mixing = slightly cooler)
+  const baseSeaTemp = Math.round(29 + (ws > 20 ? -2 : ws > 10 ? -1 : 0));
 
   return {
     waveHeight: `${waveMin.toFixed(1)} - ${waveMax.toFixed(1)}m`,
@@ -124,7 +146,12 @@ export function getWeatherTips(temp: number, desc: string, humidity: number, win
   const descLower = desc.toLowerCase();
 
   if (descLower.includes("hujan")) {
-    tips.push({ icon: "umbrella", title: "Hujan", desc: desc.includes("petir") ? "Waspada petir! Hindari berlindung di bawah pohon." : "Gunakan payung jika bepergian.", type: "warning" });
+    tips.push({
+      icon: "umbrella",
+      title: "Hujan",
+      desc: descLower.includes("petir") ? "Waspada petir! Hindari berlindung di bawah pohon." : "Gunakan payung jika bepergian.",
+      type: "warning",
+    });
   }
   if (temp > 32) {
     tips.push({ icon: "thermostat", title: "Panas", desc: "Minum air putih cukup. Hindari aktivitas berat di siang hari.", type: "warning" });
@@ -152,25 +179,31 @@ export function getWeatherTips(temp: number, desc: string, humidity: number, win
 }
 
 /** Get community-style report based on weather */
-export function generateLocalReport(regionVillage: string, desc: string, temp: number): { name: string; text: string; time: string }[] {
+export function generateLocalReport(regionVillage: string, desc: string, temp: number, wind: number): { name: string; text: string; time: string }[] {
   const reports: { name: string; text: string; time: string }[] = [];
   const minutesAgo = (m: number) => `${m} mnt lalu`;
 
+  // Add timestamp variation based on current time
+  const randOffset = (base: number) => base + Math.floor(Math.random() * 8);
+
   if (desc.toLowerCase().includes("hujan")) {
-    reports.push({ name: "Budi", text: `Hujan ${desc.toLowerCase()} di ${regionVillage}. Hati-hati jalan licin!`, time: minutesAgo(15) });
-    reports.push({ name: "Rina", text: "Jalanan mulai tergenang di beberapa titik. Hindari rute alternatif.", time: minutesAgo(35) });
+    reports.push({ name: "Budi", text: `Hujan ${desc.toLowerCase()} di ${regionVillage}. Hati-hati jalan licin!`, time: minutesAgo(randOffset(12)) });
+    reports.push({ name: "Rina", text: "Jalanan mulai tergenang di beberapa titik. Hindari rute alternatif.", time: minutesAgo(randOffset(30)) });
   } else if (desc.toLowerCase().includes("cerah")) {
-    reports.push({ name: "Andi", text: `Cuaca cerah di ${regionVillage}. Cocok untuk jalan-jalan!`, time: minutesAgo(10) });
-    reports.push({ name: "Dewi", text: "Langsit biru cerah, angin sepoi-sepoi. Enak banget!", time: minutesAgo(25) });
+    reports.push({ name: "Andi", text: `Cuaca cerah di ${regionVillage}. Cocok untuk jalan-jalan!`, time: minutesAgo(randOffset(8)) });
+    reports.push({ name: "Dewi", text: "Langit biru cerah, angin sepoi-sepoi. Enak banget!", time: minutesAgo(randOffset(22)) });
   } else if (desc.toLowerCase().includes("berawan")) {
-    reports.push({ name: "Sari", text: `Cuaca mendung tipis di ${regionVillage}. Tidak panas, nyaman.`, time: minutesAgo(20) });
-    reports.push({ name: "Doni", text: "Sempat gerimis sebentar, sekarang berawan saja.", time: minutesAgo(50) });
+    reports.push({ name: "Sari", text: `Cuaca mendung tipis di ${regionVillage}. Tidak panas, nyaman.`, time: minutesAgo(randOffset(18)) });
+    reports.push({ name: "Doni", text: "Sempat gerimis sebentar, sekarang berawan saja.", time: minutesAgo(randOffset(45)) });
   } else if (temp > 33) {
-    reports.push({ name: "Agus", text: `Panas banget hari ini di ${regionVillage}, suhu ${temp}°C!`, time: minutesAgo(5) });
-    reports.push({ name: "Maya", text: "AC nyala terus. Semoga cepat hujan.", time: minutesAgo(30) });
+    reports.push({ name: "Agus", text: `Panas banget hari ini di ${regionVillage}, suhu ${temp}°C!`, time: minutesAgo(randOffset(3)) });
+    reports.push({ name: "Maya", text: "AC nyala terus. Semoga cepat hujan.", time: minutesAgo(randOffset(25)) });
+  } else if (wind > 20) {
+    reports.push({ name: "Hendra", text: `Angin kencang di ${regionVillage}. Hati-hati pohon tumbang.`, time: minutesAgo(randOffset(10)) });
+    reports.push({ name: "Sinta", text: "Debu berterbangan. Pakai masker kalau keluar.", time: minutesAgo(randOffset(35)) });
   } else {
-    reports.push({ name: "Fajar", text: `Cuaca di ${regionVillage} cukup bersahabat hari ini.`, time: minutesAgo(15) });
-    reports.push({ name: "Tina", text: "Langit agak mendung tapi masih cerah. Enak untuk jalan kaki.", time: minutesAgo(40) });
+    reports.push({ name: "Fajar", text: `Cuaca di ${regionVillage} cukup bersahabat hari ini.`, time: minutesAgo(randOffset(15)) });
+    reports.push({ name: "Tina", text: "Langit agak mendung tapi masih cerah. Enak untuk jalan kaki.", time: minutesAgo(randOffset(40)) });
   }
 
   return reports;
@@ -197,18 +230,26 @@ export function getEducationContent(humidity: number, temp: number, desc: string
   if (desc.toLowerCase().includes("hujan")) {
     items.push({
       title: "Hujan dan Kesehatan",
-      text: `Pastikan tubuh tetap hangat setelah kehujanan. Siapkan handuk kering dan minuman hangat.`,
+      text: "Pastikan tubuh tetap hangat setelah kehujanan. Siapkan handuk kering dan minuman hangat.",
       color: "bg-indigo-50/50 border-indigo-100",
     });
   }
   if (desc.toLowerCase().includes("berawan") && !desc.toLowerCase().includes("hujan")) {
     items.push({
       title: "Fakta: Awan & Suhu",
-      text: `Lapisan awan tebal menghalangi sinar matahari, membuat suhu lebih stabil sepanjang hari.`,
+      text: "Lapisan awan tebal menghalangi sinar matahari, membuat suhu lebih stabil sepanjang hari.",
       color: "bg-gray-50/50 border-gray-200",
     });
   }
-  // Default education item
+  if (temp > 28 && temp <= 32 && !desc.toLowerCase().includes("hujan")) {
+    items.push({
+      title: "Cuaca Hangat",
+      text: "Suhu cukup hangat. Gunakan pakaian ringan dan tetap terhidrasi.",
+      color: "bg-amber-50/50 border-amber-200",
+    });
+  }
+
+  // Always add educational item at end, limited by component
   items.push({
     title: "Prakiraan Cuaca BMKG",
     text: "BMKG memperbarui data prakiraan 2× sehari. Data ini adalah prakiraan, bukan kepastian.",

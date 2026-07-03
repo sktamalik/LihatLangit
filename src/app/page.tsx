@@ -1,8 +1,6 @@
 /**
- * LihatLangit — Dashboard Prakiraan Cuaca Indonesia
- * Redesigned with rich sections: hero search, trend chart, current weather,
- * environmental metrics, hourly forecast, smart recommendations, 7-day outlook,
- * community reports, and maps.
+ * LihatLangit — layout persis seperti code.html
+ * Urutan: Hero → Tren Chart → Grid 4+8 → Metadata → Mobile Nav → Footer
  */
 
 "use client";
@@ -26,15 +24,10 @@ import WeatherErrorState from "@/components/WeatherErrorState";
 import type { ErrorCode } from "@/types/weather";
 
 export default function DashboardPage() {
-  const {
-    state,
-    searchAndSelect,
-    retry,
-    requestGeolocation,
-  } = useWeather();
+  const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
 
   return (
-    <div className="flex-1 flex flex-col relative z-10">
+    <div className="flex-1 flex flex-col relative">
       {/* ═══ TOP NAVBAR ═══ */}
       <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/50 shadow-[0_8px_30px_rgb(14,165,233,0.1)]">
         <div className="flex justify-between items-center w-full px-mobile-margin md:px-gutter max-w-container-max mx-auto h-16">
@@ -47,73 +40,56 @@ export default function DashboardPage() {
             <a className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">Map</a>
             <a className="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm" href="#">History</a>
           </nav>
-          <div className="flex items-center gap-3">
-            <button className="text-primary hover:text-primary-container transition-colors">
-              <span className="material-symbols-outlined">location_on</span>
-            </button>
-            <button className="text-primary hover:text-primary-container transition-colors">
-              <span className="material-symbols-outlined">settings</span>
-            </button>
+          <div className="flex items-center gap-4 text-primary">
+            <button className="hover:text-primary-container transition-colors"><span className="material-symbols-outlined">location_on</span></button>
+            <button className="hover:text-primary-container transition-colors"><span className="material-symbols-outlined">settings</span></button>
           </div>
         </div>
       </header>
 
-      {/* ═══ MAIN CONTENT ═══ */}
-      <main className="flex-grow w-full pb-24 md:pb-8 pt-6">
+      {/* ═══ MAIN ═══ */}
+      <main className="flex-grow flex flex-col items-center w-full pb-24 md:pb-8 pt-6">
         <div className="w-full max-w-container-max px-mobile-margin md:px-gutter mx-auto flex flex-col gap-6">
 
           {/* ─── HERO SEARCH ─── */}
-          <section className="relative rounded-3xl bg-sky-surface overflow-hidden p-8 md:p-12 flex flex-col items-center justify-center text-center">
-            <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.6) 0%, transparent 40%)' }} />
-            <div className="absolute left-0 top-1/2 -translate-x-1/4 -translate-y-1/2 pointer-events-none opacity-30">
+          <section className="w-full relative rounded-3xl bg-sky-surface overflow-hidden p-10 md:p-12 flex flex-col items-center justify-center text-center">
+            <div className="absolute left-0 top-1/2 -translate-x-1/4 -translate-y-1/2 pointer-events-none opacity-30 z-0">
               <svg width="200" height="120" viewBox="0 0 200 120" fill="none"><path d="M30 90C13.43 90 0 76.57 0 60C0 43.43 13.43 30 30 30C31.5 30 33 30.1 34.5 30.3C40.5 12.5 57.5 0 77.5 0C97.5 0 114.5 12.5 120.5 30.3C122 30.1 123.5 30 125 30C144.33 30 160 45.67 160 65C160 84.33 144.33 100 125 100H30V90Z" fill="white"/></svg>
             </div>
-            <h1 className="font-geist text-headline-lg font-semibold text-primary mb-6 relative z-10">Cuaca di sekitarmu</h1>
-            <div className="relative w-full max-w-2xl z-10 flex flex-col gap-4">
-              <div className="glass-panel flex items-center rounded-full px-6 py-3.5 sky-shadow">
-                <span className="material-symbols-outlined text-outline mr-3">search</span>
-                <RegionSearch
-                  onSelect={searchAndSelect}
-                  onGeolocate={requestGeolocation}
-                  isGeolocating={state.status === "geolocating"}
-                />
+            <div className="absolute inset-0 opacity-40 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(255,255,255,0.6) 0%, transparent 40%)' }} />
+            <h1 className="font-geist text-headline-lg font-semibold text-primary mb-8 relative z-10">Cuaca di sekitarmu</h1>
+            <div className="relative w-full max-w-3xl z-10 flex flex-col gap-4">
+              <div className="glass-panel flex items-center rounded-full px-6 py-4 sky-shadow">
+                <span className="material-symbols-outlined text-outline mr-3 text-[24px]">search</span>
+                <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
               </div>
+              <div className="flex justify-center gap-3">
+                <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="flex items-center gap-2 px-4 py-2 bg-white/50 hover:bg-white/80 transition-colors rounded-full text-primary font-label-sm border border-white/60 disabled:opacity-50">
+                  <span className="material-symbols-outlined text-[18px]">my_location</span>
+                  {state.status === "geolocating" ? "Mencari..." : "Gunakan Lokasi Saat Ini"}
+                </button>
+              </div>
+            </div>
+            <div className="absolute right-0 top-1/4 translate-x-1/4 pointer-events-none z-0">
+              <svg width="180" height="120" viewBox="0 0 200 120" fill="none"><path d="M45 100C25.67 100 10 84.33 10 65C10 47.5 22.8 33 39.5 30.5C44.5 15.5 58.5 5 75 5C91.5 5 105.5 15.5 110.5 30.5C115.5 28.5 121 27.5 126.5 27.5C146.5 27.5 162.5 43.5 162.5 63.5C162.5 65.5 162.5 67.5 162 69.5C178 72.5 190 86.5 190 103C190 112.5 182.5 120 173 120H45V100Z" fill="white"/></svg>
             </div>
           </section>
 
-          {/* Session status */}
-          {state.status === "geo-denied" && (
-            <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">
-              Izin lokasi ditolak. Anda tetap bisa mencari wilayah secara manual.
-            </div>
-          )}
-          {state.status === "geo-no-match" && (
-            <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">
-              Lokasi tidak ditemukan di dataset. Silakan cari manual.
-            </div>
-          )}
+          {state.status === "geo-denied" && <GeoMsg msg="Izin lokasi ditolak. Anda tetap bisa mencari wilayah secara manual." />}
+          {state.status === "geo-no-match" && <GeoMsg msg="Lokasi tidak ditemukan di dataset. Silakan cari manual." />}
 
-          {/* ─── LOADING ─── */}
           {state.status === "loading" && <WeatherLoadingState />}
+          {state.status === "error" && <WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} />}
 
-          {/* ─── ERROR ─── */}
-          {state.status === "error" && (
-            <WeatherErrorState
-              code={state.error.code as ErrorCode}
-              message={state.error.message}
-              onRetry={retry}
-            />
-          )}
-
-          {/* ─── READY — Full Dashboard ─── */}
           {state.status === "ready" && (
             <>
-              {/* Trend Chart */}
+              {/* ─── TREND CHART ─── */}
               <TrendChart forecast={state.forecast} />
 
-              {/* Grid Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                {/* LEFT COLUMN (4 cols) */}
+              {/* ─── 4+8 GRID ─── */}
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 w-full">
+
+                {/* LEFT COL (4) — Current Weather, Metrik, Edukasi, Laut, Matahari */}
                 <div className="md:col-span-4 flex flex-col gap-4">
                   <WeatherSummary forecast={state.forecast} />
                   <EnviroMetrics forecast={state.forecast} />
@@ -122,7 +98,7 @@ export default function DashboardPage() {
                   <SunMoon forecast={state.forecast} />
                 </div>
 
-                {/* RIGHT COLUMN (8 cols) */}
+                {/* RIGHT COL (8) — Prakiraan, Tips, Peta, 7-Hari, Laporan */}
                 <div className="md:col-span-8 flex flex-col gap-6">
                   <HourlyForecast forecast={state.forecast} />
                   <SmartTips forecast={state.forecast} />
@@ -132,7 +108,7 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Footer attribution */}
+              {/* ─── METADATA ─── */}
               <SourceAttribution
                 analysisDateUtc={state.forecast.analysisDateUtc}
                 fetchedAt={state.forecast.fetchedAt}
@@ -153,9 +129,7 @@ export default function DashboardPage() {
           { icon: "warning", label: "Peringatan", active: false },
           { icon: "menu", label: "Menu", active: false },
         ].map((item) => (
-          <a key={item.icon} href="#" className={`flex flex-col items-center justify-center rounded-2xl px-5 py-1.5 transition-all font-label-sm text-label-sm font-medium ${
-            item.active ? "bg-sky-surface text-primary" : "text-outline hover:bg-surface-container-low"
-          }`}>
+          <a key={item.icon} href="#" className={`flex flex-col items-center justify-center rounded-2xl px-5 py-1.5 transition-all font-label-sm font-medium ${item.active ? "bg-sky-surface text-primary" : "text-outline hover:bg-surface-container-low"}`}>
             <span className="material-symbols-outlined" style={{ fontVariationSettings: `'FILL' ${item.active ? 1 : 0}` }}>{item.icon}</span>
             <span className="mt-1">{item.label}</span>
           </a>
@@ -163,7 +137,7 @@ export default function DashboardPage() {
       </nav>
 
       {/* ═══ FOOTER (DESKTOP) ═══ */}
-      <footer className="bg-white/60 backdrop-blur-md w-full mt-stack-gap border-t border-outline-variant/30 max-w-container-max mx-auto px-mobile-margin py-8 hidden md:flex flex-col gap-6 opacity-90 rounded-t-3xl shadow-[0_-8px_30px_rgb(14,165,233,0.05)]">
+      <footer className="bg-white/60 backdrop-blur-md w-full mt-6 border-t border-outline-variant/30 max-w-container-max mx-auto px-mobile-margin py-8 hidden md:flex flex-col gap-6 opacity-90 rounded-t-3xl shadow-[0_-8px_30px_rgb(14,165,233,0.05)]">
         <div className="flex flex-col md:flex-row justify-between items-center w-full">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
             <span className="text-lg opacity-60">☁️</span>
@@ -177,9 +151,7 @@ export default function DashboardPage() {
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center w-full pt-4 border-t border-outline-variant/20 text-outline text-[11px]">
-          <div>
-            Data disediakan oleh BMKG Indonesia. Tidak untuk tujuan navigasi atau operasional kritis.
-          </div>
+          <span>Data disediakan oleh BMKG Indonesia. Tidak untuk tujuan navigasi atau operasional kritis.</span>
           <div className="flex gap-4 mt-4 md:mt-0">
             <a className="hover:text-primary transition-colors" href="#">Kebijakan Privasi</a>
             <a className="hover:text-primary transition-colors" href="#">Syarat & Ketentuan</a>
@@ -188,4 +160,8 @@ export default function DashboardPage() {
       </footer>
     </div>
   );
+}
+
+function GeoMsg({ msg }: { msg: string }) {
+  return <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">{msg}</div>;
 }

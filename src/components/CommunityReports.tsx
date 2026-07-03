@@ -1,61 +1,118 @@
 /**
- * Community reports — dynamically generated based on weather conditions.
+ * Data Status — shows real BMKG metadata, cache status, fetch info.
+ * Replaces simulated community reports with actual operational data.
+ * Layout aligned with SunMoon card for visual consistency.
  */
 
 "use client";
 
 import type { WeatherForecast } from "@/types/weather";
-import { generateLocalReport } from "@/lib/envCalculations";
 
 interface CommunityReportsProps {
   forecast: WeatherForecast;
 }
 
 export default function CommunityReports({ forecast }: CommunityReportsProps) {
-  const pt = forecast.nearestPoint ?? forecast.days[0]?.points[0];
-  const reports = generateLocalReport(
-    forecast.region.village,
-    pt?.weatherDescription ?? "",
-    pt?.temperatureC ?? 28
-  );
-
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col border border-primary-container/20">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="font-geist text-[20px] font-semibold text-primary flex items-center gap-2">
-          <span className="material-symbols-outlined">forum</span> Laporan Warga
-        </h2>
-        <span className="text-label-sm text-text-muted font-geist">Berdasarkan data terkini</span>
+    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+      <h2 className="font-geist text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
+        <span className="material-symbols-outlined text-[20px]">monitoring</span> Status Data
+      </h2>
+      <div className="flex flex-col gap-2">
+        <DataRow
+          icon="cloud_sync"
+          iconColor="text-primary"
+          label="Sumber Data"
+          value="BMKG — Badan Meteorologi, Klimatologi, dan Geofisika"
+        />
+        <DataRow
+          icon="distance"
+          iconColor="text-indigo-500"
+          label="Kode Wilayah (adm4)"
+          value={forecast.region.adm4 || "—"}
+        />
+        <DataRow
+          icon="schedule"
+          iconColor="text-green-600"
+          label="Analisis BMKG"
+          value={forecast.analysisDateUtc ? formatShortDate(forecast.analysisDateUtc) : "—"}
+          detail="Waktu produksi data prakiraan"
+        />
+        <DataRow
+          icon="history"
+          iconColor="text-amber-600"
+          label="Diambil Aplikasi"
+          value={formatShortDate(forecast.fetchedAt)}
+          detail={forecast.fromCache ? "Data dari cache server" : "Data baru dari BMKG"}
+        />
+        <DataRow
+          icon={forecast.isStale ? "warning" : "check_circle"}
+          iconColor={forecast.isStale ? "text-red-500" : forecast.fromCache ? "text-amber-500" : "text-green-500"}
+          label="Status Cache"
+          value={forecast.isStale ? "Data Cadangan (⏳)" : forecast.fromCache ? "Cache Aktif (✅)" : "Data Segar (✅)"}
+          detail={forecast.isStale ? "Data mungkin tidak terkini. BMKG tidak tersedia." : "Cache server berlaku 1 jam"}
+        />
+        <DataRow
+          icon="schedule"
+          iconColor="text-purple-500"
+          label="Perbaruan BMKG"
+          value="2× sehari (pagi & sore)"
+        />
       </div>
-      <div className="flex flex-col gap-3">
-        {reports.map((report, i) => (
-          <ReportItem
-            key={i}
-            initial={report.name[0]}
-            name={report.name}
-            time={report.time}
-            text={report.text}
-          />
-        ))}
+
+      {/* Link ke BMKG */}
+      <a
+        href="https://data.bmkg.go.id"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-3 pt-3 border-t border-outline-variant/20 flex items-center justify-center gap-1 text-[11px] text-primary font-medium hover:underline"
+      >
+        <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+        Kunjungi data.bmkg.go.id
+      </a>
+    </div>
+  );
+}
+
+function DataRow({
+  icon,
+  iconColor,
+  label,
+  value,
+  detail,
+}: {
+  icon: string;
+  iconColor: string;
+  label: string;
+  value: string;
+  detail?: string;
+}) {
+  return (
+    <div className="flex items-start gap-3 py-2 border-b border-outline-variant/10 last:border-b-0">
+      <span className={`material-symbols-outlined ${iconColor} text-[18px] mt-0.5`}>{icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] text-outline leading-none font-geist uppercase tracking-wider">{label}</span>
+          <span className="text-[12px] font-semibold text-on-surface text-right">{value}</span>
+        </div>
+        {detail && <p className="text-[10px] text-outline mt-0.5">{detail}</p>}
       </div>
     </div>
   );
 }
 
-function ReportItem({ initial, name, time, text }: { initial: string; name: string; time: string; text: string }) {
-  const colors = ["bg-blue-200 text-blue-600", "bg-green-200 text-green-600", "bg-purple-200 text-purple-600", "bg-amber-200 text-amber-600"];
-  const colorClass = colors[Math.abs(name.charCodeAt(0)) % colors.length];
-
-  return (
-    <div className="flex gap-3 p-3 bg-white/40 rounded-xl">
-      <div className={`w-8 h-8 rounded-full ${colorClass} flex items-center justify-center font-bold text-xs`}>{initial}</div>
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="font-label-sm font-semibold text-on-surface">{name}</span>
-          <span className="text-[10px] text-outline">{time}</span>
-        </div>
-        <p className="text-sm text-on-surface-variant">{text}</p>
-      </div>
-    </div>
-  );
+function formatShortDate(iso: string): string {
+  try {
+    const date = new Date(iso.replace(" ", "T"));
+    if (isNaN(date.getTime())) return iso;
+    return date.toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
 }
