@@ -1,65 +1,113 @@
-import Image from "next/image";
+/**
+ * LihatLangit — Dashboard Prakiraan Cuaca Indonesia
+ *
+ * Main dashboard page. First screen is the dashboard (not a landing page).
+ * Features region search, weather summary, 3-day forecast timeline,
+ * and BMKG source attribution.
+ */
 
-export default function Home() {
+"use client";
+
+import RegionSearch from "@/components/RegionSearch";
+import WeatherSummary from "@/components/WeatherSummary";
+import ForecastTimeline from "@/components/ForecastTimeline";
+import SourceAttribution from "@/components/SourceAttribution";
+import EmptyState from "@/components/EmptyState";
+import WeatherLoadingState from "@/components/WeatherLoadingState";
+import WeatherErrorState from "@/components/WeatherErrorState";
+import { useWeather } from "@/lib/useWeather";
+import type { ErrorCode } from "@/types/weather";
+
+export default function DashboardPage() {
+  const {
+    state,
+    searchAndSelect,
+    retry,
+    requestGeolocation,
+  } = useWeather();
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="flex-1 flex flex-col">
+      {/* Header */}
+      <header className="w-full py-4 px-mobile-margin md:px-gutter">
+        <div className="max-w-container-max mx-auto w-full">
+          <h1 className="font-geist text-headline-md font-semibold text-text-deep">
+            LihatLangit
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-body-sm text-text-muted -mt-1">
+            Prakiraan cuaca Indonesia &middot; Sumber: BMKG
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+      </header>
+
+      {/* Main content */}
+      <main className="flex-1 w-full px-mobile-margin md:px-gutter pb-8">
+        <div className="max-w-container-max mx-auto w-full space-y-6">
+          {/* Search */}
+          <section aria-label="Pencarian wilayah">
+            <RegionSearch
+              onSelect={searchAndSelect}
+              onGeolocate={requestGeolocation}
+              isGeolocating={state.status === "geolocating"}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </section>
+
+          {/* Geo status messages */}
+          {state.status === "geo-denied" && (
+            <GeoMessage type="info" message="Izin lokasi ditolak. Anda tetap bisa mencari wilayah secara manual." />
+          )}
+          {state.status === "geo-unavailable" && (
+            <GeoMessage type="info" message="Geolokasi tidak tersedia. Silakan cari wilayah secara manual." />
+          )}
+          {state.status === "geo-no-match" && (
+            <GeoMessage type="info" message="Lokasi Anda belum tersedia di dataset. Coba cari wilayah lain." />
+          )}
+
+          {/* Dashboard content */}
+          {state.status === "idle" && <EmptyState />}
+
+          {state.status === "loading" && <WeatherLoadingState />}
+
+          {state.status === "geolocating" && <WeatherLoadingState />}
+
+          {state.status === "ready" && (
+            <>
+              <WeatherSummary forecast={state.forecast} />
+              <ForecastTimeline forecast={state.forecast} />
+              <SourceAttribution
+                analysisDateUtc={state.forecast.analysisDateUtc}
+                fetchedAt={state.forecast.fetchedAt}
+                fromCache={state.forecast.fromCache}
+                isStale={state.forecast.isStale}
+                regionTimezone={state.forecast.region.timezone}
+              />
+            </>
+          )}
+
+          {state.status === "error" && (
+            <WeatherErrorState
+              code={state.error.code as ErrorCode}
+              message={state.error.message}
+              onRetry={retry}
+              onChangeRegion={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            />
+          )}
         </div>
       </main>
+    </div>
+  );
+}
+
+/** Small info banner for geolocation feedback */
+function GeoMessage({ message }: { type: "info"; message: string }) {
+  return (
+    <div className="glass-card rounded-lg px-4 py-2.5 animate-fade-in-up">
+      <p className="text-body-sm text-text-muted flex items-center gap-2">
+        <svg className="w-4 h-4 shrink-0 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+        </svg>
+        {message}
+      </p>
     </div>
   );
 }
