@@ -36,47 +36,14 @@ export default function RootLayout({
       lang="id"
       className={`${geist.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col relative overflow-x-hidden">
-        {/* Animated cloud decor */}
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-          {/* Cloud 1 — top */}
-          <div className="absolute -top-4 left-0 animate-cloud opacity-0">
-            <CloudShape />
-          </div>
-          {/* Cloud 2 — middle */}
-          <div className="absolute top-1/3 left-0 animate-cloud-slow opacity-0" style={{ animationDelay: "-12s" }}>
-            <CloudShapeSmall />
-          </div>
-          {/* Cloud 3 — lower */}
-          <div className="absolute top-2/3 left-0 animate-cloud opacity-0" style={{ animationDelay: "-25s" }}>
-            <CloudShape />
-          </div>
-        </div>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+      </head>
+      <body className="min-h-full flex flex-col text-on-surface antialiased">
         {children}
       </body>
     </html>
-  );
-}
-
-/** Decorative cloud shape made from overlapping circles */
-function CloudShape() {
-  return (
-    <svg width="160" height="60" viewBox="0 0 160 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="50" cy="40" rx="50" ry="20" fill="white" opacity="0.6" />
-      <circle cx="40" cy="30" r="22" fill="white" opacity="0.6" />
-      <circle cx="70" cy="28" r="18" fill="white" opacity="0.6" />
-      <circle cx="55" cy="22" r="15" fill="white" opacity="0.55" />
-    </svg>
-  );
-}
-
-function CloudShapeSmall() {
-  return (
-    <svg width="100" height="40" viewBox="0 0 100 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="30" cy="26" rx="30" ry="14" fill="white" opacity="0.5" />
-      <circle cx="25" cy="18" r="14" fill="white" opacity="0.5" />
-      <circle cx="45" cy="16" r="12" fill="white" opacity="0.5" />
-      <circle cx="35" cy="12" r="10" fill="white" opacity="0.45" />
-    </svg>
   );
 }

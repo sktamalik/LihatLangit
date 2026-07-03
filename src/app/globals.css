@@ -2,7 +2,6 @@
 
 /* ─── Design Tokens ─── */
 @theme inline {
-  /* Surface colors */
   --color-surface: #f6faff;
   --color-surface-dim: #d6dae0;
   --color-surface-bright: #f6faff;
@@ -19,49 +18,40 @@
   --color-outline-variant: #bec8d2;
   --color-surface-tint: #006591;
 
-  /* Primary */
   --color-primary: #006591;
   --color-on-primary: #ffffff;
   --color-primary-container: #0ea5e9;
   --color-on-primary-container: #003751;
   --color-inverse-primary: #89ceff;
 
-  /* Secondary */
   --color-secondary: #396477;
   --color-on-secondary: #ffffff;
   --color-secondary-container: #bae6fd;
   --color-on-secondary-container: #3d687c;
 
-  /* Tertiary / Sun accent */
   --color-tertiary: #8a5100;
   --color-on-tertiary: #ffffff;
   --color-tertiary-container: #de8712;
   --color-on-tertiary-container: #4d2b00;
   --color-sun-accent: #f59e0b;
 
-  /* Error */
   --color-error: #ba1a1a;
   --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
   --color-on-error-container: #93000a;
 
-  /* Brand-specific */
   --color-sky-surface: #e0f2fe;
   --color-cloud-white: #ffffff;
   --color-text-deep: #0c4a6e;
   --color-text-muted: #64748b;
-
-  /* Backgrounds */
   --color-background: #f6faff;
   --color-on-background: #171c20;
   --color-surface-variant: #dee3e9;
 
-  /* Fonts */
   --font-geist: "Geist", sans-serif;
   --font-inter: "Inter", sans-serif;
   --font-sans: "Geist", "Inter", sans-serif;
 
-  /* Radius */
   --radius-sm: 0.25rem;
   --radius-default: 0.5rem;
   --radius-md: 0.75rem;
@@ -69,26 +59,19 @@
   --radius-xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* Spacing */
   --container-max: 1200px;
   --gutter: 1.5rem;
   --spacing-gutter: 1.5rem;
   --spacing-stack: 2rem;
-  --spacing-card-padding: 1.25rem;
+  --spacing-card-padding: 1.5rem;
   --spacing-mobile-margin: 1rem;
 }
 
-/* ─── Global Styles ─── */
 @layer base {
   body {
-    background-color: var(--color-sky-surface);
-    background-image:
-      radial-gradient(ellipse 80% 60% at 50% -20%, rgba(14, 165, 233, 0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 40% at 80% 30%, rgba(186, 230, 253, 0.2) 0%, transparent 50%);
+    background: linear-gradient(180deg, #e0f2fe 0%, #f6faff 50%, #f6faff 100%);
     color: var(--color-on-surface);
     font-family: var(--font-inter), system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
   }
 
@@ -97,83 +80,50 @@
     color: var(--color-on-primary-container);
   }
 
-  /* Hide scrollbar for forecast timeline on mobile */
-  .scrollbar-none {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-none::-webkit-scrollbar {
-    display: none;
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }
 }
 
-/* ─── Glass Card Utility ─── */
-@utility glass-card {
-  background-color: rgb(255 255 255 / 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgb(255 255 255 / 0.5);
-  box-shadow:
-    0 4px 24px -8px rgb(14 165 233 / 0.10),
-    0 2px 8px -4px rgb(14 165 233 / 0.06);
-}
-
-@utility glass-card-elevated {
-  background-color: rgb(255 255 255 / 0.85);
+/* ─── Glass Panel Utility ─── */
+@utility glass-panel {
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgb(255 255 255 / 0.6);
-  box-shadow:
-    0 8px 32px -12px rgb(14 165 233 / 0.15),
-    0 4px 16px -8px rgb(14 165 233 / 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-/* ─── Animated Cloud Decor ─── */
-@keyframes cloud-drift {
-  0% { transform: translateX(-10%) translateY(0); opacity: 0; }
-  10% { opacity: 0.5; }
-  90% { opacity: 0.5; }
-  100% { transform: translateX(110%) translateY(0); opacity: 0; }
+@utility sky-shadow {
+  box-shadow: 0 12px 48px -12px rgba(14, 165, 233, 0.15);
 }
 
-@keyframes cloud-drift-slow {
-  0% { transform: translateX(-15%) translateY(0); opacity: 0; }
-  15% { opacity: 0.35; }
-  85% { opacity: 0.35; }
-  100% { transform: translateX(115%) translateY(0); opacity: 0; }
+@utility sky-shadow-sm {
+  box-shadow: 0 4px 20px -8px rgba(14, 165, 233, 0.10);
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
+/* ─── Animations ─── */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes skeleton-pulse {
+@keyframes pulse-soft {
   0%, 100% { opacity: 0.4; }
   50% { opacity: 0.8; }
 }
 
-@utility animate-cloud {
-  animation: cloud-drift 30s linear infinite;
-}
-
-@utility animate-cloud-slow {
-  animation: cloud-drift-slow 45s linear infinite;
-}
-
-@utility animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
 @utility animate-fade-in-up {
-  animation: fade-in-up 0.4s ease-out forwards;
+  animation: fade-in-up 0.5s ease-out forwards;
 }
 
-@utility animate-skeleton {
-  animation: skeleton-pulse 1.5s ease-in-out infinite;
+@utility animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
 }
+
+/* ─── Trend chart ─── */
+.trend-line { stroke: #0ea5e9; stroke-width: 3; fill: none; stroke-linecap: round; }
+.trend-area { fill: url(#blue-gradient); opacity: 0.2; }
+.trend-line-alt { stroke: #f59e0b; stroke-width: 2; fill: none; stroke-dasharray: 4; }
