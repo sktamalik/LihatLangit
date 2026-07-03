@@ -1,6 +1,7 @@
 /**
- * Region search — glass-style search bar with floating results.
- * Supports keyboard navigation, debounced search, and geolocation trigger.
+ * Region search — large glass search bar per DESIGN.md.
+ * Includes search icon, debounced input with keyboard nav,
+ * floating glass result list, and "Gunakan lokasi" button.
  */
 
 "use client";
@@ -25,7 +26,6 @@ export default function RegionSearch({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isSearching, setIsSearching] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const listRef = useRef<HTMLUListElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
@@ -37,8 +37,6 @@ export default function RegionSearch({
     }
 
     setIsSearching(true);
-
-    // Abort previous
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -53,7 +51,7 @@ export default function RegionSearch({
       setIsOpen(data.length > 0);
       setActiveIndex(-1);
     } catch {
-      // Abort is expected on new keystrokes
+      // Abort expected on new keystroke
     } finally {
       setIsSearching(false);
     }
@@ -72,14 +70,10 @@ export default function RegionSearch({
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((prev) =>
-        prev < results.length - 1 ? prev + 1 : 0
-      );
+      setActiveIndex((prev) => (prev < results.length - 1 ? prev + 1 : 0));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setActiveIndex((prev) =>
-        prev > 0 ? prev - 1 : results.length - 1
-      );
+      setActiveIndex((prev) => (prev > 0 ? prev - 1 : results.length - 1));
     } else if (e.key === "Enter" && activeIndex >= 0) {
       e.preventDefault();
       selectResult(results[activeIndex]);
@@ -90,9 +84,7 @@ export default function RegionSearch({
   };
 
   const selectResult = (region: Region) => {
-    setQuery(
-      `${region.village}, ${region.district}, ${region.city}`
-    );
+    setQuery(`${region.village}, ${region.district}, ${region.city}`);
     setIsOpen(false);
     setResults([]);
     onSelect(region);
@@ -102,9 +94,7 @@ export default function RegionSearch({
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
-      if (
-        !inputRef.current?.parentElement?.contains(target)
-      ) {
+      if (!(target instanceof Element && target.closest('[data-search-root]'))) {
         setIsOpen(false);
       }
     };
@@ -113,8 +103,9 @@ export default function RegionSearch({
   }, []);
 
   return (
-    <div className="relative w-full">
-      <div className="glass-card rounded-xl flex items-center gap-3 px-4 py-3">
+    <div data-search-root className="relative w-full">
+      {/* Large glass search bar per DESIGN.md */}
+      <div className="glass-card rounded-xl flex items-center gap-3 px-5 py-3.5">
         {/* Search icon */}
         <svg
           className="w-5 h-5 text-text-muted shrink-0"
@@ -142,7 +133,7 @@ export default function RegionSearch({
             if (results.length > 0) setIsOpen(true);
           }}
           placeholder="Cari desa, kecamatan, kota..."
-          className="flex-1 bg-transparent text-body-md text-text-deep placeholder:text-text-muted/60 outline-none font-inter"
+          className="flex-1 bg-transparent text-body-lg text-text-deep placeholder:text-text-muted/50 outline-none font-inter"
           role="combobox"
           aria-expanded={isOpen}
           aria-autocomplete="list"
@@ -152,13 +143,17 @@ export default function RegionSearch({
           }
         />
 
-        {/* Geolocate button */}
+        {/* Searching spinner */}
+        {isSearching && (
+          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
+        )}
+
+        {/* Ghost button per DESIGN.md — border, rounded-lg */}
         <button
           onClick={onGeolocate}
           disabled={isGeolocating}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary font-geist text-label-sm hover:bg-primary/20 transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg border border-primary/30 text-primary font-geist text-label-sm hover:bg-primary/5 transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary shrink-0"
           aria-label="Gunakan lokasi saat ini"
-          title="Gunakan lokasi"
         >
           <svg
             className="w-4 h-4"
@@ -181,13 +176,12 @@ export default function RegionSearch({
         </button>
       </div>
 
-      {/* Results dropdown */}
+      {/* Floating glass result list per DESIGN.md */}
       {isOpen && results.length > 0 && (
         <ul
           id="region-results"
-          ref={listRef}
           role="listbox"
-          className="absolute top-full left-0 right-0 mt-2 glass-card rounded-xl overflow-hidden z-50 shadow-lg animate-fade-in-up max-h-80 overflow-y-auto"
+          className="absolute top-full left-0 right-0 mt-2 glass-card-elevated rounded-xl overflow-hidden z-50 max-h-80 overflow-y-auto animate-fade-in-up"
         >
           {results.map((region, index) => (
             <li
@@ -197,16 +191,16 @@ export default function RegionSearch({
               aria-selected={index === activeIndex}
               onClick={() => selectResult(region)}
               onMouseEnter={() => setActiveIndex(index)}
-              className={`px-4 py-3 cursor-pointer transition-colors border-b border-white/30 last:border-b-0 ${
+              className={`px-5 py-3.5 cursor-pointer transition-colors border-b border-white/30 last:border-b-0 ${
                 index === activeIndex
-                  ? "bg-primary/10"
-                  : "hover:bg-white/40"
+                  ? "bg-primary-container/15"
+                  : "hover:bg-white/50"
               }`}
             >
               <p className="text-body-md font-semibold text-text-deep font-geist">
                 {region.village}
               </p>
-              <p className="text-label-sm text-text-muted font-geist">
+              <p className="text-label-sm text-text-muted font-geist mt-0.5">
                 {region.district}, {region.city}, {region.province}
               </p>
             </li>
@@ -214,10 +208,12 @@ export default function RegionSearch({
         </ul>
       )}
 
-      {/* Searching indicator */}
-      {isSearching && query.trim().length >= 2 && (
-        <div className="absolute right-20 top-1/2 -translate-y-1/2">
-          <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      {/* No results message */}
+      {isOpen && results.length === 0 && query.trim().length >= 2 && !isSearching && (
+        <div className="absolute top-full left-0 right-0 mt-2 glass-card-elevated rounded-xl p-5 z-50 animate-fade-in-up text-center">
+          <p className="text-body-md text-text-muted">
+            Wilayah tidak ditemukan. Coba kata kunci lain.
+          </p>
         </div>
       )}
     </div>

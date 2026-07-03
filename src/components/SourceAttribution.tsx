@@ -1,6 +1,6 @@
 /**
- * Source attribution — BMKG data source notice with metadata timestamps.
- * Must always be visible when weather data is displayed.
+ * Source attribution — BMKG data source with metadata timestamps.
+ * Per DESIGN.md: placed in footer, small label-sm text.
  */
 
 "use client";
@@ -22,35 +22,36 @@ export default function SourceAttribution({
   isStale,
 }: SourceAttributionProps) {
   return (
-    <div className="glass-card rounded-xl px-card-padding py-3 text-center space-y-0.5">
-      <p className="text-label-sm text-text-muted font-geist">
+    <div className="glass-card rounded-xl px-card-padding py-4 text-center space-y-1">
+      <p className="text-label-sm text-text-muted font-geist tracking-wide">
         Sumber data:{" "}
         <a
           href="https://data.bmkg.go.id"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:text-primary transition-colors"
+          className="underline underline-offset-2 hover:text-primary transition-colors font-medium"
         >
           BMKG (Badan Meteorologi, Klimatologi, dan Geofisika)
         </a>
       </p>
-      <div className="flex flex-wrap justify-center gap-x-4 gap-y-0.5 text-label-sm text-text-muted font-geist">
+      <div className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-label-sm text-text-muted font-geist">
         {analysisDateUtc && (
           <span>
-            Diperbarui BMKG: {formatTimestamp(analysisDateUtc)}
+            Diperbarui BMKG:{" "}
+            <span className="text-text-deep font-medium">
+              {formatTimestamp(analysisDateUtc)}
+            </span>
           </span>
         )}
         <span>
-          Diambil aplikasi: {formatTimestamp(fetchedAt)}
+          Diambil aplikasi:{" "}
+          <span className="text-text-deep font-medium">
+            {formatTimestamp(fetchedAt)}
+          </span>
         </span>
         {fromCache && (
-          <span className="text-primary font-medium">
+          <span className={`font-semibold ${isStale ? "text-sun-accent" : "text-primary"}`}>
             {isStale ? "Data cadangan" : "Data dari cache"}
-          </span>
-        )}
-        {isStale && (
-          <span className="text-sun-accent font-medium">
-            Data mungkin tidak terkini
           </span>
         )}
       </div>
