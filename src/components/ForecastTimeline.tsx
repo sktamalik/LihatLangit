@@ -21,7 +21,7 @@ export default function ForecastTimeline({
 
   if (days.length === 0) {
     return (
-      <div className="glass-card rounded-xl p-card-padding text-center text-text-muted">
+      <div className="bg-white border border-outline-variant/20 rounded-xl p-card-padding text-center text-text-muted">
         <p className="text-body-md">Data prakiraan belum tersedia.</p>
       </div>
     );

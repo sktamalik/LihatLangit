@@ -14,7 +14,7 @@ interface CommunityReportsProps {
 
 export default function CommunityReports({ forecast }: CommunityReportsProps) {
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col">
       <h2 className="font-geist text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
         <span className="material-symbols-outlined text-[20px]">monitoring</span> Status Data
       </h2>
@@ -49,7 +49,7 @@ export default function CommunityReports({ forecast }: CommunityReportsProps) {
           icon={forecast.isStale ? "warning" : "check_circle"}
           iconColor={forecast.isStale ? "text-red-500" : forecast.fromCache ? "text-amber-500" : "text-green-500"}
           label="Status Cache"
-          value={forecast.isStale ? "Data Cadangan (⏳)" : forecast.fromCache ? "Cache Aktif (✅)" : "Data Segar (✅)"}
+          value={forecast.isStale ? "Data Cadangan" : forecast.fromCache ? "Cache Aktif" : "Data Segar"}
           detail={forecast.isStale ? "Data mungkin tidak terkini. BMKG tidak tersedia." : "Cache server berlaku 1 jam"}
         />
         <DataRow

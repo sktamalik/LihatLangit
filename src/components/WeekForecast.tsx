@@ -11,19 +11,35 @@ interface WeekForecastProps {
 }
 
 const weatherIcons: Record<string, string> = {
-  "cerah": "☀️",
-  "cerah berawan": "⛅",
-  "berawan": "☁️",
-  "berawan tebal": "☁️",
-  "hujan ringan": "🌦️",
-  "hujan sedang": "🌧️",
-  "hujan lebat": "🌧️",
-  "hujan petir": "⛈️",
+  "cerah": "clear_day",
+  "cerah berawan": "partly_cloudy_day",
+  "berawan": "cloudy",
+  "berawan tebal": "cloud",
+  "hujan ringan": "rainy_light",
+  "hujan sedang": "rainy",
+  "hujan lebat": "rainy_heavy",
+  "hujan petir": "thunderstorm",
+};
+
+const weatherColors: Record<string, string> = {
+  "cerah": "text-amber-400",
+  "cerah berawan": "text-amber-400",
+  "berawan": "text-slate-400",
+  "berawan tebal": "text-slate-500",
+  "hujan ringan": "text-sky-500",
+  "hujan sedang": "text-blue-500",
+  "hujan lebat": "text-blue-700",
+  "hujan petir": "text-purple-600",
 };
 
 function getIcon(desc: string): string {
   const key = Object.keys(weatherIcons).find((k) => desc.toLowerCase().includes(k));
-  return weatherIcons[key ?? ""] ?? "🌤️";
+  return weatherIcons[key ?? ""] ?? "partly_cloudy_day";
+}
+
+function getIconColor(desc: string): string {
+  const key = Object.keys(weatherColors).find((k) => desc.toLowerCase().includes(k));
+  return weatherColors[key ?? ""] ?? "text-primary";
 }
 
 function avgTemp(points: { temperatureC: number | null }[]): { min: number; max: number } {
@@ -40,7 +56,7 @@ function avgHumidity(points: { humidityPct: number | null }[]): number {
 
 export default function WeekForecast({ forecast }: WeekForecastProps) {
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow">
       <h2 className="font-geist text-headline-md font-semibold text-primary mb-4">Perkiraan 3 Hari</h2>
       <div className="flex flex-col gap-1">
         {forecast.days.map((day, idx) => {
@@ -53,7 +69,7 @@ export default function WeekForecast({ forecast }: WeekForecastProps) {
                 <span className={`font-body-md font-semibold w-24 ${idx === 0 ? "text-primary" : "text-on-surface-variant"}`}>
                   {day.label}
                 </span>
-                <span className="text-2xl w-10">{icon}</span>
+                <span className={`material-symbols-outlined text-[26px] w-10 ${getIconColor(day.points[0]?.weatherDescription ?? "")}`}>{icon}</span>
                 <span className="flex items-center gap-1 w-20 text-primary font-label-sm text-xs">
                   <span className="material-symbols-outlined text-[14px]">water_drop</span> {hum}%
                 </span>

@@ -20,7 +20,7 @@ export default function EducationNews({ forecast }: EducationNewsProps) {
   );
 
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col">
       <h2 className="font-geist text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
         <span className="material-symbols-outlined text-[20px]">school</span> Edukasi & Berita
       </h2>

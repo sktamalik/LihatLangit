@@ -95,7 +95,7 @@ export default function WarningBanner() {
               onClick={() => { setExpanded(expanded === w.link ? null : w.link); loadDetail(w.link); }}
               className="w-full flex items-start gap-3 p-3 text-left hover:bg-white/40 transition-colors"
             >
-              <span className="text-base mt-0.5">⚠️</span>
+              <span className="material-symbols-outlined text-amber-500 text-[18px]">warning</span>
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-semibold text-red-800">{w.region}</p>
                 <p className="text-[11px] text-red-600 line-clamp-1">{w.title}</p>

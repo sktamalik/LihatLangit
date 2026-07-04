@@ -26,7 +26,7 @@ export default function EnviroMetrics({ forecast }: EnviroMetricsProps) {
   const moon = getMoonPhase(new Date());
 
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col gap-4">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col gap-4">
       <h2 className="font-geist text-[18px] font-semibold text-primary mb-1">Metrik Lingkungan</h2>
       <div className="flex flex-col gap-2">
         <MetricRow
@@ -46,7 +46,7 @@ export default function EnviroMetrics({ forecast }: EnviroMetricsProps) {
         <MetricRow
           icon="routine"
           label="Fase Bulan"
-          value={`${moon.icon} ${moon.phase}`}
+          value={moon.phase}
           color="text-indigo-500"
           detail={`${moon.illumination}% Iluminasi`}
         />

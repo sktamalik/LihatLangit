@@ -70,7 +70,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
   const timeLabels = points.filter((_, i) => i % labelInterval === 0 || i === n - 1);
 
   return (
-    <section className="glass-panel rounded-3xl p-card-padding sky-shadow">
+    <section className="weather-card rounded-3xl p-card-padding sky-shadow">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
         <h2 className="font-geist text-headline-md font-semibold text-primary">Tren Cuaca 24 Jam</h2>
         <div className="flex gap-4 font-label-sm text-xs">
@@ -83,7 +83,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
         </div>
       </div>
 
-      <div className="w-full h-[200px] relative overflow-hidden">
+      <div className="w-full h-[200px] relative">
         <svg
           className="w-full h-full"
           preserveAspectRatio="none"
@@ -124,10 +124,11 @@ export default function TrendChart({ forecast }: TrendChartProps) {
             strokeLinejoin="round"
           />
 
-          {/* Data point dots */}
+          {/* Data point dots — only on visible label points to reduce noise */}
           {points.map((_, i) => {
             const x = xScale(i);
             const yTemp = toY(temps[i], tempMin, tempRange);
+            if (n > 12 && i % 2 !== 0) return null;
             return (
               <circle
                 key={`t${i}`}
@@ -140,6 +141,37 @@ export default function TrendChart({ forecast }: TrendChartProps) {
             );
           })}
         </svg>
+
+        {/* Temperature value labels — sit well above the line */}
+        {points.map((_, i) => {
+          if (n > 12 && i % 2 !== 0) return null;
+          const xPct = n > 1 ? (i / (n - 1)) * 100 : 50;
+          const ySvg = toY(temps[i], tempMin, tempRange);
+          const yPx = (ySvg / H) * 200;
+          return (
+            <span key={`tl${i}`}
+              className="absolute text-[11px] font-geist font-bold text-[#0ea5e9] leading-none pointer-events-none z-10 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]"
+              style={{ left: `${xPct}%`, top: `${yPx - 26}px`, transform: "translateX(-50%)" }}
+            >
+              {Math.round(temps[i])}°
+            </span>
+          );
+        })}
+        {/* Humidity value labels — sit below the dashed line */}
+        {points.map((_, i) => {
+          if (n > 12 && i % 2 !== 0) return null;
+          const xPct = n > 1 ? (i / (n - 1)) * 100 : 50;
+          const ySvg = toY(hums[i], humMin, humRange);
+          const yPx = (ySvg / H) * 200;
+          return (
+            <span key={`hl${i}`}
+              className="absolute text-[10px] font-geist font-semibold text-[#f59e0b] leading-none pointer-events-none z-10 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]"
+              style={{ left: `${xPct}%`, top: `${yPx + 14}px`, transform: "translateX(-50%)" }}
+            >
+              {Math.round(hums[i])}%
+            </span>
+          );
+        })}
 
         {/* X-axis labels */}
         <div className="absolute -bottom-1 left-0 right-0 flex justify-between px-1 text-outline font-label-sm text-[10px] pointer-events-none">

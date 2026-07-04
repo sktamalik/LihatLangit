@@ -105,7 +105,7 @@ export default function WeatherMap({ forecast }: WeatherMapProps) {
   }, [lat, lon]); // Re-init when location changes
 
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-geist text-[18px] font-semibold text-primary">
           Peta Cuaca — {forecast.region.city}
@@ -130,23 +130,23 @@ export default function WeatherMap({ forecast }: WeatherMapProps) {
         )}
         {loadError && (
           <div className="w-full h-full flex items-center justify-center">
-            <span className="text-text-muted">🗺️ Peta tidak dapat dimuat</span>
+            <span className="flex items-center gap-1 text-text-muted"><span className="material-symbols-outlined text-[14px]">map</span> Peta tidak dapat dimuat</span>
           </div>
         )}
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2 text-xs text-text-muted">
-        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist">
-          📍 {forecast.region.village}, {forecast.region.city}
+        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist flex items-center gap-1">
+          <span className="material-symbols-outlined text-[14px]">location_on</span> {forecast.region.village}, {forecast.region.city}
         </span>
-        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist">
-          🌡️ {forecast.nearestPoint?.temperatureC ?? "--"}°C
+        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist flex items-center gap-1">
+          <span className="material-symbols-outlined text-[14px]">thermostat</span> {forecast.nearestPoint?.temperatureC ?? "--"}°C
         </span>
-        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist">
-          💨 {forecast.nearestPoint?.windSpeedKmh ?? "--"} km/j
+        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist flex items-center gap-1">
+          <span className="material-symbols-outlined text-[14px]">air</span> {forecast.nearestPoint?.windSpeedKmh ?? "--"} km/j
         </span>
-        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist">
-          📍 {lat.toFixed(2)}°S, {lon.toFixed(2)}°E
+        <span className="bg-primary/10 px-2.5 py-1 rounded-full font-geist flex items-center gap-1">
+          <span className="material-symbols-outlined text-[14px]">map</span> {lat.toFixed(2)}°S, {lon.toFixed(2)}°E
         </span>
       </div>
     </div>

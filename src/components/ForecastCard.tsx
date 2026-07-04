@@ -17,7 +17,7 @@ interface ForecastCardProps {
 export default function ForecastCard({ point, isNow }: ForecastCardProps) {
   return (
     <div
-      className={`glass-card rounded-xl p-3 sm:p-card-padding text-center transition-all duration-200 hover:shadow-md ${
+      className={`bg-white border border-outline-variant/20 rounded-xl p-3 sm:p-card-padding text-center transition-all duration-200 hover:shadow-md ${
         isNow
           ? "ring-2 ring-secondary-container/60 shadow-lg shadow-secondary-container/20"
           : ""
@@ -37,8 +37,10 @@ export default function ForecastCard({ point, isNow }: ForecastCardProps) {
           loading="lazy"
         />
       ) : (
-        <div className="w-14 h-14 mx-auto mb-2 flex items-center justify-center text-3xl">
-          {getWeatherEmoji(point.weatherDescription)}
+        <div className="w-14 h-14 mx-auto mb-2 flex items-center justify-center">
+          <span className={`material-symbols-outlined text-[32px] ${getIconColor(point.weatherDescription)}`}>
+            {getWeatherIcon(point.weatherDescription)}
+          </span>
         </div>
       )}
 
@@ -87,16 +89,35 @@ export default function ForecastCard({ point, isNow }: ForecastCardProps) {
   );
 }
 
-/** Fallback emoji when BMKG icon is not available */
-function getWeatherEmoji(desc: string): string {
+/** Fallback icon when BMKG icon is not available */
+function getWeatherIcon(desc: string): string {
   const lower = desc.toLowerCase();
-  if (lower.includes("hujan") && lower.includes("petir")) return "⛈️";
-  if (lower.includes("hujan lebat")) return "🌧️";
-  if (lower.includes("hujan")) return "🌦️";
-  if (lower.includes("berawan tebal") || lower.includes("mendung")) return "☁️";
-  if (lower.includes("berawan")) return "⛅";
-  if (lower.includes("cerah")) return "☀️";
-  if (lower.includes("kabut")) return "🌫️";
-  if (lower.includes("angin")) return "💨";
-  return "🌤️";
+  if (lower.includes("hujan") && lower.includes("petir")) return "thunderstorm";
+  if (lower.includes("hujan lebat")) return "rainy_heavy";
+  if (lower.includes("hujan")) return "rainy";
+  if (lower.includes("berawan tebal") || lower.includes("mendung")) return "cloud";
+  if (lower.includes("berawan")) return "partly_cloudy_day";
+  if (lower.includes("cerah")) return "clear_day";
+  if (lower.includes("kabut")) return "foggy";
+  if (lower.includes("angin")) return "air";
+  return "partly_cloudy_day";
+}
+
+const weatherColors: Record<string, string> = {
+  "cerah": "text-amber-400",
+  "berawan tebal": "text-slate-500",
+  "berawan": "text-slate-400",
+  "hujan": "text-blue-500",
+  "hujan lebat": "text-blue-700",
+  "hujan petir": "text-purple-600",
+  "kabut": "text-gray-400",
+  "angin": "text-teal-500",
+};
+
+function getIconColor(desc: string): string {
+  const lower = desc.toLowerCase();
+  for (const [key, color] of Object.entries(weatherColors)) {
+    if (lower.includes(key)) return color;
+  }
+  return "text-amber-400";
 }

@@ -16,7 +16,7 @@ export default function WeatherSummary({ forecast }: WeatherSummaryProps) {
   const tz = region.timezone?.includes("Makassar") ? "WITA" : region.timezone?.includes("Jayapura") ? "WIT" : "WIB";
 
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col items-center text-center relative overflow-hidden">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col items-center text-center relative overflow-hidden">
       {/* Decorative clouds */}
       <div className="absolute left-0 top-1/4 -translate-x-1/2 pointer-events-none opacity-30">
         <svg width="120" height="80" viewBox="0 0 200 120" fill="none">
@@ -30,9 +30,19 @@ export default function WeatherSummary({ forecast }: WeatherSummaryProps) {
         <span className="font-label-sm text-[11px]">{region.city}</span>
       </div>
 
-      {/* Weather icon */}
+      {/* Weather icon — color changes with condition */}
       <div className="mt-6 mb-1">
-        <span className="material-symbols-outlined text-[72px] text-sun-accent drop-shadow-md" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <span className={`material-symbols-outlined text-[72px] drop-shadow-md ${(() => {
+          const desc = current?.weatherDescription.toLowerCase() ?? "";
+          if (desc.includes("hujan") && desc.includes("petir")) return "text-purple-600";
+          if (desc.includes("hujan lebat")) return "text-blue-700";
+          if (desc.includes("hujan")) return "text-blue-500";
+          if (desc.includes("berawan tebal") || desc.includes("mendung")) return "text-slate-500";
+          if (desc.includes("berawan")) return "text-amber-400";
+          if (desc.includes("kabut")) return "text-gray-400";
+          if (desc.includes("cerah")) return "text-amber-400";
+          return "text-amber-400";
+        })()}`} style={{ fontVariationSettings: "'FILL' 1" }}>
           {current?.weatherDescription.toLowerCase().includes("hujan") ? "rainy" :
            current?.weatherDescription.toLowerCase().includes("awan") ? "cloud" :
            current?.weatherDescription.toLowerCase().includes("berawan") ? "partly_cloudy_day" :

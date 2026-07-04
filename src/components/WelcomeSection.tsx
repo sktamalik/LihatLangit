@@ -51,7 +51,7 @@ export default function WelcomeSection({ onExplore, onGeolocate, isGeolocating }
       <div className="relative z-10 flex flex-col items-center text-center px-6 py-16 md:py-20 max-w-3xl">
         <div className="mb-6">
           <div className="w-20 h-20 rounded-2xl bg-white/80 backdrop-blur-md shadow-lg flex items-center justify-center">
-            <span className="text-5xl">☁️</span>
+            <span className="material-symbols-outlined text-[40px] text-primary">cloud</span>
           </div>
         </div>
 

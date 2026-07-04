@@ -18,7 +18,7 @@ export default function SmartTips({ forecast }: SmartTipsProps) {
   const isHumid = (point?.humidityPct ?? 70) > 75;
 
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col">
       <h2 className="font-geist text-[20px] font-semibold text-primary mb-4">Rekomendasi Pintar</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <TipCard

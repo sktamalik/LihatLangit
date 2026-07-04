@@ -61,15 +61,15 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number;
 
   const illumination = Math.round((daysSinceNew / lunarCycle) * 100);
 
-  if (daysSinceNew < 1.8) return { phase: "Bulan Baru", illumination, icon: "🌑" };
-  if (daysSinceNew < 5.5) return { phase: "Sabit Muda", illumination, icon: "🌒" };
-  if (daysSinceNew < 9.2) return { phase: "Kuartal Awal", illumination, icon: "🌓" };
-  if (daysSinceNew < 12.9) return { phase: "Cembung Awal", illumination, icon: "🌔" };
-  if (daysSinceNew < 16.6) return { phase: "Bulan Purnama", illumination, icon: "🌕" };
-  if (daysSinceNew < 20.3) return { phase: "Cembung Akhir", illumination, icon: "🌖" };
-  if (daysSinceNew < 24.0) return { phase: "Kuartal Akhir", illumination, icon: "🌗" };
-  if (daysSinceNew < 27.6) return { phase: "Sabit Tua", illumination, icon: "🌘" };
-  return { phase: "Bulan Baru", illumination, icon: "🌑" };
+  if (daysSinceNew < 1.8) return { phase: "Bulan Baru", illumination, icon: "dark_mode" };
+  if (daysSinceNew < 5.5) return { phase: "Sabit Muda", illumination, icon: "bedtime" };
+  if (daysSinceNew < 9.2) return { phase: "Kuartal Awal", illumination, icon: "brightness_medium" };
+  if (daysSinceNew < 12.9) return { phase: "Cembung Awal", illumination, icon: "brightness_full" };
+  if (daysSinceNew < 16.6) return { phase: "Bulan Purnama", illumination, icon: "circle" };
+  if (daysSinceNew < 20.3) return { phase: "Cembung Akhir", illumination, icon: "brightness_4" };
+  if (daysSinceNew < 24.0) return { phase: "Kuartal Akhir", illumination, icon: "brightness_3" };
+  if (daysSinceNew < 27.6) return { phase: "Sabit Tua", illumination, icon: "nightlight" };
+  return { phase: "Bulan Baru", illumination, icon: "dark_mode" };
 }
 
 /** Calculate approximate sunrise/sunset times based on latitude and longitude */

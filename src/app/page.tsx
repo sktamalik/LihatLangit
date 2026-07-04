@@ -56,7 +56,7 @@ export default function DashboardPage() {
   return (
     <div className="flex-1 flex flex-col">
       {/* ═══ NAVBAR ═══ */}
-      <header className="bg-white/80 backdrop-blur-xl sticky top-0 z-50 border-b border-white/50 shadow-[0_8px_30px_rgb(14,165,233,0.08)]">
+      <header className="bg-white sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm">
         <div className="flex justify-between items-center w-full px-mobile-margin md:px-gutter max-w-container-max mx-auto h-16">
           <div className="flex items-center gap-2">
             <Image src="/logo.jpg" alt="LihatLangit" width={200} height={60} className="h-9 w-auto object-contain" priority />
@@ -77,8 +77,9 @@ export default function DashboardPage() {
           </nav>
           <div className="flex items-center gap-4">
             {state.status === "ready" && (
-              <span className="hidden sm:block text-xs text-text-muted font-geist">
-                📍 {state.forecast.region.city}
+              <span className="hidden sm:flex items-center gap-1 text-xs text-text-muted font-geist">
+                <span className="material-symbols-outlined text-[14px]">location_on</span>
+                {state.forecast.region.city}
               </span>
             )}
             <button className="text-primary hover:text-primary-container transition-colors" onClick={requestGeolocation} disabled={state.status === "geolocating"} title="Gunakan lokasi">
@@ -120,7 +121,7 @@ export default function DashboardPage() {
                 Prakiraan cuaca Indonesia dari BMKG. Cari desa/kelurahan, pantau cuaca 3 hari ke depan.
               </p>
               <div className="max-w-xl mx-auto">
-                <div className="glass-panel flex items-center rounded-full px-5 py-3 sky-shadow-sm">
+                <div className="bg-white flex items-center rounded-full px-5 py-3 border border-outline-variant/20 shadow-sm">
                   <span className="material-symbols-outlined text-outline mr-2">search</span>
                   <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
                 </div>
@@ -131,18 +132,18 @@ export default function DashboardPage() {
                   Mulai Jelajahi
                 </button>
                 <button onClick={requestGeolocation} disabled={state.status === "geolocating"}
-                  className="px-5 py-2.5 bg-white/70 text-primary rounded-full text-sm font-geist font-medium border border-white/60 hover:bg-white/90 transition-all disabled:opacity-50">
-                  📍 Pakai Lokasi Saya
+                  className="px-5 py-2.5 bg-white text-primary rounded-full text-sm font-geist font-medium border border-outline-variant/20 hover:bg-surface-container-low transition-all disabled:opacity-50 flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[18px]">my_location</span> Pakai Lokasi Saya
                 </button>
               </div>
             </div>
           </section>
 
           {state.status === "geo-denied" && (
-            <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">Izin lokasi ditolak. Cari manual.</div>
+            <div className="bg-white rounded-xl px-4 py-3 text-center text-text-muted text-sm border border-outline-variant/20 shadow-sm">Izin lokasi ditolak. Cari manual.</div>
           )}
           {state.status === "geo-no-match" && (
-            <div className="glass-panel rounded-xl px-4 py-3 text-center text-text-muted text-sm">Lokasi tidak ditemukan.</div>
+            <div className="bg-white rounded-xl px-4 py-3 text-center text-text-muted text-sm border border-outline-variant/20 shadow-sm">Lokasi tidak ditemukan.</div>
           )}
 
           {/* ─── PERINGATAN DINI — data asli BMKG ─── */}
@@ -189,7 +190,7 @@ export default function DashboardPage() {
       </main>
 
       {/* Bottom Nav Mobile */}
-      <nav className="md:hidden fixed bottom-0 w-full bg-white/90 backdrop-blur-lg border-t border-white/50 flex justify-around py-2 px-4 z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.12)]">
+      <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-outline-variant/20 flex justify-around py-2 px-4 z-50 rounded-t-2xl shadow-[0_-4px_20px_rgba(14,165,233,0.12)]">
         {[
           { icon: "home", label: "Home", id: "hero" },
           { icon: "map", label: "Peta", id: "peta-cuaca" },

@@ -17,7 +17,7 @@ export default function SunMoon({ forecast }: SunMoonProps) {
   const moon = getMoonPhase(now);
 
   return (
-    <div className="glass-panel rounded-3xl p-card-padding sky-shadow flex flex-col flex-grow">
+    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col flex-grow">
       <h2 className="font-geist text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
         <span className="material-symbols-outlined text-[20px]">brightness_low</span> Matahari & Bulan
       </h2>
@@ -26,7 +26,7 @@ export default function SunMoon({ forecast }: SunMoonProps) {
         <SunRow icon="wb_twilight" color="text-orange-500" label="Terbenam" value={sun.sunset} />
         <div className="flex items-center justify-between py-2">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">{moon.icon}</span>
+            <span className="material-symbols-outlined text-[22px] text-indigo-400">{moon.icon}</span>
             <span className="text-[13px] text-on-surface">Bulan</span>
           </div>
           <div className="text-right">
