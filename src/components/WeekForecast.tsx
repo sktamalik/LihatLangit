@@ -56,7 +56,7 @@ function avgHumidity(points: { humidityPct: number | null }[]): number {
 
 export default function WeekForecast({ forecast }: WeekForecastProps) {
   return (
-    <div className="weather-card rounded-3xl p-card-padding sky-shadow">
+    <div id="prakiraan-3-hari" className="weather-card rounded-3xl p-card-padding sky-shadow">
       <h2 className="font-geist text-headline-md font-semibold text-primary mb-4">Perkiraan 3 Hari</h2>
       <div className="flex flex-col gap-1">
         {forecast.days.map((day, idx) => {
