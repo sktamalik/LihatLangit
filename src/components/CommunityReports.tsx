@@ -7,6 +7,7 @@
 "use client";
 
 import type { WeatherForecast } from "@/types/weather";
+import { formatDateTimeShort } from "@/lib/time";
 
 interface CommunityReportsProps {
   forecast: WeatherForecast;
@@ -102,17 +103,5 @@ function DataRow({
 }
 
 function formatShortDate(iso: string): string {
-  try {
-    const date = new Date(iso.replace(" ", "T"));
-    if (isNaN(date.getTime())) return iso;
-    return date.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return iso;
-  }
+  return formatDateTimeShort(iso);
 }

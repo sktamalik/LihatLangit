@@ -1,0 +1,13 @@
+{
+  "name": "lihat-langit",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "regions": ["hnd1"],
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
+}

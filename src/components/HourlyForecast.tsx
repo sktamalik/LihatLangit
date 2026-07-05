@@ -50,7 +50,7 @@ export default function HourlyForecast({ forecast }: HourlyForecastProps) {
   if (!today) return null;
 
   const now = new Date();
-  const sun = getSunTimes(now, forecast.region.latitude, forecast.region.longitude);
+  const sun = getSunTimes(now, forecast.region.latitude, forecast.region.longitude, forecast.region.timezone);
   const moon = getMoonPhase(now);
 
   // Tomorrow stats
@@ -72,7 +72,7 @@ export default function HourlyForecast({ forecast }: HourlyForecastProps) {
   // Tomorrow sunrise
   const tomorrowDate = new Date(now);
   tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-  const tomorrowSun = getSunTimes(tomorrowDate, forecast.region.latitude, forecast.region.longitude);
+  const tomorrowSun = getSunTimes(tomorrowDate, forecast.region.latitude, forecast.region.longitude, forecast.region.timezone);
 
   const scrollToWeekForecast = () => {
     document.getElementById("prakiraan-3-hari")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -82,7 +82,6 @@ export default function HourlyForecast({ forecast }: HourlyForecastProps) {
   // BMKG only returns future slots for the current day.
   // We fill missing past slots with gray placeholders so the timeline is complete.
   const standardHours = ["07:00", "10:00", "13:00", "16:00", "19:00", "22:00"];
-  const todayDate = today.date;
 
   const allSlots = standardHours.map((hour) => {
     const existing = today.points.find((p) => p.localDateTime.slice(11, 16) === hour);

@@ -72,10 +72,33 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number;
   return { phase: "Bulan Baru", illumination, icon: "dark_mode" };
 }
 
+/** Get UTC offset hours from an IANA timezone string */
+function getUtcOffsetHours(timezone: string | undefined, date: Date): number {
+  if (!timezone) return 7;
+  try {
+    const parts = new Intl.DateTimeFormat("en", {
+      timeZone: timezone,
+      timeZoneName: "longOffset",
+    }).formatToParts(date);
+    const offsetPart = parts.find((p) => p.type === "timeZoneName")?.value;
+    if (!offsetPart) return 7;
+    const match = offsetPart.match(/GMT([+-]\d{2})/);
+    return match ? parseInt(match[1], 10) : 7;
+  } catch {
+    return 7;
+  }
+}
+
 /** Calculate approximate sunrise/sunset times based on latitude and longitude */
-export function getSunTimes(date: Date, latitude?: number, longitude?: number): { sunrise: string; sunset: string } {
+export function getSunTimes(
+  date: Date,
+  latitude?: number,
+  longitude?: number,
+  timezone?: string
+): { sunrise: string; sunset: string } {
   const lat = latitude ?? -6.2;
   const lon = longitude ?? 106.8;
+  const utcOffset = getUtcOffsetHours(timezone ?? "Asia/Jakarta", date);
 
   // Day of year
   const start = new Date(date.getFullYear(), 0, 0);
@@ -103,7 +126,7 @@ export function getSunTimes(date: Date, latitude?: number, longitude?: number): 
 
   const toTime = (mins: number): string => {
     const adjusted = ((mins % 1440) + 1440) % 1440; // Handle negative
-    const h = Math.floor((adjusted / 60 + 7) % 24); // WIB (UTC+7)
+    const h = Math.floor((adjusted / 60 + utcOffset) % 24);
     const m = Math.floor(adjusted % 60);
     return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
   };

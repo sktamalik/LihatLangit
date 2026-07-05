@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * Build comprehensive Indonesian adm4 regions dataset.
  * Sources:
@@ -41,18 +42,7 @@ function toTitleCase(str) {
 }
 
 // Determine timezone from province code
-function getTimezone(provinceCode) {
-  const code = parseInt(provinceCode, 10);
-  if (code >= 11 && code <= 36) return 'Asia/Jakarta';
-  if ([51, 52, 53, 64, 65].includes(code)) return 'Asia/Makassar';
-  if ([61, 62, 63].includes(code)) return 'Asia/Jakarta'; // West/Central/South Kalimantan = WIB
-  if (code >= 71 && code <= 76) return 'Asia/Makassar'; // Sulawesi = WITA
-  if ([81, 82].includes(code)) return 'Asia/Jayapura'; // Maluku = WIT
-  if ([91, 94].includes(code)) return 'Asia/Jayapura'; // Papua = WIT
-  return 'Asia/Jakarta';
-}
-
-// Actually let me use a more accurate timezone mapping
+// More accurate than simple range check
 function getTimezoneByProvince(provinceCode) {
   // WIB (UTC+7) - Sumatra, Java, West/Central/South Kalimantan
   const wib = [11,12,13,14,15,16,17,18,19,21,31,32,33,34,35,36,61,62,63];

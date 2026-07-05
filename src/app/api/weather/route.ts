@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
   }
 
   // ── Check region in local dataset (soft check — BMKG may still have data) ──
-  let region = getRegionByAdm4(adm4);
+  const region = await getRegionByAdm4(adm4);
   const bmkgAdm4 = toBmkgAdm4(adm4);
 
   // ── Rate limit ──

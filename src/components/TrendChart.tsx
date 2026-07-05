@@ -20,7 +20,7 @@ export default function TrendChart({ forecast }: TrendChartProps) {
   const n = points.length;
 
   // Guard against single-point data to avoid division by zero
-  const xScale = n > 1 ? (i: number) => (i / (n - 1)) * W : (_: number) => W / 2;
+  const xScale = n > 1 ? (i: number) => (i / (n - 1)) * W : () => W / 2;
 
   // Extract values with defaults
   const temps: number[] = [];

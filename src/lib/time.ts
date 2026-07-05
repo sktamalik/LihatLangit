@@ -1,31 +1,40 @@
 /**
- * Time formatting utilities.
- * Handles BMKG's space-separated date format: "2026-07-03 16:00:00"
+ * Safe date formatting utilities — does NOT depend on Node.js ICU data.
+ * Provides Indonesian locale formatting with manual fallback.
  */
 
-/** Normalize BMKG space-separated datetime to ISO format for reliable JS Date parsing */
-function normalizeDate(isoString: string): string {
-  return isoString.replace(" ", "T");
+const MONTHS_SHORT = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Agu", "Sep", "Okt", "Nov", "Des",
+];
+
+const MONTHS_LONG = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember",
+];
+
+const DAYS = [
+  "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu",
+];
+
+/** Create Date from ISO string, handling BMKG's space-separated format */
+function toDate(isoString: string): Date | null {
+  const normalized = typeof isoString === "string" ? isoString.replace(" ", "T") : isoString;
+  const d = new Date(normalized);
+  return isNaN(d.getTime()) ? null : d;
 }
 
 /**
- * Format an ISO timestamp for display in Indonesian locale.
- * Example: "3 Juli 2026, 14:00"
+ * Format as "3 Juli 2026, 14:00" — Indonesian long date with time.
+ * Falls back to raw string if date is invalid.
  */
 export function formatTimestamp(isoString: string): string {
-  try {
-    const date = new Date(normalizeDate(isoString));
-    if (isNaN(date.getTime())) return isoString;
-    return date.toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return isoString;
-  }
+  const d = toDate(isoString);
+  if (!d) return isoString;
+  return (
+    `${d.getDate()} ${MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}, ` +
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+  );
 }
 
 /**
@@ -41,20 +50,45 @@ export function formatTime(isoString: string): string {
     }
   }
 
-  // Try ISO format
-  try {
-    const date = new Date(normalizeDate(isoString));
-    if (isNaN(date.getTime())) return isoString.slice(11, 16) || isoString;
-    return date.toLocaleTimeString("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  } catch {
-    // Fallback: extract HH:mm directly
-    const match = isoString.match(/(\d{2}):(\d{2})/);
-    return match ? `${match[1]}:${match[2]}` : isoString;
+  // Try Date parsing
+  const d = toDate(isoString);
+  if (d) {
+    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
   }
+
+  // Fallback: extract HH:mm via regex
+  const match = isoString.match(/(\d{2}):(\d{2})/);
+  return match ? `${match[1]}:${match[2]}` : isoString;
+}
+
+/**
+ * Format as "3 Jul 2026" — short Indonesian date.
+ */
+export function formatDateShort(isoString: string): string {
+  const d = toDate(isoString);
+  if (!d) return isoString;
+  return `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/**
+ * Format as "3 Juli 2026" — long Indonesian date.
+ */
+export function formatDateLong(isoString: string): string {
+  const d = toDate(isoString);
+  if (!d) return isoString;
+  return `${d.getDate()} ${MONTHS_LONG[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/**
+ * Format as "3 Jul, 14:00" — short date with time.
+ */
+export function formatDateTimeShort(isoString: string): string {
+  const d = toDate(isoString);
+  if (!d) return isoString;
+  return (
+    `${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}, ` +
+    `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`
+  );
 }
 
 /**
@@ -62,7 +96,9 @@ export function formatTime(isoString: string): string {
  */
 export function getTimezoneAbbr(timezone?: string): string {
   if (!timezone) return "WIB";
-  if (timezone.includes("Makassar") || timezone.includes("+0800")) return "WITA";
-  if (timezone.includes("Jayapura") || timezone.includes("+0900")) return "WIT";
+  if (timezone.includes("Makassar")) return "WITA";
+  if (timezone.includes("Jayapura")) return "WIT";
   return "WIB";
 }
+
+export { DAYS, MONTHS_LONG, MONTHS_SHORT };

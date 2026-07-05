@@ -7,14 +7,10 @@
 
 import { useEffect, useState, useMemo } from "react";
 import type { WarningItem, WarningDetail } from "@/app/api/warnings/route";
+import { formatDateTimeShort } from "@/lib/time";
 
 function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString("id-ID", {
-      day: "numeric", month: "short",
-      hour: "2-digit", minute: "2-digit",
-    });
-  } catch { return dateStr; }
+  return formatDateTimeShort(dateStr);
 }
 
 export default function WarningBanner() {

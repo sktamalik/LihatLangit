@@ -21,6 +21,7 @@ export type DashboardState =
 const DEFAULT_REGION: Region = {
   adm4: "73.71.01.0005", province: "SULAWESI SELATAN", city: "KOTA MAKASSAR",
   district: "MARISO", village: "MARISO",
+  latitude: -5.14, longitude: 119.41,
   timezone: "Asia/Makassar",
 };
 

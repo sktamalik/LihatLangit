@@ -13,7 +13,7 @@ interface SunMoonProps {
 
 export default function SunMoon({ forecast }: SunMoonProps) {
   const now = new Date();
-  const sun = getSunTimes(now, forecast.region.latitude, forecast.region.longitude);
+  const sun = getSunTimes(now, forecast.region.latitude, forecast.region.longitude, forecast.region.timezone);
   const moon = getMoonPhase(now);
 
   return (

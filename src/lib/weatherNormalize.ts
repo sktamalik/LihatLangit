@@ -185,7 +185,7 @@ export function normalizeBmkgForecast(
   }
 
   // ── Find nearest forecast point ──
-  const nearestPoint = getNearestForecastPoint(allPoints);
+  const nearestPoint = getNearestForecastPoint(allPoints, region.timezone);
 
   return {
     source: "BMKG",
@@ -202,21 +202,55 @@ export function normalizeBmkgForecast(
 /**
  * Find the forecast point nearest to current local time.
  * Returns the first slot at or after now; if all are past, returns the last.
+ *
+ * IMPORTANT: point.localDateTime is in LOCAL time (e.g., WITA+8),
+ * so we must compare against local current time, NOT UTC.
+ * Without timezone we fall back to server local time.
  */
 export function getNearestForecastPoint(
-  points: WeatherPoint[]
+  points: WeatherPoint[],
+  timezone?: string
 ): WeatherPoint | null {
   if (points.length === 0) return null;
 
-  const now = new Date().toISOString();
+  const localNow = formatLocalNow(timezone);
 
-  // Find first point whose localDateTime is >= now
+  // Find first point whose localDateTime is >= local current time
   for (const point of points) {
-    if (point.localDateTime >= now.slice(0, 16)) {
+    if (point.localDateTime >= localNow) {
       return point;
     }
   }
 
   // All points are in the past — return the last available
   return points[points.length - 1];
+}
+
+/**
+ * Get current time formatted as YYYY-MM-DDTHH:MM in a given IANA timezone.
+ * Indonesia only has 3 timezones: WIB (+7), WITA (+8), WIT (+9).
+ */
+function formatLocalNow(timezone?: string): string {
+  const now = new Date();
+  let offsetMinutes = 7 * 60; // default WIB
+
+  if (timezone) {
+    const tzMap: Record<string, number> = {
+      "Asia/Jakarta": 7 * 60,
+      "Asia/Makassar": 8 * 60,
+      "Asia/Jayapura": 9 * 60,
+    };
+    offsetMinutes = tzMap[timezone] ?? 7 * 60;
+  }
+
+  const localMs = now.getTime() + offsetMinutes * 60 * 1000;
+  const localDate = new Date(localMs);
+
+  const y = localDate.getUTCFullYear();
+  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(localDate.getUTCDate()).padStart(2, "0");
+  const h = String(localDate.getUTCHours()).padStart(2, "0");
+  const min = String(localDate.getUTCMinutes()).padStart(2, "0");
+
+  return `${y}-${m}-${d}T${h}:${min}`;
 }

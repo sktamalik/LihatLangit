@@ -1,34 +1,65 @@
 /**
  * Region search utilities using local adm4 dataset.
- * Optimized for large dataset (80K+ entries) with pre-computed indices.
+ * Optimized for large dataset (80K+ entries) with lazy-loaded index.
+ *
+ * Data is loaded asynchronously from public/data/regions-adm4.json
+ * on first use — NOT bundled with the serverless function.
  */
 
-import regions from "@/data/regions-adm4.json";
+import fs from "fs";
+import path from "path";
 import type { Region } from "@/types/weather";
 
 const MAX_RESULTS = 20;
 
-// ── Pre-computed search indices at module load ──
+// Multiple possible paths for different deployment environments (Vercel, local dev, etc.)
+const DATA_CANDIDATES = [
+  path.join(process.cwd(), "public", "data", "regions-adm4.json"),
+  path.join(process.cwd(), "src", "data", "regions-adm4.json"),
+];
+
+function resolveDataPath(): string {
+  for (const p of DATA_CANDIDATES) {
+    if (fs.existsSync(p)) return p;
+  }
+  return DATA_CANDIDATES[0]; // fallback — will throw with a clear error
+}
+
+// ── Lazy-loaded search index (module-level cache) ──
 
 interface IndexEntry {
   region: Region;
-  /** Lowercased, normalized searchable text */
   villageNorm: string;
   districtNorm: string;
   cityNorm: string;
   provinceNorm: string;
 }
 
-const index: IndexEntry[] = regions.map((r) => {
-  const region = r as Region;
-  return {
-    region,
-    villageNorm: normalize(region.village),
-    districtNorm: normalize(region.district),
-    cityNorm: normalize(region.city),
-    provinceNorm: normalize(region.province),
-  };
-});
+let indexPromise: Promise<IndexEntry[]> | null = null;
+let indexCache: IndexEntry[] | null = null;
+
+async function getIndex(): Promise<IndexEntry[]> {
+  if (indexCache) return indexCache;
+  if (!indexPromise) {
+    indexPromise = loadIndex();
+  }
+  indexCache = await indexPromise;
+  return indexCache;
+}
+
+async function loadIndex(): Promise<IndexEntry[]> {
+  const dataPath = resolveDataPath();
+  const raw = fs.readFileSync(dataPath, "utf-8");
+  const regions: Region[] = JSON.parse(raw);
+
+  return regions.map((r) => ({
+    region: r,
+    villageNorm: normalize(r.village),
+    districtNorm: normalize(r.district),
+    cityNorm: normalize(r.city),
+    provinceNorm: normalize(r.province),
+  }));
+}
 
 /** Normalize string for fuzzy comparison — strip diacritics, lowercase, keep alphanumeric+spaces */
 function normalize(s: string): string {
@@ -65,16 +96,14 @@ function score(entry: IndexEntry, query: string): number {
  * Search regions by query string.
  * Returns up to 20 results ranked by relevance.
  */
-export function searchRegions(query: string): Region[] {
+export async function searchRegions(query: string): Promise<Region[]> {
   const q = query.trim();
   if (!q) return [];
-
-  // Quick reject: query too short
   if (q.length < 2) return [];
 
-  // Score all entries and collect non-zero scores
-  const scored: Array<{ region: Region; score: number }> = [];
+  const index = await getIndex();
 
+  const scored: Array<{ region: Region; score: number }> = [];
   for (const entry of index) {
     const s = score(entry, q);
     if (s > 0) {
@@ -82,7 +111,6 @@ export function searchRegions(query: string): Region[] {
     }
   }
 
-  // Sort by score descending, then by village name ascending for stability
   scored.sort((a, b) => {
     if (b.score !== a.score) return b.score - a.score;
     return a.region.village.localeCompare(b.region.village);
@@ -92,12 +120,7 @@ export function searchRegions(query: string): Region[] {
 }
 
 /** Haversine distance in kilometers */
-function haversineKm(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number {
+function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -113,13 +136,9 @@ function haversineKm(
  * Find the nearest region to given coordinates.
  * Returns null if no region has coordinates.
  */
-export function findNearestRegion(
-  lat: number,
-  lon: number
-): Region | null {
-  const withCoords = index.filter(
-    (e) => e.region.latitude != null && e.region.longitude != null
-  );
+export async function findNearestRegion(lat: number, lon: number): Promise<Region | null> {
+  const index = await getIndex();
+  const withCoords = index.filter((e) => e.region.latitude != null && e.region.longitude != null);
 
   if (withCoords.length === 0) return null;
 
@@ -139,8 +158,9 @@ export function findNearestRegion(
 }
 
 /** Get a region by its adm4 code */
-export function getRegionByAdm4(adm4: string): Region | undefined {
-  return (regions as Region[]).find((r) => r.adm4 === adm4);
+export async function getRegionByAdm4(adm4: string): Promise<Region | undefined> {
+  const index = await getIndex();
+  return index.find((e) => e.region.adm4 === adm4)?.region;
 }
 
 /**

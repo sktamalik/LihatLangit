@@ -63,7 +63,7 @@ export default function WeatherSummary({ forecast }: WeatherSummaryProps) {
         <Metric icon="humidity_percentage" label="Kelembapan" value={current?.humidityPct !== null ? `${current!.humidityPct}%` : "--"} />
         <Metric icon="air" label="Angin" value={current?.windSpeedKmh !== null ? `${current!.windSpeedKmh} km/h` : "--"} />
         <Metric icon="visibility" label="Jarak Pandang" value={current?.visibilityText ?? "--"} />
-        <Metric icon="compress" label="Tekanan" value="1012 hPa" />
+        <Metric icon="near_me" label="Arah Angin" value={current?.windDirection ?? "--"} />
       </div>
 
       {/* Location detail */}

@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(error, { status: 400 });
     }
 
-    const nearest = findNearestRegion(latNum, lonNum);
+    const nearest = await findNearestRegion(latNum, lonNum);
     if (!nearest) {
       const error: ApiError = {
         error: {
@@ -52,6 +52,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json([]);
   }
 
-  const results: Region[] = searchRegions(q);
+  const results: Region[] = await searchRegions(q);
   return NextResponse.json(results);
 }

@@ -81,6 +81,8 @@ export default function RegionSearch({
         className="bg-transparent border-none focus:ring-0 w-full text-body-md text-on-surface placeholder-outline/70 outline-none"
         role="combobox"
         aria-expanded={isOpen}
+        aria-controls="region-search-results"
+        aria-autocomplete="list"
       />
       <button
         onClick={onGeolocate}
@@ -92,7 +94,7 @@ export default function RegionSearch({
       </button>
 
       {isOpen && results.length > 0 && (
-        <ul className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-outline-variant/30 overflow-hidden z-[999] max-h-64 overflow-y-auto shadow-lg animate-fade-in-up">
+        <ul id="region-search-results" className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-outline-variant/30 overflow-hidden z-[999] max-h-64 overflow-y-auto shadow-lg animate-fade-in-up" role="listbox">
           {results.map((region, index) => (
             <li
               key={region.adm4}

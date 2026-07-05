@@ -1,9 +1,12 @@
 /**
  * GET /api/warnings — list peringatan dini BMKG
  * GET /api/warnings?detail=<link> — detail CAP XML
+ *
+ * Uses fast-xml-parser for reliable XML parsing instead of fragile regex.
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { XMLParser } from "fast-xml-parser";
 
 export type WarningItem = {
   title: string;
@@ -32,6 +35,16 @@ export type WarningDetail = {
   contact?: string;
 };
 
+const XML_PARSER_OPTS = {
+  ignoreAttributes: false,
+  attributeNamePrefix: "@_",
+  textNodeName: "#text",
+  preserveOrder: false,
+  trimValues: true,
+  isArray: (name: string) =>
+    ["item", "parameter", "area", "resource", "eventCode"].includes(name),
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const detailUrl = searchParams.get("detail");
@@ -40,34 +53,54 @@ export async function GET(request: NextRequest) {
   if (detailUrl) {
     try {
       const res = await fetch(detailUrl, { next: { revalidate: 300 } });
-      if (!res.ok) return NextResponse.json({ error: "Gagal mengambil detail" }, { status: 502 });
+      if (!res.ok)
+        return NextResponse.json(
+          { error: "Gagal mengambil detail" },
+          { status: 502 }
+        );
       const xml = await res.text();
 
-      const extract = (tag: string): string => {
-        const match = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`));
-        return match ? match[1].trim() : "";
-      };
+      const parser = new XMLParser(XML_PARSER_OPTS);
+      const parsed = parser.parse(xml);
+      const alert = parsed?.alert ?? {};
 
       const detail: WarningDetail = {
-        identifier: extract("identifier"),
-        sent: extract("sent"),
-        event: extract("event"),
-        urgency: extract("urgency"),
-        severity: extract("severity"),
-        certainty: extract("certainty"),
-        headline: extract("headline"),
-        description: extract("description"),
-        effective: extract("effective"),
-        expires: extract("expires"),
-        senderName: extract("senderName"),
-        areaDesc: extract("areaDesc"),
-        web: extract("web") || undefined,
-        contact: extract("contact") || undefined,
+        identifier: alert.identifier ?? "",
+        sent: alert.sent ?? "",
+        event: alert.info?.event ?? alert.info?.[0]?.event ?? "",
+        urgency: alert.info?.urgency ?? alert.info?.[0]?.urgency ?? "",
+        severity: alert.info?.severity ?? alert.info?.[0]?.severity ?? "",
+        certainty:
+          alert.info?.certainty ?? alert.info?.[0]?.certainty ?? "",
+        headline:
+          alert.info?.headline ?? alert.info?.[0]?.headline ?? "",
+        description:
+          alert.info?.description ?? alert.info?.[0]?.description ?? "",
+        effective:
+          alert.info?.effective ?? alert.info?.[0]?.effective ?? "",
+        expires:
+          alert.info?.expires ?? alert.info?.[0]?.expires ?? "",
+        senderName: alert.senderName ?? "",
+        areaDesc:
+          alert.info?.area?.areaDesc ??
+          alert.info?.[0]?.area?.areaDesc ??
+          "",
+        web:
+          alert.info?.web ?? alert.info?.[0]?.web ?? undefined,
+        instruction:
+          alert.info?.instruction ??
+          alert.info?.[0]?.instruction ??
+          undefined,
+        contact:
+          alert.info?.contact ?? alert.info?.[0]?.contact ?? undefined,
       };
 
       return NextResponse.json(detail);
     } catch {
-      return NextResponse.json({ error: "Gagal memproses detail" }, { status: 502 });
+      return NextResponse.json(
+        { error: "Gagal memproses detail" },
+        { status: 502 }
+      );
     }
   }
 
@@ -79,34 +112,31 @@ export async function GET(request: NextRequest) {
     if (!res.ok) return NextResponse.json({ warnings: [] });
 
     const xml = await res.text();
-    const warnings: WarningItem[] = [];
-    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
-    let match;
+    const parser = new XMLParser(XML_PARSER_OPTS);
+    const parsed = parser.parse(xml);
+    const channel = parsed?.rss?.channel ?? {};
+    const items = channel.item ?? [];
 
-    while ((match = itemRegex.exec(xml)) !== null) {
-      const item = match[1];
-      const title = item.match(/<title>(.*?)<\/title>/)?.[1] || "";
-      const description = item.match(/<description>(.*?)<\/description>/)?.[1] || "";
-      const link = item.match(/<link>(.*?)<\/link>/)?.[1] || "";
-      const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || "";
-      const category = item.match(/<category>(.*?)<\/category>/)?.[1] || "";
+    const warnings: WarningItem[] = items.map((item: Record<string, unknown>) => {
+      const title = String(item.title ?? "");
       const regionMatch = title.match(/di (.+)$/);
-      const region = regionMatch ? regionMatch[1] : "";
-
-      if (title) {
-        warnings.push({
-          title: title.replace(/<\/?[^>]+>/g, ""),
-          description: description.replace(/<[^>]*>/g, "").trim(),
-          region,
-          pubDate,
-          link,
-          category,
-        });
-      }
-    }
+      return {
+        title: stripHtml(String(item.title ?? "")),
+        description: stripHtml(String(item.description ?? "")).trim(),
+        region: regionMatch ? regionMatch[1] : "",
+        pubDate: String(item.pubDate ?? ""),
+        link: String(item.link ?? ""),
+        category: String(item.category ?? ""),
+      };
+    });
 
     return NextResponse.json({ warnings, total: warnings.length });
   } catch {
     return NextResponse.json({ warnings: [], total: 0 });
   }
+}
+
+/** Remove HTML tags from a string */
+function stripHtml(text: string): string {
+  return text.replace(/<[^>]*>/g, "");
 }
