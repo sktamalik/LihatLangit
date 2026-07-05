@@ -21,7 +21,7 @@ const SITE_URL =
     ? `https://${process.env.VERCEL_URL}`
     : "https://lihatlangit.vercel.app");
 
-const OG_IMAGE = `${SITE_URL}/Share.jpg`;
+const OG_IMAGE = `${SITE_URL}/Share.jpg?v=2`;
 
 const TITLE = "LihatLangit | Prakiraan Cuaca Indonesia";
 const DESCRIPTION =
@@ -44,8 +44,8 @@ export const metadata: Metadata = {
       {
         url: OG_IMAGE,
         secureUrl: OG_IMAGE,
-        width: 1200,
-        height: 630,
+        width: 3386,
+        height: 1858,
         alt: "LihatLangit — Prakiraan Cuaca Indonesia via BMKG",
       },
     ],
@@ -57,10 +57,6 @@ export const metadata: Metadata = {
     title: "LihatLangit",
     description: DESCRIPTION,
     images: [OG_IMAGE],
-  },
-  other: {
-    "og:image:url": OG_IMAGE,
-    "og:image:secure_url": OG_IMAGE,
   },
 };
 
