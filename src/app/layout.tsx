@@ -21,6 +21,8 @@ const SITE_URL =
     ? `https://${process.env.VERCEL_URL}`
     : "https://lihatlangit.vercel.app");
 
+const OG_IMAGE = `${SITE_URL}/Share.jpg`;
+
 const TITLE = "LihatLangit | Prakiraan Cuaca Indonesia";
 const DESCRIPTION =
   "Dashboard prakiraan cuaca Indonesia berdasarkan data resmi BMKG. Cari wilayah hingga level desa/kelurahan dan dapatkan prakiraan 3 hari.";
@@ -36,11 +38,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
     description: DESCRIPTION,
-    url: "/",
+    url: SITE_URL,
     siteName: "LihatLangit",
     images: [
       {
-        url: "/Share.jpg",
+        url: OG_IMAGE,
+        secureUrl: OG_IMAGE,
         width: 1200,
         height: 630,
         alt: "LihatLangit — Prakiraan Cuaca Indonesia via BMKG",
@@ -53,7 +56,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "LihatLangit",
     description: DESCRIPTION,
-    images: ["/Share.jpg"],
+    images: [OG_IMAGE],
+  },
+  other: {
+    "og:image:url": OG_IMAGE,
+    "og:image:secure_url": OG_IMAGE,
   },
 };
 
