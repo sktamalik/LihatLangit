@@ -160,4 +160,10 @@ try {
 const outputPath = path.join(__dirname, '..', 'src', 'data', 'regions-adm4.json');
 fs.writeFileSync(outputPath, JSON.stringify(regions, null, 2), 'utf8');
 console.log(`\nWritten to: ${outputPath}`);
+
+// Also write to public/data/ untuk runtime lazy-load
+const publicPath = path.join(__dirname, '..', 'public', 'data', 'regions-adm4.json');
+fs.writeFileSync(publicPath, JSON.stringify(regions, null, 2), 'utf8');
+console.log(`Written to: ${publicPath}`);
+
 console.log(`File size: ${(fs.statSync(outputPath).size / 1024 / 1024).toFixed(2)} MB`);

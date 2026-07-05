@@ -15,13 +15,45 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "https://lihatlangit.vercel.app");
+
+const TITLE = "LihatLangit | Prakiraan Cuaca Indonesia";
+const DESCRIPTION =
+  "Dashboard prakiraan cuaca Indonesia berdasarkan data resmi BMKG. Cari wilayah hingga level desa/kelurahan dan dapatkan prakiraan 3 hari.";
+
 export const metadata: Metadata = {
-  title: "LihatLangit | Prakiraan Cuaca Indonesia",
-  description:
-    "Dashboard prakiraan cuaca Indonesia berdasarkan data resmi BMKG. Cari wilayah hingga level desa/kelurahan dan dapatkan prakiraan 3 hari.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
   icons: {
     icon: "/favicon.ico",
     apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "/",
+    siteName: "LihatLangit",
+    images: [
+      {
+        url: "/Share.jpg",
+        width: 1200,
+        height: 630,
+        alt: "LihatLangit — Prakiraan Cuaca Indonesia via BMKG",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LihatLangit",
+    description: DESCRIPTION,
+    images: ["/Share.jpg"],
   },
 };
 
