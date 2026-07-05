@@ -171,6 +171,7 @@
   font-family: var(--font-inter), sans-serif !important;
   border-radius: 1rem !important;
 }
+
 .weather-tooltip {
   background: rgba(255,255,255,0.9) !important;
   border: none !important;
