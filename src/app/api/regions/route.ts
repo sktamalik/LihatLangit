@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { searchRegions, findNearestRegion } from "@/lib/regionSearch";
+import { searchRegions, findNearestRegion, reverseGeocode } from "@/lib/regionSearch";
 import type { Region, ApiError } from "@/types/weather";
 
 export async function GET(request: NextRequest) {
@@ -34,17 +34,20 @@ export async function GET(request: NextRequest) {
     }
 
     const nearest = await findNearestRegion(latNum, lonNum);
-    if (!nearest) {
-      const error: ApiError = {
-        error: {
-          code: "REGION_NOT_FOUND",
-          message: "Tidak ada wilayah yang cocok dengan koordinat Anda.",
-        },
-      };
-      return NextResponse.json(error, { status: 404 });
-    }
+    if (nearest) return NextResponse.json(nearest);
 
-    return NextResponse.json(nearest);
+    // Fallback: reverse geocode via Nominatim + match local dataset
+    const geocoded = await reverseGeocode(latNum, lonNum);
+    if (geocoded) return NextResponse.json(geocoded);
+
+    // Still no match
+    const error: ApiError = {
+      error: {
+        code: "REGION_NOT_FOUND",
+        message: "Tidak ada wilayah yang cocok dengan koordinat Anda.",
+      },
+    };
+    return NextResponse.json(error, { status: 404 });
   }
 
   // Text search

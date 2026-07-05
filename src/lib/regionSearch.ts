@@ -185,3 +185,88 @@ export function toBmkgAdm4(adm4: string): string {
   // Convert: 0001 → 1001, 0002 → 1002, etc.
   return `${parts[0]}.${parts[1]}.${parts[2]}.${(villageNum + 1000).toString().padStart(4, "0")}`;
 }
+
+// ── Reverse geocoding via Nominatim (OpenStreetMap) ──
+
+interface NominatimResult {
+  village?: string;
+  city?: string;
+  district?: string;
+  state?: string;
+  county?: string;
+  municipality?: string;
+}
+
+/**
+ * Reverse geocode coordinates via Nominatim, then search our dataset.
+ * Used as fallback when local dataset lacks coordinate data.
+ */
+export async function reverseGeocode(
+  lat: number,
+  lon: number
+): Promise<Region | null> {
+  const address = await fetchNominatim(lat, lon);
+  if (!address) return null;
+
+  const index = await getIndex();
+  const candidates = collectCandidates(address, index);
+  if (candidates.length === 0) return null;
+
+  // Return highest-scored match
+  candidates.sort((a, b) => b.score - a.score);
+  return candidates[0].region;
+}
+
+async function fetchNominatim(
+  lat: number,
+  lon: number
+): Promise<NominatimResult | null> {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=id&zoom=14`;
+    const res = await fetch(url, {
+      headers: { "User-Agent": "LihatLangit/1.0 (weather dashboard)" },
+    });
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const addr = data?.address ?? {};
+    return {
+      village: addr.village ?? addr.hamlet ?? addr.isolated_dwelling ?? addr.neighbourhood,
+      city: addr.city ?? addr.town ?? addr.municipality ?? addr.county,
+      district: addr.suburb ?? addr.district ?? addr.county,
+      state: addr.state,
+      county: addr.county,
+      municipality: addr.municipality,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function collectCandidates(
+  address: NominatimResult,
+  index: IndexEntry[]
+): Array<{ region: Region; score: number }> {
+  const candidates: Array<{ region: Region; score: number }> = [];
+  const seen = new Set<string>();
+  const searchTerms = [
+    address.village,
+    address.district,
+    address.city,
+    address.municipality,
+    address.county,
+  ].filter(Boolean) as string[];
+
+  for (const term of searchTerms) {
+    const norm = normalize(term);
+    for (const entry of index) {
+      const s = score(entry, norm);
+      if (s > 0 && !seen.has(entry.region.adm4)) {
+        seen.add(entry.region.adm4);
+        candidates.push({ region: entry.region, score: s });
+      }
+    }
+  }
+
+  return candidates;
+}

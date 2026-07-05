@@ -1,5 +1,5 @@
 /**
- * Minimal region search input — used inside the hero glass bar.
+ * Region search — type to search, select from dropdown, submit via button.
  */
 
 "use client";
@@ -9,19 +9,14 @@ import type { Region } from "@/types/weather";
 
 interface RegionSearchProps {
   onSelect: (region: Region) => void;
-  onGeolocate: () => void;
-  isGeolocating: boolean;
 }
 
-export default function RegionSearch({
-  onSelect,
-  onGeolocate,
-  isGeolocating,
-}: RegionSearchProps) {
+export default function RegionSearch({ onSelect }: RegionSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Region[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
+  const [pendingRegion, setPendingRegion] = useState<Region | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -46,18 +41,39 @@ export default function RegionSearch({
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, doSearch]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") { e.preventDefault(); setActiveIndex((p) => (p < results.length - 1 ? p + 1 : 0)); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); setActiveIndex((p) => (p > 0 ? p - 1 : results.length - 1)); }
-    else if (e.key === "Enter" && activeIndex >= 0) { e.preventDefault(); selectResult(results[activeIndex]); }
-    else if (e.key === "Escape") { setIsOpen(false); inputRef.current?.blur(); }
-  };
-
-  const selectResult = (region: Region) => {
+  const commitRegion = (region: Region) => {
     setQuery(`${region.village}, ${region.district}`);
     setIsOpen(false);
     setResults([]);
+    setPendingRegion(null);
     onSelect(region);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "ArrowDown") { e.preventDefault(); setActiveIndex((p) => (p < results.length - 1 ? p + 1 : 0)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActiveIndex((p) => (p > 0 ? p - 1 : results.length - 1)); }
+    else if (e.key === "Enter") {
+      e.preventDefault();
+      if (activeIndex >= 0) commitRegion(results[activeIndex]);
+      else if (pendingRegion) commitRegion(pendingRegion);
+    }
+    else if (e.key === "Escape") { setIsOpen(false); inputRef.current?.blur(); }
+  };
+
+  const selectFromDropdown = (region: Region) => {
+    setQuery(`${region.village}, ${region.district}`);
+    setIsOpen(false);
+    setResults([]);
+    setPendingRegion(region);
+    inputRef.current?.focus();
+  };
+
+  const handleSearchClick = () => {
+    if (pendingRegion) {
+      commitRegion(pendingRegion);
+    } else if (results.length > 0) {
+      commitRegion(results[0]);
+    }
   };
 
   useEffect(() => {
@@ -69,28 +85,28 @@ export default function RegionSearch({
   }, []);
 
   return (
-    <div data-search-root className="relative flex-1 flex items-center">
+    <div data-search-root className="relative flex-1 flex items-center gap-2">
       <input
         ref={inputRef}
         type="text"
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => { setQuery(e.target.value); setPendingRegion(null); }}
         onKeyDown={handleKeyDown}
         onFocus={() => { if (results.length > 0) setIsOpen(true); }}
         placeholder="Cari Desa atau Kecamatan..."
-        className="bg-transparent border-none focus:ring-0 w-full text-body-md text-on-surface placeholder-outline/70 outline-none"
+        className="bg-transparent border-none focus:ring-0 w-full text-body-md text-on-surface placeholder-outline/70 outline-none flex-1"
         role="combobox"
         aria-expanded={isOpen}
         aria-controls="region-search-results"
         aria-autocomplete="list"
       />
       <button
-        onClick={onGeolocate}
-        disabled={isGeolocating}
-        className="ml-3 p-2.5 bg-primary text-white rounded-full hover:bg-primary-container transition-colors flex items-center justify-center disabled:opacity-50"
-        aria-label="Gunakan lokasi"
+        onClick={handleSearchClick}
+        disabled={!pendingRegion && results.length === 0}
+        className="shrink-0 p-2.5 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
+        aria-label="Cari cuaca"
       >
-        <span className="material-symbols-outlined text-[20px]">my_location</span>
+        <span className="material-symbols-outlined text-[20px]">search</span>
       </button>
 
       {isOpen && results.length > 0 && (
@@ -98,7 +114,7 @@ export default function RegionSearch({
           {results.map((region, index) => (
             <li
               key={region.adm4}
-              onClick={() => selectResult(region)}
+              onClick={() => selectFromDropdown(region)}
               onMouseEnter={() => setActiveIndex(index)}
               className={`px-4 py-3 cursor-pointer transition-colors border-b border-white/30 last:border-b-0 ${
                 index === activeIndex ? "bg-primary-container/15" : "hover:bg-white/50"

@@ -17,7 +17,8 @@ import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
-import { useState, useEffect } from "react";
+import Toast from "@/components/Toast";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import type { ErrorCode } from "@/types/weather";
 
@@ -31,6 +32,29 @@ const NAV_ITEMS = [
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
   const [activeNav, setActiveNav] = useState("hero");
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+  const prevStatusRef = useRef<string | null>(null);
+
+  // Show toast on state transitions (deferred to avoid sync setState in effect)
+  useEffect(() => {
+    if (prevStatusRef.current === state.status) return;
+    prevStatusRef.current = state.status;
+
+    const id = setTimeout(() => {
+      if (state.status === "ready") {
+        setToast({ message: `Data cuaca ${state.forecast.region.village} berhasil dimuat`, type: "success" });
+      } else if (state.status === "error") {
+        setToast({ message: state.error.message, type: "error" });
+      } else if (state.status === "geo-denied") {
+        setToast({ message: "Izin lokasi ditolak. Silakan cari manual.", type: "error" });
+      } else if (state.status === "geo-no-match") {
+        setToast({ message: "Lokasi tidak ditemukan.", type: "error" });
+      } else if (state.status === "geo-unavailable") {
+        setToast({ message: "Fitur lokasi tidak tersedia di perangkat ini.", type: "info" });
+      }
+    }, 0);
+    return () => clearTimeout(id);
+  }, [state]);
 
   const scrollTo = (id: string) => {
     setActiveNav(id);
@@ -55,6 +79,9 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-1 flex flex-col">
+      {/* Toast notification */}
+      <Toast toast={toast} onDismiss={() => setToast(null)} />
+
       {/* ═══ NAVBAR ═══ */}
       <header className="bg-white sticky top-0 z-50 border-b border-outline-variant/20 shadow-sm">
         <div className="flex justify-between items-center w-full px-mobile-margin md:px-gutter max-w-container-max mx-auto h-16">
@@ -122,8 +149,7 @@ export default function DashboardPage() {
               </p>
               <div className="max-w-xl mx-auto">
                 <div className="bg-white flex items-center rounded-full px-5 py-3 border border-outline-variant/20 shadow-sm">
-                  <span className="material-symbols-outlined text-outline mr-2">search</span>
-                  <RegionSearch onSelect={searchAndSelect} onGeolocate={requestGeolocation} isGeolocating={state.status === "geolocating"} />
+                  <RegionSearch onSelect={searchAndSelect} />
                 </div>
               </div>
               <div className="flex flex-wrap justify-center gap-3 mt-5">
