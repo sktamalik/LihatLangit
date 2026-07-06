@@ -42,6 +42,9 @@ export type WeatherForecast = {
   isStale: boolean;
   nearestPoint: WeatherPoint | null;
   days: WeatherDay[];
+  /** When BMKG data comes from a nearby village instead of the exact region */
+  fallbackFrom?: string;
+  fallbackAdm4?: string;
 };
 
 /** Standard internal error codes */

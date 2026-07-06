@@ -70,6 +70,12 @@ export default function WeatherSummary({ forecast }: WeatherSummaryProps) {
       <div className="mt-3 text-label-sm text-text-muted font-geist">
         {region.village}, {region.district} · {tz}
       </div>
+
+      {forecast.fallbackFrom && (
+        <div className="mt-1.5 text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded-full">
+          Data dari stasiun terdekat: {forecast.fallbackFrom}
+        </div>
+      )}
     </div>
   );
 }

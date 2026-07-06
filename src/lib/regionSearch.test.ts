@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchRegions, findNearestRegion, getRegionByAdm4, toBmkgAdm4 } from "./regionSearch";
+import { searchRegions, findNearestRegion, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, generateBmkgVariants, getVillagesByAdm3 } from "./regionSearch";
 
 describe("searchRegions", () => {
   it("returns results for 'Kemayoran'", async () => {
@@ -7,6 +7,17 @@ describe("searchRegions", () => {
     expect(results.length).toBeGreaterThan(0);
     // Now data is uppercase from BPS/Kemendagri
     expect(results[0].district).toContain("KEMAYORAN");
+  });
+
+  it("finds regions with multi-word query (village + city)", async () => {
+    // Search for a well-known area: "Mariso Makassar"
+    const results = await searchRegions("Mariso Makassar");
+    expect(results.length).toBeGreaterThan(0);
+    // The top result should be in Makassar with district Mariso
+    const match = results.find(
+      (r) => r.city.includes("MAKASSAR") && r.district === "MARISO"
+    );
+    expect(match).toBeDefined();
   });
 
   it("returns empty array for empty query", async () => {
@@ -89,5 +100,50 @@ describe("toBmkgAdm4", () => {
   it("handles invalid input gracefully", () => {
     expect(toBmkgAdm4("invalid")).toBe("invalid");
     expect(toBmkgAdm4("")).toBe("");
+  });
+});
+
+describe("getAdm3Prefix", () => {
+  it("extracts adm3 from full adm4", () => {
+    expect(getAdm3Prefix("73.71.01.0005")).toBe("73.71.01");
+    expect(getAdm3Prefix("31.73.06.1007")).toBe("31.73.06");
+  });
+
+  it("returns full string for invalid input", () => {
+    expect(getAdm3Prefix("invalid")).toBe("invalid");
+  });
+});
+
+describe("generateBmkgVariants", () => {
+  it("generates variants for 0XXX code", () => {
+    const variants = generateBmkgVariants("73.71.01.0005");
+    expect(variants).toContain("73.71.01.1005"); // converted
+    expect(variants).toContain("73.71.01.0005"); // original
+    expect(variants.length).toBe(2);
+  });
+
+  it("generates variants for 1XXX code (reverse direction)", () => {
+    const variants = generateBmkgVariants("73.71.01.1005");
+    expect(variants).toContain("73.71.01.1005"); // original
+    expect(variants).toContain("73.71.01.0005"); // reversed
+    expect(variants.length).toBe(2);
+  });
+
+  it("handles invalid input", () => {
+    expect(generateBmkgVariants("invalid")).toEqual(["invalid"]);
+  });
+
+  it("deduplicates when 0XXX and 1XXX are same", () => {
+    // This shouldn't normally happen, but verify dedup works
+    const variants = generateBmkgVariants("73.71.01.1001");
+    expect(variants.length).toBe(2);
+  });
+});
+
+describe("getVillagesByAdm3", () => {
+  it("returns villages in district 73.71.01 (Mariso)", async () => {
+    const villages = await getVillagesByAdm3("73.71.01");
+    expect(villages.length).toBeGreaterThan(0);
+    expect(villages[0].adm4).toMatch(/^73\.71\.01\./);
   });
 });

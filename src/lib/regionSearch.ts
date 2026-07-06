@@ -71,11 +71,16 @@ function normalize(s: string): string {
     .trim();
 }
 
-/** Score a region match: exact match > prefix match > substring match */
+/**
+ * Score a region match: multi-word support, exact match > prefix > substring.
+ * For each word in the query, add score from the best-matching field.
+ * Longer matches get averaged so a 2-word exact match beats a single-word partial.
+ */
 function score(entry: IndexEntry, query: string): number {
-  const q = normalize(query);
-  if (!q) return 0;
+  const raw = query.trim();
+  if (!raw) return 0;
 
+  const words = raw.split(/\s+/).filter(Boolean);
   const fields = [
     entry.villageNorm,
     entry.districtNorm,
@@ -83,12 +88,42 @@ function score(entry: IndexEntry, query: string): number {
     entry.provinceNorm,
   ];
 
-  let total = 0;
-  for (const field of fields) {
-    if (field === q) total += 100; // exact match
-    else if (field.startsWith(q)) total += 50; // prefix match
-    else if (field.includes(q)) total += 20; // substring match
+  // Single-word query: sum across all fields (preserves original ranking)
+  if (words.length === 1) {
+    const q = normalize(words[0]);
+    if (!q) return 0;
+    let total = 0;
+    for (const field of fields) {
+      if (field === q) total += 100;
+      else if (field.startsWith(q)) total += 50;
+      else if (field.includes(q)) total += 20;
+    }
+    return total;
   }
+
+  // Multi-word query: for each word, take the best-matching field,
+  // then average per matched word to reward broad matches
+  let total = 0;
+  let matchedWords = 0;
+
+  for (const word of words) {
+    const q = normalize(word);
+    if (!q || q.length < 1) continue;
+
+    let best = 0;
+    for (const field of fields) {
+      if (field === q) best = Math.max(best, 100);
+      else if (field.startsWith(q)) best = Math.max(best, 50);
+      else if (field.includes(q)) best = Math.max(best, 20);
+    }
+    if (best > 0) matchedWords++;
+    total += best;
+  }
+
+  if (matchedWords > 0) {
+    total = Math.round(total / words.length);
+  }
+
   return total;
 }
 
@@ -184,6 +219,253 @@ export function toBmkgAdm4(adm4: string): string {
 
   // Convert: 0001 → 1001, 0002 → 1002, etc.
   return `${parts[0]}.${parts[1]}.${parts[2]}.${(villageNum + 1000).toString().padStart(4, "0")}`;
+}
+
+/**
+ * Extract the adm3 prefix (XX.XX.XX) from a full adm4 code (XX.XX.XX.XXXX).
+ * Returns the original string if it doesn't have 4 dot-separated parts.
+ */
+export function getAdm3Prefix(adm4: string): string {
+  const parts = adm4.split(".");
+  if (parts.length !== 4) return adm4;
+  return `${parts[0]}.${parts[1]}.${parts[2]}`;
+}
+
+/**
+ * Get all villages/regions sharing the same adm3 (district) prefix.
+ * Useful for district-level BMKG fallback — find nearby alternatives.
+ */
+export async function getVillagesByAdm3(adm3: string): Promise<Region[]> {
+  const index = await getIndex();
+  const prefix = `${adm3}.`;
+  return index
+    .filter((e) => e.region.adm4.startsWith(prefix))
+    .map((e) => e.region);
+}
+
+/**
+ * Generate alternative BMKG-compatible adm4 codes for a given adm4.
+ *
+ * BMKG uses the older Kemendagri code system. While most village codes
+ * follow a 0XXX → 1XXX pattern, some provinces/regions use different
+ * numbering. This function tries multiple plausible conversions.
+ *
+ * Examples:
+ *   "73.71.01.0005" → ["73.71.01.1005", "73.71.01.0005"]
+ *   "31.71.03.1001" → ["31.71.03.1001", "31.71.03.0001"]
+ */
+export function generateBmkgVariants(adm4: string): string[] {
+  const parts = adm4.split(".");
+  if (parts.length !== 4) return [adm4];
+
+  const villageNum = parseInt(parts[3], 10);
+  if (isNaN(villageNum)) return [adm4];
+
+  const variants: string[] = [];
+
+  // Primary: the standard 0XXX → 1XXX conversion (kelurahan format)
+  if (villageNum < 1000) {
+    variants.push(
+      `${parts[0]}.${parts[1]}.${parts[2]}.${(villageNum + 1000).toString().padStart(4, "0")}`
+    );
+  }
+
+  // If already in 1XXX range, also try 0XXX range (desa format)
+  if (villageNum >= 1000) {
+    variants.push(
+      `${parts[0]}.${parts[1]}.${parts[2]}.${(villageNum - 1000).toString().padStart(4, "0")}`
+    );
+  }
+
+  // Always include the original
+  variants.push(adm4);
+
+  // Deduplicate while preserving order
+  const seen = new Set<string>();
+  const deduped: string[] = [];
+  for (let i = 0; i < variants.length; i++) {
+    if (!seen.has(variants[i])) {
+      seen.add(variants[i]);
+      deduped.push(variants[i]);
+    }
+  }
+  return deduped;
+}
+
+/**
+ * Find BMKG-compatible adm4 codes from expanding scope.
+ *
+ * Strategy by level (each capped to ensure diversity across levels):
+ *   0 (exact):     Direct variants of the requested adm4 code (cap 3)
+ *   1 (district):  Other villages in the same adm3 (kecamatan) — cap 5
+ *   2 (city):      Other districts in the same adm2 (kab/kota) — cap 5
+ *   3 (province):  Other cities in the same adm1 (provinsi) — cap 5
+ *   4 (nearest):   Nearest villages from other provinces by coord — cap 5
+ *   5 (any):       First village from each other province — cap 10
+ *
+ * 1XXX-format codes (kelurahan) are prioritized since BMKG
+ * is more likely to have data for them.
+ */
+export async function findBmkgFallback(
+  adm4: string,
+  maxCandidates: number = 35
+): Promise<string[]> {
+  const parts = adm4.split(".");
+  if (parts.length !== 4) return [adm4];
+
+  const adm1 = parts[0];
+  const adm2 = `${parts[0]}.${parts[1]}`;
+  const adm3 = getAdm3Prefix(adm4);
+  const seen = new Set<string>();
+  const candidates: string[] = [];
+
+  function addCandidate(code: string): boolean {
+    if (seen.has(code) || candidates.length >= maxCandidates) return false;
+    seen.add(code);
+    candidates.push(code);
+    return true;
+  }
+
+  function addVariants(adm4Code: string, cap: number = 999): void {
+    const variants = generateBmkgVariants(adm4Code);
+    // 1XXX codes first (more likely to have BMKG data)
+    const kelurahan = variants.filter((v) => {
+      const last = parseInt(v.split(".")[3], 10);
+      return last >= 1000;
+    });
+    const others = variants.filter((v) => !kelurahan.includes(v));
+    let added = 0;
+    for (const v of [...kelurahan, ...others]) {
+      if (added >= cap) break;
+      if (addCandidate(v)) added++;
+    }
+  }
+
+  const index = await getIndex();
+
+  // Level 0: Direct variants of the requested adm4 (cap 3)
+  addVariants(adm4, 3);
+
+  // Level 1: Other villages in the same district (adm3, cap 5)
+  const sameDistrict = await getVillagesByAdm3(adm3);
+  let level1Added = 0;
+  for (const village of sameDistrict) {
+    if (level1Added >= 5) break;
+    if (village.adm4 === adm4) continue;
+    const before = candidates.length;
+    addVariants(village.adm4, 1); // 1 variant per village
+    if (candidates.length > before) level1Added++;
+  }
+
+  if (candidates.length >= maxCandidates) return candidates;
+
+  // Level 2: Other districts in the same city (adm2, cap 5)
+  const cityPrefix = `${adm2}.`;
+  const otherDistricts = new Set<string>();
+  for (const entry of index) {
+    if (entry.region.adm4.startsWith(cityPrefix)) {
+      const entryAdm3 = entry.region.adm4.slice(0, 8);
+      if (!entryAdm3.startsWith(adm3)) {
+        otherDistricts.add(entryAdm3);
+      }
+    }
+  }
+  const otherDistrictsArr: string[] = [];
+  otherDistricts.forEach((d) => otherDistrictsArr.push(d));
+  let level2Added = 0;
+  for (let di = 0; di < otherDistrictsArr.length && level2Added < 5; di++) {
+    const firstVillage = index.find((e) =>
+      e.region.adm4.startsWith(otherDistrictsArr[di])
+    );
+    if (firstVillage) {
+      const before = candidates.length;
+      addVariants(firstVillage.region.adm4, 1);
+      if (candidates.length > before) level2Added++;
+    }
+  }
+
+  if (candidates.length >= maxCandidates) return candidates;
+
+  // Level 3: Other cities in the same province (adm1, cap 5)
+  const provPrefix = `${adm1}.`;
+  const otherCities = new Set<string>();
+  for (const entry of index) {
+    if (entry.region.adm4.startsWith(provPrefix)) {
+      const entryAdm2 = entry.region.adm4.slice(0, 5);
+      if (!entryAdm2.startsWith(adm2)) {
+        otherCities.add(entryAdm2);
+      }
+    }
+  }
+  const otherCitiesArr: string[] = [];
+  otherCities.forEach((c) => otherCitiesArr.push(c));
+  let level3Added = 0;
+  for (let ci = 0; ci < otherCitiesArr.length && level3Added < 5; ci++) {
+    const firstVillage = index.find((e) =>
+      e.region.adm4.startsWith(otherCitiesArr[ci])
+    );
+    if (firstVillage) {
+      const before = candidates.length;
+      addVariants(firstVillage.region.adm4, 1);
+      if (candidates.length > before) level3Added++;
+    }
+  }
+
+  if (candidates.length >= maxCandidates) return candidates;
+
+  // Level 4: Nearest villages from other provinces by coordinates (cap 5)
+  const coordsEntry = index.find(
+    (e) =>
+      e.region.adm4 === adm4 &&
+      e.region.latitude != null &&
+      e.region.longitude != null
+  );
+  if (coordsEntry) {
+    const { latitude, longitude } = coordsEntry.region;
+    const nearest: Array<{ entry: IndexEntry; dist: number }> = [];
+    for (const entry of index) {
+      if (entry.region.adm4.startsWith(provPrefix)) continue;
+      if (entry.region.latitude == null || entry.region.longitude == null) continue;
+      const d = haversineKm(
+        latitude!,
+        longitude!,
+        entry.region.latitude!,
+        entry.region.longitude!
+      );
+      nearest.push({ entry, dist: d });
+    }
+    nearest.sort((a, b) => a.dist - b.dist);
+    let level4Added = 0;
+    for (let ni = 0; ni < nearest.length && level4Added < 5; ni++) {
+      const before = candidates.length;
+      addVariants(nearest[ni].entry.region.adm4, 1);
+      if (candidates.length > before) level4Added++;
+    }
+  }
+
+  // Level 5: First village from each other province (cap 10)
+  // Try the XX.01.01.1001 pattern first (known to have BMKG data for many provinces)
+  const otherProvs = new Set<string>();
+  let level5Added = 0;
+  for (const entry of index) {
+    if (level5Added >= 10) break;
+    const entryProv = entry.region.adm4.slice(0, 2);
+    if (entryProv === adm1) continue;
+    if (otherProvs.has(entryProv)) continue;
+    otherProvs.add(entryProv);
+    const before = candidates.length;
+
+    // Try known-working pattern: XX.01.01.1001 (first district, first kelurahan)
+    addCandidate(`${entryProv}.01.01.1001`);
+
+    // Also try the first actual entry from this province
+    if (candidates.length < maxCandidates) {
+      addVariants(entry.region.adm4, 1);
+    }
+    if (candidates.length > before) level5Added++;
+  }
+
+  return candidates;
 }
 
 // ── Reverse geocoding via Nominatim (OpenStreetMap) ──

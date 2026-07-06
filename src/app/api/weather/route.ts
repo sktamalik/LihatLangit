@@ -7,8 +7,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { isValidAdm4 } from "@/lib/adm4";
-import { getRegionByAdm4, toBmkgAdm4 } from "@/lib/regionSearch";
+import { getRegionByAdm4, toBmkgAdm4, findBmkgFallback } from "@/lib/regionSearch";
 import { fetchForecast } from "@/lib/bmkgClient";
+import type { BmkgClientResult } from "@/lib/bmkgClient";
 import { normalizeBmkgForecast } from "@/lib/weatherNormalize";
 import { getCache, setCache } from "@/lib/cache";
 import type {
@@ -147,6 +148,52 @@ export async function GET(request: NextRequest) {
       fromCache: false,
       isStale: false,
     } satisfies WeatherForecast);
+  }
+
+  // ── BMKG failed — try expanded fallback ──
+  // The exact adm4 has no BMKG data. Try a broader set of candidates:
+  //   1. Direct code variants (0XXX↔1XXX)
+  //   2. Other villages in same district
+  //   3. Other districts in same city
+  //   4. Other cities in same province
+  // Each level uses a shorter timeout (4s) since these are probes.
+  console.log(`[Weather] Exact adm4 ${adm4} failed, trying expanded fallback...`);
+  const fallbackCandidates = await findBmkgFallback(adm4, 25);
+  let fallbackResult: BmkgClientResult | null = null;
+  let fallbackCode: string | null = null;
+  let fallbackAttempts = 0;
+  const MAX_FALLBACK_ATTEMPTS = 25;
+
+  for (let fi = 0; fi < fallbackCandidates.length && fallbackAttempts < MAX_FALLBACK_ATTEMPTS; fi++) {
+    const candidate = fallbackCandidates[fi];
+    if (candidate === bmkgAdm4 || candidate === adm4) continue; // already tried
+    fallbackAttempts++;
+    console.log(`[Weather] Trying fallback #${fallbackAttempts}: adm4=${candidate}`);
+    fallbackResult = await fetchForecast(candidate, 5000); // 5s timeout for probes
+    if (fallbackResult.ok) {
+      fallbackCode = candidate;
+      console.log(`[Weather] Fallback SUCCESS (#${fallbackAttempts}) for adm4=${candidate}`);
+      break;
+    }
+  }
+
+  if (fallbackResult?.ok && fallbackCode) {
+    const normalized = normalizeBmkgForecast(fallbackResult.data, region);
+
+    if (normalized && normalized.days.length > 0) {
+      // Look up the actual village name for the fallback code
+      const fallbackRegion = normalized.region;
+
+      setCache(cacheKey, normalized);
+
+      return NextResponse.json({
+        ...normalized,
+        fromCache: false,
+        isStale: false,
+        fallbackFrom: fallbackRegion.village,
+        fallbackAdm4: fallbackCode,
+      } satisfies WeatherForecast);
+    }
   }
 
   // ── BMKG failed — try stale cache ──
