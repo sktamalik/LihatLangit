@@ -1,75 +1,19 @@
-/**
- * Environmental metrics card — AQI, UV Index based on real weather data.
- */
-
 "use client";
-
 import type { WeatherForecast } from "@/types/weather";
 import { estimateAQI, estimateUVIndex, getMoonPhase } from "@/lib/envCalculations";
 
-interface EnviroMetricsProps {
-  forecast: WeatherForecast;
-}
-
-export default function EnviroMetrics({ forecast }: EnviroMetricsProps) {
-  const pt = forecast.nearestPoint ?? forecast.days[0]?.points[0];
-  const temp = pt?.temperatureC ?? 28;
-  const hum = pt?.humidityPct ?? 70;
-  const cloud = pt?.cloudCoverPct ?? 30;
-
-  const aqi = estimateAQI(temp, hum);
-  const uv = estimateUVIndex(
-    pt?.localDateTime ?? new Date().toISOString(),
-    cloud,
-    forecast.region.latitude
-  );
-  const moon = getMoonPhase(new Date());
-
-  return (
-    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col gap-4">
-      <h2 className="font-geist text-[18px] font-semibold text-primary mb-1">Metrik Lingkungan</h2>
-      <div className="flex flex-col gap-2">
-        <MetricRow
-          icon="air"
-          label="AQI (Estimasi)"
-          value={`${aqi.value} (${aqi.label})`}
-          color={aqi.color}
-          detail={`PM2.5: ${Math.round(aqi.value * 0.26)}  PM10: ${Math.round(aqi.value * 0.44)}`}
-        />
-        <MetricRow
-          icon="light_mode"
-          label="Indeks UV"
-          value={`${uv.value} (${uv.label})`}
-          color={uv.color}
-          detail={uv.tip}
-        />
-        <MetricRow
-          icon="routine"
-          label="Fase Bulan"
-          value={moon.phase}
-          color="text-indigo-500"
-          detail={`${moon.illumination}% Iluminasi`}
-        />
+export default function EnviroMetrics({forecast}:{forecast:WeatherForecast}){
+  const pt=forecast.nearestPoint??forecast.days[0]?.points[0];
+  const aqi=estimateAQI(pt?.temperatureC??28,pt?.humidityPct??70);
+  const uv=estimateUVIndex(pt?.localDateTime??new Date().toISOString(),pt?.cloudCoverPct??30,forecast.region.latitude);
+  const moon=getMoonPhase(new Date());
+  return(
+    <div className="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full">
+      <h3 className="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary-container text-[20px]">co2</span> Metrik Lingkungan</h3>
+      <div className="flex-grow space-y-4">
+        <div className="flex justify-between items-center"><span className="text-[14px] text-on-surface-variant font-medium">AQI</span><span className={`text-[14px] font-bold ${aqi.color}`}>{aqi.value} ({aqi.label})</span></div>
+        <div className="flex justify-between items-center"><span className="text-[14px] text-on-surface-variant font-medium">UV</span><span className={`text-[14px] font-bold ${uv.color}`}>{uv.value} ({uv.label})</span></div>
+        <div className="flex justify-between items-center"><span className="text-[14px] text-on-surface-variant font-medium">Bulan</span><span className="text-[14px] font-bold text-secondary">{moon.phase}</span></div>
       </div>
-    </div>
-  );
-}
-
-function MetricRow({
-  icon, label, value, color, detail,
-}: {
-  icon: string; label: string; value: string; color: string; detail: string;
-}) {
-  return (
-    <div className="flex items-center justify-between p-3 bg-surface-container-low rounded-xl border border-white/60">
-      <div className="flex items-center gap-2">
-        <span className={`material-symbols-outlined ${color} text-[20px]`}>{icon}</span>
-        <div className="flex flex-col">
-          <span className="text-[10px] text-outline leading-none">{label}</span>
-          <span className={`text-[13px] font-semibold ${color}`}>{value}</span>
-        </div>
-      </div>
-      <span className="text-[10px] text-outline text-right max-w-[90px]">{detail}</span>
-    </div>
-  );
+    </div>);
 }

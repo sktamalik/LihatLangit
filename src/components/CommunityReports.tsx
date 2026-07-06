@@ -1,107 +1,35 @@
-/**
- * Data Status — shows real BMKG metadata, cache status, fetch info.
- * Replaces simulated community reports with actual operational data.
- * Layout aligned with SunMoon card for visual consistency.
- */
-
 "use client";
-
 import type { WeatherForecast } from "@/types/weather";
 import { formatDateTimeShort } from "@/lib/time";
-
-interface CommunityReportsProps {
-  forecast: WeatherForecast;
-}
-
-export default function CommunityReports({ forecast }: CommunityReportsProps) {
-  return (
-    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col">
-      <h2 className="font-geist text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
-        <span className="material-symbols-outlined text-[20px]">monitoring</span> Status Data
-      </h2>
-      <div className="flex flex-col gap-2">
-        <DataRow
-          icon="cloud_sync"
-          iconColor="text-primary"
-          label="Sumber Data"
-          value="BMKG — Badan Meteorologi, Klimatologi, dan Geofisika"
-        />
-        <DataRow
-          icon="distance"
-          iconColor="text-indigo-500"
-          label="Kode Wilayah (adm4)"
-          value={forecast.region.adm4 || "—"}
-        />
-        <DataRow
-          icon="schedule"
-          iconColor="text-green-600"
-          label="Analisis BMKG"
-          value={forecast.analysisDateUtc ? formatShortDate(forecast.analysisDateUtc) : "—"}
-          detail="Waktu produksi data prakiraan"
-        />
-        <DataRow
-          icon="history"
-          iconColor="text-amber-600"
-          label="Diambil Aplikasi"
-          value={formatShortDate(forecast.fetchedAt)}
-          detail={forecast.fromCache ? "Data dari cache server" : "Data baru dari BMKG"}
-        />
-        <DataRow
-          icon={forecast.isStale ? "warning" : "check_circle"}
-          iconColor={forecast.isStale ? "text-red-500" : forecast.fromCache ? "text-amber-500" : "text-green-500"}
-          label="Status Cache"
-          value={forecast.isStale ? "Data Cadangan" : forecast.fromCache ? "Cache Aktif" : "Data Segar"}
-          detail={forecast.isStale ? "Data mungkin tidak terkini. BMKG tidak tersedia." : "Cache server berlaku 1 jam"}
-        />
-        <DataRow
-          icon="schedule"
-          iconColor="text-purple-500"
-          label="Perbaruan BMKG"
-          value="2× sehari (pagi & sore)"
-        />
-      </div>
-
-      {/* Link ke BMKG */}
-      <a
-        href="https://data.bmkg.go.id"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 pt-3 border-t border-outline-variant/20 flex items-center justify-center gap-1 text-[11px] text-primary font-medium hover:underline"
-      >
-        <span className="material-symbols-outlined text-[14px]">open_in_new</span>
-        Kunjungi data.bmkg.go.id
-      </a>
-    </div>
-  );
-}
-
-function DataRow({
-  icon,
-  iconColor,
-  label,
-  value,
-  detail,
-}: {
-  icon: string;
-  iconColor: string;
-  label: string;
-  value: string;
-  detail?: string;
-}) {
-  return (
-    <div className="flex items-start gap-3 py-2 border-b border-outline-variant/10 last:border-b-0">
-      <span className={`material-symbols-outlined ${iconColor} text-[18px] mt-0.5`}>{icon}</span>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] text-outline leading-none font-geist uppercase tracking-wider">{label}</span>
-          <span className="text-[12px] font-semibold text-on-surface text-right">{value}</span>
+export default function CommunityReports({forecast}:{forecast:WeatherForecast}){
+  return(
+    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="font-body-sans text-[20px] font-semibold text-text-dark flex items-center gap-2"><span className="material-symbols-outlined text-[20px] text-primary-container">monitoring</span> Status Data</h3>
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-grass-green/10 border border-grass-green/20">
+          <span className="w-2 h-2 rounded-full bg-grass-green animate-pulse"></span>
+          <span className="text-[12px] font-bold text-grass-green font-body-sans">{forecast.fromCache ? "Cache" : "Live"}</span>
         </div>
-        {detail && <p className="text-[10px] text-outline mt-0.5">{detail}</p>}
       </div>
-    </div>
-  );
-}
-
-function formatShortDate(iso: string): string {
-  return formatDateTimeShort(iso);
+      <div className="space-y-4 font-body-sans">
+        <div className="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant">
+          <span className="text-[15px] text-primary-container font-bold w-24">Sumber</span>
+          <span className="material-symbols-outlined text-[24px] text-primary-container">cloud_sync</span>
+          <span className="text-[15px] text-text-dark font-semibold flex-1 text-right">BMKG</span>
+          <span className="text-[15px] text-text-muted w-28 text-right">Resmi</span>
+        </div>
+        <div className="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant">
+          <span className="text-[15px] text-text-dark font-medium w-24">Analisis</span>
+          <span className="material-symbols-outlined text-[24px] text-grass-green">schedule</span>
+          <span className="text-[15px] text-text-dark font-semibold flex-1 text-right">{forecast.analysisDateUtc ? formatDateTimeShort(forecast.analysisDateUtc) : "—"}</span>
+          <span className="text-[15px] text-text-muted w-28 text-right">BMKG</span>
+        </div>
+        <div className="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant">
+          <span className="text-[15px] text-text-dark font-medium w-24">Diambil</span>
+          <span className="material-symbols-outlined text-[24px] text-amber-600">history</span>
+          <span className="text-[15px] text-text-dark font-semibold flex-1 text-right">{formatDateTimeShort(forecast.fetchedAt)}</span>
+          <span className="text-[15px] text-text-muted w-28 text-right">{forecast.fromCache ? "Cache" : "Live"}</span>
+        </div>
+      </div>
+    </div>);
 }

@@ -1,52 +1,14 @@
-/**
- * Sun & Moon timeline — calculated from location and date.
- */
-
 "use client";
-
 import type { WeatherForecast } from "@/types/weather";
-import { getSunTimes, getMoonPhase } from "@/lib/envCalculations";
-
-interface SunMoonProps {
-  forecast: WeatherForecast;
-}
-
-export default function SunMoon({ forecast }: SunMoonProps) {
-  const now = new Date();
-  const sun = getSunTimes(now, forecast.region.latitude, forecast.region.longitude, forecast.region.timezone);
-  const moon = getMoonPhase(now);
-
-  return (
-    <div className="weather-card rounded-3xl p-card-padding sky-shadow flex flex-col flex-grow">
-      <h2 className="font-geist text-[18px] font-semibold text-primary mb-3 flex items-center gap-2">
-        <span className="material-symbols-outlined text-[20px]">brightness_low</span> Matahari & Bulan
-      </h2>
-      <div className="flex flex-col gap-2">
-        <SunRow icon="wb_sunny" color="text-sun-accent" label="Terbit" value={sun.sunrise} />
-        <SunRow icon="wb_twilight" color="text-orange-500" label="Terbenam" value={sun.sunset} />
-        <div className="flex items-center justify-between py-2">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[22px] text-indigo-400">{moon.icon}</span>
-            <span className="text-[13px] text-on-surface">Bulan</span>
-          </div>
-          <div className="text-right">
-            <div className="text-[13px] font-bold text-on-surface">{moon.phase}</div>
-            <div className="text-[10px] text-outline">{moon.illumination}% Iluminasi</div>
-          </div>
-        </div>
+import { getSunTimes } from "@/lib/envCalculations";
+export default function SunMoon({forecast}:{forecast:WeatherForecast}){
+  const n=new Date();const s=getSunTimes(n,forecast.region.latitude,forecast.region.longitude,forecast.region.timezone);
+  return(
+    <div className="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full">
+      <h3 className="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-[#FDE047] text-[20px]">routine</span> Aktivitas Harian</h3>
+      <div className="flex-grow flex flex-col justify-around">
+        <div className="flex items-center gap-4"><span className="material-symbols-outlined text-[24px] text-[#FDE047]">wb_twilight</span><div><p className="text-[12px] text-on-surface-variant font-medium">Terbit</p><p className="text-[16px] font-bold text-text-dark">{s.sunrise}</p></div></div>
+        <div className="flex items-center gap-4"><span className="material-symbols-outlined text-[24px] text-primary-container">nights_stay</span><div><p className="text-[12px] text-on-surface-variant font-medium">Terbenam</p><p className="text-[16px] font-bold text-text-dark">{s.sunset}</p></div></div>
       </div>
-    </div>
-  );
-}
-
-function SunRow({ icon, color, label, value }: { icon: string; color: string; label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between py-2 border-b border-outline-variant/20">
-      <div className="flex items-center gap-2">
-        <span className={`material-symbols-outlined ${color} text-[18px]`}>{icon}</span>
-        <span className="text-[13px] text-on-surface">{label}</span>
-      </div>
-      <span className="text-[13px] font-bold text-on-surface">{value}</span>
-    </div>
-  );
+    </div>);
 }

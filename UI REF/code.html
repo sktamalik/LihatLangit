@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html class="light" lang="en" style="">
+
+<head></head>
+
+<body class="bg-background-sky text-text-dark font-body-sans antialiased min-h-screen flex flex-col relative"><svg
+        aria-hidden="true" class="inline-defs-container"
+        style="position:absolute;width:0;height:0;overflow:hidden"></svg>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-surface-variant": "#5b4039",
+                            "surface-container-highest": "#f9dcd4",
+                            "surface-container-low": "#fff1ed",
+                            "surface-container-lowest": "#ffffff",
+                            "surface-dim": "#f1d4cc",
+                            "inverse-primary": "#ffb59f",
+                            "on-secondary": "#ffffff",
+                            "surface-container": "#ffe9e3",
+                            "on-primary-container": "#551300",
+                            "primary": "#ae3100",
+                            "background-sky": "#E2F0F9",
+                            "text-dark": "#111827",
+                            "surface-variant": "#f9dcd4",
+                            "footer-earth": "#5A3714",
+                            "error": "#ba1a1a",
+                            "on-primary-fixed-variant": "#852300",
+                            "surface-bright": "#fff8f6",
+                            "surface": "#fff8f6",
+                            "primary-fixed-dim": "#ffb59f",
+                            "on-error": "#ffffff",
+                            "on-tertiary-container": "#002f45",
+                            "secondary-fixed": "#d8e2ff",
+                            "on-primary": "#ffffff",
+                            "secondary-container": "#2170e4",
+                            "on-surface": "#271813",
+                            "primary-fixed": "#ffdbd0",
+                            "surface-tint": "#ae3100",
+                            "grass-green": "#22C55E",
+                            "secondary": "#0058be",
+                            "secondary-fixed-dim": "#adc6ff",
+                            "on-secondary-container": "#fefcff",
+                            "inverse-on-surface": "#ffede8",
+                            "on-tertiary-fixed-variant": "#004c6c",
+                            "on-primary-fixed": "#3a0a00",
+                            "surface-container-high": "#ffe2da",
+                            "tertiary-fixed-dim": "#85cfff",
+                            "primary-container": "#ff5a22",
+                            "text-muted": "#6B7280",
+                            "outline-variant": "#e4beb4",
+                            "on-error-container": "#93000a",
+                            "tertiary-fixed": "#c7e7ff",
+                            "on-secondary-fixed-variant": "#004395",
+                            "on-background": "#271813",
+                            "on-tertiary-fixed": "#001e2e",
+                            "on-tertiary": "#ffffff",
+                            "outline": "#8f7067",
+                            "inverse-surface": "#3e2c27",
+                            "error-container": "#ffdad6",
+                            "tertiary": "#00658f",
+                            "background": "#fff8f6",
+                            "tertiary-container": "#009cda",
+                            "on-secondary-fixed": "#001a42"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                        },
+                        "spacing": {
+                            "margin-desktop": "80px",
+                            "section-gap": "96px",
+                            "base": "8px",
+                            "margin-mobile": "20px",
+                            "gutter": "24px",
+                            "card-padding": "32px"
+                        },
+                        "fontFamily": {
+                            "body-sans": ["Inter", "system-ui", "sans-serif"],
+                            "headline-md": ["Space Mono", "monospace"],
+                            "body-lg": ["Inter", "sans-serif"],
+                            "display-pixel": ["'Press Start 2P'", "monospace"],
+                            "display-lg": ["Space Mono", "monospace"],
+                            "display-lg-mobile": ["Space Mono", "monospace"],
+                            "headline-sm": ["Space Mono", "monospace"],
+                            "body-md": ["Inter", "sans-serif"],
+                            "label-md": ["Inter", "sans-serif"]
+                        },
+                        "fontSize": {
+                            "body-sans": ["1rem", { "lineHeight": "1.6", "fontWeight": "400" }],
+                            "headline-md": ["32px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                            "display-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                            "headline-sm": ["24px", { "lineHeight": "1.4", "fontWeight": "700" }],
+                            "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                            "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "600" }]
+                        }
+                    }
+                }
+            }
+        } catch (_e) { }</script>
+    <div
+        class="absolute top-24 right-[8%] w-24 h-24 z-0 rounded-full bg-[#FDE047] shadow-[0_0_40px_rgba(253,224,71,0.6)]">
+    </div>
+    <!-- Background Clouds -->
+    <div class="absolute top-20 right-[20%] w-32 h-12 rounded-full opacity-80 hidden md:block bg-white z-0"></div>
+    <div class="absolute top-64 left-[10%] w-40 h-16 rounded-full opacity-90 hidden md:block bg-white z-0"></div>
+    <div class="absolute top-96 right-[5%] w-48 h-20 rounded-full opacity-70 hidden lg:block bg-white z-0"></div>
+    <div class="absolute top-32 left-[5%] w-24 h-8 rounded-full bg-white opacity-85 hidden md:block z-0"></div>
+    <div class="absolute top-[25rem] right-[15%] w-36 h-10 rounded-full bg-white opacity-75 hidden lg:block z-0"></div>
+    <div class="absolute top-[50rem] right-[30%] w-28 h-8 rounded-full bg-white opacity-60 hidden md:block z-0"></div>
+    <div class="absolute top-[40rem] left-[15%] w-32 h-12 rounded-full opacity-80 hidden md:block bg-white z-0"></div>
+    <!-- TopNavBar -->
+    <nav
+        class="sticky top-0 w-full z-50 border-b border-outline-variant flat no shadows flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-full bg-white">
+        <div class="flex items-center gap-4">
+            <a class="font-display-pixel text-[16px] text-text-dark flex items-center gap-2" href="#">
+                obscura
+            </a>
+        </div>
+        <div class="hidden md:flex items-center gap-6">
+            <a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px]"
+                href="#">Features <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+            <a class="text-text-dark font-semibold border-b-2 border-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px]"
+                href="#">Product <span class="material-symbols-outlined text-[16px]">expand_more</span></a>
+            <a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-sans text-[14px]"
+                href="#">Check Connection</a>
+            <a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-sans text-[14px]"
+                href="#">Blog</a>
+            <a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-sans text-[14px]"
+                href="#">Knowledge Base</a>
+            <a class="text-on-surface-variant hover:text-primary transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px]"
+                href="#">Discord <span class="material-symbols-outlined text-[16px]">open_in_new</span></a>
+        </div>
+        <div class="flex items-center gap-4">
+            <a class="hidden md:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[14px]"
+                href="#">Manage Account</a>
+            <button
+                class="bg-primary-container text-white px-6 py-2 rounded-md font-body-sans text-body-md font-medium hover:bg-primary-container/90 transition-colors flex items-center gap-1">Get
+                Started <span class="material-symbols-outlined text-[18px]">arrow_forward</span></button>
+        </div>
+    </nav>
+    <main class="flex-grow relative z-10">
+        <!-- Hero Section -->
+        <section
+            class="flex flex-col items-center justify-center text-center px-margin-mobile md:px-margin-desktop pt-24 pb-12 w-full max-w-5xl mx-auto relative">
+            <div
+                class="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white border border-outline-variant mb-10 shadow-sm relative z-10">
+                <span
+                    class="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">New</span>
+                <span class="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Now
+                    available on Android <span class="material-symbols-outlined text-[16px]">arrow_forward</span></span>
+            </div>
+            <h1
+                class="font-display-pixel text-[24px] md:text-[36px] lg:text-[48px] text-text-dark leading-[1.3] mb-6 max-w-4xl relative z-10 uppercase tracking-tight">
+                Privacy that's <br><span class="text-primary-container">more than a promise</span></h1>
+            <p
+                class="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl relative z-10 font-medium">
+                Meet Obscura: the first VPN that <span class="font-bold text-text-dark italic">can't</span> log your
+                activity and <span class="font-bold text-text-dark">outsmarts internet censorship</span>.
+            </p>
+            <div class="flex flex-col items-center gap-6 mb-4 relative z-10">
+                <button
+                    class="bg-primary-container text-white px-8 py-3.5 rounded-md font-body-sans text-[18px] font-medium hover:bg-primary-container/90 transition-transform hover:scale-105 flex items-center gap-2 shadow-sm">
+                    Get Started
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </button>
+                <div class="flex items-center gap-6 text-on-surface-variant font-body-sans text-[14px] font-medium">
+                    <a class="flex items-center gap-2 hover:text-text-dark transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[18px]">vpn_key</span>
+                        Use with Wireguard
+                    </a>
+                    <a class="flex items-center gap-2 hover:text-text-dark transition-colors" href="#">
+                        <span class="material-symbols-outlined text-[18px]">devices</span>
+                        Other platforms
+                    </a>
+                </div>
+            </div>
+        </section>
+        <!-- App UI Mockup Section -->
+        <section class="px-margin-mobile md:px-margin-desktop py-12 w-full flex justify-center relative z-10">
+            <div
+                class="w-full max-w-4xl bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-outline-variant overflow-hidden flex flex-col md:flex-row min-h-[500px]">
+                <!-- Sidebar -->
+                <div class="w-full md:w-64 bg-surface-bright flex flex-col pt-4 pb-6 px-4">
+                    <!-- macOS style window controls -->
+                    <div class="flex gap-2 mb-8 mt-2">
+                        <div class="w-3 h-3 rounded-full bg-[#FF5F56]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#FFBD2E]"></div>
+                        <div class="w-3 h-3 rounded-full bg-[#27C93F]"></div>
+                    </div>
+                    <nav class="flex-grow space-y-1">
+                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium"
+                            href="#">
+                            <span class="material-symbols-outlined text-[20px] text-text-muted">language</span>
+                            Connection
+                        </a>
+                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-secondary-fixed/50 text-secondary-container font-medium font-body-sans text-[14px]"
+                            href="#">
+                            <span class="material-symbols-outlined text-[20px]">pin_drop</span>
+                            Location
+                        </a>
+                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium"
+                            href="#">
+                            <span class="material-symbols-outlined text-[20px] text-text-muted">person</span>
+                            Account
+                        </a>
+                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium"
+                            href="#">
+                            <span class="material-symbols-outlined text-[20px] text-text-muted">help</span>
+                            Help
+                        </a>
+                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium"
+                            href="#">
+                            <span class="material-symbols-outlined text-[20px] text-text-muted">settings</span>
+                            Settings
+                        </a>
+                    </nav>
+                </div>
+                <!-- Main Content Area -->
+                <div class="flex-grow bg-white p-6 md:p-8 flex flex-col border-l border-outline-variant/50">
+                    <h2 class="font-body-sans text-[20px] font-semibold text-text-dark mb-6">Location</h2>
+                    <!-- Status Banner -->
+                    <div
+                        class="border border-grass-green/20 bg-grass-green/5 rounded-lg p-4 flex justify-between items-center mb-8">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined text-grass-green text-[24px]">verified</span>
+                            <div>
+                                <h3 class="font-body-sans text-[15px] font-semibold text-grass-green">Connected to New
+                                    York, NY</h3>
+                                <p class="font-body-sans text-[13px] text-on-surface-variant">Traffic is protected</p>
+                            </div>
+                        </div>
+                        <button
+                            class="px-4 py-2 bg-error-container text-on-error-container rounded-md font-body-sans text-[13px] font-medium hover:bg-error-container/80 transition-colors">Disconnect</button>
+                    </div>
+                    <h4
+                        class="font-body-sans text-[11px] text-on-surface-variant uppercase tracking-wider font-semibold mb-4">
+                        North America</h4>
+                    <!-- Location List -->
+                    <div class="space-y-3">
+                        <div
+                            class="border border-outline-variant rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-6 bg-gray-100 rounded overflow-hidden relative border border-gray-200">
+                                    <img alt="Canada Flag" class="w-full h-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuUm5hhn45ldzNrU0reBBl7zHNVyTPZQQBgzZaDjybzix9COEhwHjgunp8TQmjJp7Q3bRdbALh1FMjYREvdUpJ0Ca8owbd0mF7WSCh4HepKEPX9McaN1W--0iUjuCm2Y_WxbKaq3WjOESROD43suWxYNSgzPbhXpCSC3wVaziYTJxg1z7i-lDKNwh-wPI5gKf5FWeSrWTZBwZcXcNNgF9kqhp0vNOMBDuYc5Nixrh9AMfHP_xIrdzqLXQVlWw_sa4B20OExYXVyv8">
+                                </div>
+                                <div>
+                                    <h5 class="font-body-sans text-[14px] font-medium text-text-dark">Toronto</h5>
+                                    <p class="font-body-sans text-[12px] text-on-surface-variant">Canada</p>
+                                </div>
+                            </div>
+                            <button class="p-1 text-on-surface-variant hover:bg-surface-container rounded-md"><span
+                                    class="material-symbols-outlined text-[18px]">push_pin</span></button>
+                        </div>
+                        <div
+                            class="border border-outline-variant rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-6 bg-gray-100 rounded overflow-hidden relative border border-gray-200">
+                                    <img alt="Canada Flag" class="w-full h-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1Ssy12gn_ydrtk_dS3MUKZUphRMOVibP-wHgLHq1CY6jLyor9J3Juq2SuqhhFK9IVBAKLsQ0gIP3cyqe6rLo_rb5WqtXT-tzkJK3N1UXfhe0CBnO1yjNbQntuYWmu2VesQdDhthLQJ9we2KnzrbfbwO2swud4lHJheLz3DHbPl4SmUEE5natPDM2JejWNaUI0u33KGOKl61ub92wIxa1tgdtR6-fgyCYddYOl3orPBDUCKOPt2kh6dw0yT99umMohkAcSZAQZMCU">
+                                </div>
+                                <div>
+                                    <h5 class="font-body-sans text-[14px] font-medium text-text-dark">Vancouver</h5>
+                                    <p class="font-body-sans text-[12px] text-on-surface-variant">Canada</p>
+                                </div>
+                            </div>
+                            <button class="p-1 text-on-surface-variant hover:bg-surface-container rounded-md"><span
+                                    class="material-symbols-outlined text-[18px]">push_pin</span></button>
+                        </div>
+                        <div
+                            class="border border-outline-variant rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-6 bg-gray-100 rounded overflow-hidden relative border border-gray-200">
+                                    <img alt="US Flag" class="w-full h-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFLQWVkfpMFJTw5bWvj1M-CzO9oFj9Tbo3y9RWjtRX9RxdrmwF4mcu93QXjA-OIf-Ay7bYvU1LCfbtCuLGi0uMEI05sowkpO8U87VCkrsZcs0nn4GIp__1LSx2ANwCDfsCPcpSY1g9tXIvQ0Mu25h_lZa7NrFIPjK4UqbScuAqE-5HHbdtWA9abwDaOQUN6qy1EZgEZeJK9dx4pwKvAnHZ7yaKyHOVqTcwJ3QYQhQR7lP5ml97QK8uCiv_MKaUDINKmKu9lLJMu8s">
+                                </div>
+                                <div>
+                                    <h5 class="font-body-sans text-[14px] font-medium text-text-dark">Ashburn, VA</h5>
+                                    <p class="font-body-sans text-[12px] text-on-surface-variant">United States</p>
+                                </div>
+                            </div>
+                            <button class="p-1 text-on-surface-variant hover:bg-surface-container rounded-md"><span
+                                    class="material-symbols-outlined text-[18px]">push_pin</span></button>
+                        </div>
+                        <div
+                            class="border border-outline-variant rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-8 h-6 bg-gray-100 rounded overflow-hidden relative border border-gray-200">
+                                    <img alt="US Flag" class="w-full h-full object-cover"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjfRZy0kiDzfJqsWuTOT6ADmAjq-yLK_Bxz4kBCLTebqpsnbuw_ne3poVhBjPwUc_RGCmQNXTame7GXcyLoRqw7mUJ2TUskvZJiPMA3hGs1Ev_nHD7sHBBKhfRn0WWcRUPoe-hd_lPeu-STh6QrUTZSlcJ9PI5Sz_IEKpnHgyyIr8E0AXPyFppxoaQ_XdzRHXlmwru7Svh4BMnZbxiAp4ClLKF9IUNidSLmgWX0jQnR1-2rtlAuacd_OelVSaZvhsXM9qGETLFuyg">
+                                </div>
+                                <div>
+                                    <h5 class="font-body-sans text-[14px] font-medium text-text-dark">Chicago, IL</h5>
+                                    <p class="font-body-sans text-[12px] text-on-surface-variant">United States</p>
+                                </div>
+                            </div>
+                            <button class="p-1 text-on-surface-variant hover:bg-surface-container rounded-md"><span
+                                    class="material-symbols-outlined text-[18px]">push_pin</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Value Prop Section -->
+        <section class="px-margin-mobile py-24 flex justify-center text-center relative z-10 md:px-8">
+
+        </section>
+        <!-- Features Section -->
+        <section
+            class="px-4 md:px-8 pb-24 pt-12 w-full max-w-[1800px] mx-auto flex flex-col items-center relative z-10">
+            <h3 class="font-display-pixel text-[14px] md:text-[18px] text-text-dark text-center mb-12 uppercase">
+                Real-Time <span class="text-primary-container">Network Intelligence</span>
+            </h3>
+            <div class="w-full flex flex-col gap-8">
+                <!-- Row 1: Trend Graph -->
+                <div
+                    class="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-body-sans text-[20px] font-semibold text-text-dark">Latency Trend 24 Hours</h3>
+                        <div
+                            class="flex items-center gap-4 text-[12px] font-body-sans text-on-surface-variant font-medium">
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-primary-container"></div> NY Server
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-[#FDE047]"></div> Global Avg
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-full h-[240px] relative mt-8">
+                        <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 1000 200">
+                            <path d="M0 50 Q 250 80 500 120 T 1000 150 L 1000 200 L 0 200 Z" fill="url(#grad)"
+                                opacity="0.1"></path>
+                            <path d="M0 50 Q 250 80 500 120 T 1000 150" fill="none" stroke="#ff5a22" stroke-width="3">
+                            </path>
+                            <circle cx="0" cy="50" fill="#ff5a22" r="5"></circle>
+                            <circle cx="1000" cy="150" fill="#ff5a22" r="5"></circle>
+                            <path d="M0 100 L 1000 80" fill="none" stroke="#FDE047" stroke-dasharray="8,8"
+                                stroke-width="2"></path>
+                        </svg>
+                        <defs>
+                            <lineargradient id="grad" x1="0%" x2="0%" y1="0%" y2="100%">
+                                <stop offset="0%" stop-color="#ff5a22" stop-opacity="1">
+                                    <stop offset="100%" stop-color="#ff5a22" stop-opacity="0">
+                                    </stop>
+                                </stop>
+                            </lineargradient>
+                        </defs>
+                        <div
+                            class="absolute top-[20px] left-0 text-[13px] text-primary-container font-bold bg-white px-2 rounded">
+                            12ms</div>
+                        <div
+                            class="absolute bottom-[20px] right-0 text-[13px] text-primary-container font-bold bg-white px-2 rounded">
+                            45ms</div>
+                        <div class="absolute bottom-[-30px] left-0 text-[13px] text-text-muted font-medium">18:00</div>
+                        <div class="absolute bottom-[-30px] right-0 text-[13px] text-text-muted font-medium">21:00</div>
+                    </div>
+                </div>
+                <div
+                    class="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant mt-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-body-sans text-[20px] font-semibold text-text-dark">Global Server Node Map</h3>
+                        <div
+                            class="flex items-center gap-2 px-3 py-1 rounded-full bg-grass-green/10 border border-grass-green/20">
+                            <span class="w-2 h-2 rounded-full bg-grass-green animate-pulse"></span>
+                            <span class="text-[12px] font-bold text-grass-green">Active Nodes: 142</span>
+                        </div>
+                    </div>
+                    <div
+                        class="w-full h-[400px] bg-background-sky/30 rounded-lg relative overflow-hidden border border-outline-variant/30">
+                        <div class="absolute inset-0 opacity-20"
+                            style="background-image: radial-gradient(#ae3100 0.5px, transparent 0.5px); background-size: 20px 20px;">
+                        </div>
+                        <div
+                            class="absolute top-1/4 left-1/4 w-3 h-3 bg-primary-container rounded-full shadow-[0_0_10px_#ff5a22]">
+                        </div>
+                        <div
+                            class="absolute top-1/3 left-1/2 w-3 h-3 bg-primary-container rounded-full shadow-[0_0_10px_#ff5a22]">
+                        </div>
+                        <div
+                            class="absolute top-1/2 left-1/3 w-3 h-3 bg-primary-container rounded-full shadow-[0_0_10px_#ff5a22]">
+                        </div>
+                        <div
+                            class="absolute top-2/3 left-3/4 w-3 h-3 bg-primary-container rounded-full shadow-[0_0_10px_#ff5a22]">
+                        </div>
+                        <div
+                            class="absolute bottom-1/4 left-2/3 w-3 h-3 bg-primary-container rounded-full shadow-[0_0_10px_#ff5a22]">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <span class="material-symbols-outlined text-[120px] text-primary/5">public</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Row 2: Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-8 w-full">
+                    <!-- Current Node Status -->
+                    <div class="md:col-span-5 h-full">
+                        <div
+                            class="bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col items-center justify-center h-full">
+                            <div class="w-full flex justify-end mb-6">
+                                <div
+                                    class="px-3 py-1.5 rounded-full bg-surface-container flex items-center gap-1.5 border border-outline-variant/50">
+                                    <span
+                                        class="material-symbols-outlined text-[16px] text-primary-container">location_on</span>
+                                    <span class="font-body-sans text-[13px] text-primary-container font-semibold">New
+                                        York Node</span>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-[56px] text-grass-green mb-4">shield</span>
+                            <h2
+                                class="font-body-sans text-[72px] font-bold text-text-dark leading-none tracking-tighter mb-2">
+                                12<span class="text-[28px] font-semibold text-text-muted ml-1">ms</span></h2>
+                            <p
+                                class="font-body-sans text-[18px] text-primary-container font-bold mb-10 tracking-wide uppercase">
+                                Optimal</p>
+                            <div class="grid grid-cols-2 gap-x-8 gap-y-8 w-full text-center">
+                                <div>
+                                    <span
+                                        class="material-symbols-outlined text-[24px] text-text-muted mb-2">download</span>
+                                    <p class="font-body-sans text-[13px] text-text-muted font-medium">Download</p>
+                                    <p class="font-body-sans text-[16px] font-bold text-text-dark">340 Mbps</p>
+                                </div>
+                                <div>
+                                    <span
+                                        class="material-symbols-outlined text-[24px] text-text-muted mb-2">upload</span>
+                                    <p class="font-body-sans text-[13px] text-text-muted font-medium">Upload</p>
+                                    <p class="font-body-sans text-[16px] font-bold text-text-dark">120 Mbps</p>
+                                </div>
+                                <div>
+                                    <span
+                                        class="material-symbols-outlined text-[24px] text-text-muted mb-2">visibility_off</span>
+                                    <p class="font-body-sans text-[13px] text-text-muted font-medium">Packet Loss</p>
+                                    <p class="font-body-sans text-[16px] font-bold text-text-dark">&lt; 0.1%</p>
+                                </div>
+                                <div>
+                                    <span
+                                        class="material-symbols-outlined text-[24px] text-text-muted mb-2">router</span>
+                                    <p class="font-body-sans text-[13px] text-text-muted font-medium">Protocol</p>
+                                    <p class="font-body-sans text-[16px] font-bold text-text-dark">WireGuard</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Server Load Prediction -->
+                    <div class="md:col-span-7 h-full">
+                        <div
+                            class="bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant h-full flex flex-col">
+                            <h3 class="font-body-sans text-[20px] font-semibold text-text-dark mb-8">Server Load
+                                Prediction</h3>
+                            <div class="space-y-4 font-body-sans flex-grow flex flex-col justify-center">
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant">
+                                    <span class="text-[15px] text-primary-container font-bold w-24">Today</span>
+                                    <span class="material-symbols-outlined text-[24px] text-[#FDE047]">dns</span>
+                                    <div class="flex items-center gap-2 w-24 justify-end">
+                                        <span
+                                            class="material-symbols-outlined text-[18px] text-primary-container">speed</span>
+                                        <span class="text-[15px] text-primary-container font-semibold">66%</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 w-28 justify-end">
+                                        <span class="text-[15px] text-text-muted">28ms</span>
+                                        <span class="text-[15px] font-bold text-text-dark">29ms</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant">
+                                    <span class="text-[15px] text-text-dark font-medium w-24">Tomorrow</span>
+                                    <span class="material-symbols-outlined text-[24px] text-[#FDE047]">dns</span>
+                                    <div class="flex items-center gap-2 w-24 justify-end">
+                                        <span
+                                            class="material-symbols-outlined text-[18px] text-primary-container">speed</span>
+                                        <span class="text-[15px] text-primary-container font-semibold">70%</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 w-28 justify-end">
+                                        <span class="text-[15px] text-text-muted">25ms</span>
+                                        <span class="text-[15px] font-bold text-text-dark">31ms</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant">
+                                    <span class="text-[15px] text-text-dark font-medium w-24">Wednesday</span>
+                                    <span class="material-symbols-outlined text-[24px] text-[#FDE047]">dns</span>
+                                    <div class="flex items-center gap-2 w-24 justify-end">
+                                        <span
+                                            class="material-symbols-outlined text-[18px] text-primary-container">speed</span>
+                                        <span class="text-[15px] text-primary-container font-semibold">71%</span>
+                                    </div>
+                                    <div class="flex items-center gap-3 w-28 justify-end">
+                                        <span class="text-[15px] text-text-muted">25ms</span>
+                                        <span class="text-[15px] font-bold text-text-dark">33ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                class="mt-8 pt-4 border-t border-outline-variant/40 flex justify-between items-center text-[12px] text-text-muted font-medium">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="material-symbols-outlined text-[16px]">info</span>
+                                    Data Source: Global Network Analysis
+                                </div>
+                                <div class="">Updated: Just now</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- New Metric Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full mt-8">
+                    <!-- Card 1: Environment Metrics -->
+                    <div
+                        class="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full">
+                        <h3
+                            class="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary-container text-[20px]">co2</span> Metrik
+                            Lingkungan
+                        </h3>
+                        <div class="flex-grow space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[14px] text-on-surface-variant font-medium">Server AQI</span>
+                                <span class="text-[14px] font-bold text-grass-green">42 (Good)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[14px] text-on-surface-variant font-medium">UV Interference</span>
+                                <span class="text-[14px] font-bold text-[#FDE047]">Low (2)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-[14px] text-on-surface-variant font-medium">Network Cycle</span>
+                                <span class="text-[14px] font-bold text-secondary">Waxing Gibbous</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 2: Sea Conditions (Fiber Optic Status) -->
+                    <div
+                        class="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full">
+                        <h3
+                            class="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary text-[20px]">water</span> Fiber Optic
+                            Cable Status
+                        </h3>
+                        <div class="flex-grow flex flex-col justify-center items-center text-center">
+                            <span class="material-symbols-outlined text-[40px] text-secondary mb-2">waves</span>
+                            <p class="text-[14px] text-on-surface-variant font-medium mb-1">Trans-Atlantic Cable</p>
+                            <p class="text-[20px] font-bold text-text-dark">Optimal</p>
+                            <div class="mt-4 flex gap-4 text-[12px] text-text-muted">
+                                <span class="">Wave: 1.2m</span>
+                                <span class="">Temp: 14°C</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 3: Sunrise & Sunset (Daily Peak Activity) -->
+                    <div
+                        class="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full">
+                        <h3
+                            class="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[#FDE047] text-[20px]">routine</span> Daily Peak
+                            Activity
+                        </h3>
+                        <div class="flex-grow flex flex-col justify-around">
+                            <div class="flex items-center gap-4">
+                                <span class="material-symbols-outlined text-[24px] text-[#FDE047]">wb_twilight</span>
+                                <div>
+                                    <p class="text-[12px] text-on-surface-variant font-medium">Morning Peak</p>
+                                    <p class="text-[16px] font-bold text-text-dark">08:45 AM</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <span
+                                    class="material-symbols-outlined text-[24px] text-primary-container">nights_stay</span>
+                                <div>
+                                    <p class="text-[12px] text-on-surface-variant font-medium">Evening Peak</p>
+                                    <p class="text-[16px] font-bold text-text-dark">09:15 PM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 4: Smart Recommendation (Security Recommendations) -->
+                    <div
+                        class="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full">
+                        <h3
+                            class="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-[20px]">security</span> Security
+                            Recommendations
+                        </h3>
+                        <div class="flex-grow space-y-3">
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-grass-green/10 flex items-center justify-center text-grass-green">
+                                    <span class="material-symbols-outlined text-[16px]">monitor_heart</span>
+                                </div>
+                                <div>
+                                    <p class="text-[13px] font-semibold text-text-dark">System Health</p>
+                                    <p class="text-[11px] text-text-muted">All protocols secure</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                                    <span class="material-symbols-outlined text-[16px]">router</span>
+                                </div>
+                                <div>
+                                    <p class="text-[13px] font-semibold text-text-dark">Home Network</p>
+                                    <p class="text-[11px] text-text-muted">Encrypted traffic only</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-primary-container/10 flex items-center justify-center text-primary-container">
+                                    <span class="material-symbols-outlined text-[16px]">lock</span>
+                                </div>
+                                <div>
+                                    <p class="text-[13px] font-semibold text-text-dark">Secure Activities</p>
+                                    <p class="text-[11px] text-text-muted">Enabled for all apps</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 5: Forecast Slider (Hourly Load Forecast) -->
+                    <div
+                        class="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full col-span-1 md:col-span-2 lg:col-span-2">
+                        <h3
+                            class="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-text-muted text-[20px]">timeline</span> Hourly
+                            Load Forecast
+                        </h3>
+                        <div class="flex-grow flex items-center overflow-x-auto pb-2 gap-6 no-scrollbar">
+                            <!-- Time slots -->
+                            <div class="flex flex-col items-center min-w-[50px]">
+                                <span class="text-[12px] text-text-muted mb-2">12 PM</span>
+                                <span class="material-symbols-outlined text-[20px] text-grass-green mb-1">speed</span>
+                                <span class="text-[14px] font-bold text-text-dark">45%</span>
+                            </div>
+                            <div class="flex flex-col items-center min-w-[50px]">
+                                <span class="text-[12px] text-text-muted mb-2">1 PM</span>
+                                <span class="material-symbols-outlined text-[20px] text-grass-green mb-1">speed</span>
+                                <span class="text-[14px] font-bold text-text-dark">52%</span>
+                            </div>
+                            <div class="flex flex-col items-center min-w-[50px]">
+                                <span class="text-[12px] text-text-dark font-bold mb-2">Now</span>
+                                <span class="material-symbols-outlined text-[20px] text-[#FDE047] mb-1">speed</span>
+                                <span class="text-[14px] font-bold text-text-dark">66%</span>
+                            </div>
+                            <div class="flex flex-col items-center min-w-[50px]">
+                                <span class="text-[12px] text-text-muted mb-2">3 PM</span>
+                                <span
+                                    class="material-symbols-outlined text-[20px] text-primary-container mb-1">speed</span>
+                                <span class="text-[14px] font-bold text-text-dark">78%</span>
+                            </div>
+                            <div class="flex flex-col items-center min-w-[50px]">
+                                <span class="text-[12px] text-text-muted mb-2">4 PM</span>
+                                <span
+                                    class="material-symbols-outlined text-[20px] text-primary-container mb-1">speed</span>
+                                <span class="text-[14px] font-bold text-text-dark">82%</span>
+                            </div>
+                            <div class="flex flex-col items-center min-w-[50px]">
+                                <span class="text-[12px] text-text-muted mb-2">5 PM</span>
+                                <span class="material-symbols-outlined text-[20px] text-[#FDE047] mb-1">speed</span>
+                                <span class="text-[14px] font-bold text-text-dark">70%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 6: Data Status -->
+                    <div
+                        class="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col h-full md:col-span-2">
+                        <h3
+                            class="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-text-muted text-[20px]">info</span> Status Data
+                        </h3>
+                        <div class="flex-grow flex flex-col justify-center gap-4">
+                            <div>
+                                <p class="text-[12px] text-on-surface-variant font-medium uppercase tracking-wider">
+                                    Source</p>
+                                <p class="text-[14px] font-bold text-text-dark">Obscura Global Network Analysis</p>
+                            </div>
+                            <div>
+                                <p class="text-[12px] text-on-surface-variant font-medium uppercase tracking-wider">Last
+                                    Update</p>
+                                <p class="text-[14px] font-bold text-text-dark flex items-center gap-1">
+                                    <span
+                                        class="material-symbols-outlined text-[16px] text-grass-green">check_circle</span>
+                                    Just now
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Card 7: Weather Map (Global Server Node Map) -->
+                </div>
+            </div>
+        </section>
+        <!-- Bottom CTA -->
+        <section class="px-margin-mobile md:px-margin-desktop py-24 w-full max-w-5xl mx-auto relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="font-display-pixel text-[18px] md:text-[24px] text-text-dark leading-[1.4] uppercase mb-4">
+                    It's simple: <span class="text-primary-container">We can't leak what we don't have.</span></h2>
+                <p class="font-body-sans text-[16px] text-on-surface-variant max-w-2xl mx-auto">Our infrastructure is
+                    built on RAM-only servers. Data that is never written to a disk cannot be seized, stolen, or leaked.
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-[16px] p-8 border border-outline-variant shadow-sm text-center">
+                    <span
+                        class="material-symbols-outlined text-[48px] text-primary-container mb-4">history_toggle_off</span>
+                    <h3 class="font-body-sans text-[18px] font-bold text-text-dark mb-2">No Logs</h3>
+                    <p class="font-body-sans text-[14px] text-on-surface-variant">We don't track your IP, your browsing
+                        history, or your session duration. Ever.</p>
+                </div>
+                <div class="bg-white rounded-[16px] p-8 border border-outline-variant shadow-sm text-center">
+                    <span
+                        class="material-symbols-outlined text-[48px] text-primary-container mb-4">alternate_email</span>
+                    <h3 class="font-body-sans text-[18px] font-bold text-text-dark mb-2">No Emails</h3>
+                    <p class="font-body-sans text-[14px] text-on-surface-variant">Sign up with a generated token. No
+                        personal identity required to stay private.</p>
+                </div>
+                <div class="bg-white rounded-[16px] p-8 border border-outline-variant shadow-sm text-center">
+                    <span
+                        class="material-symbols-outlined text-[48px] text-primary-container mb-4">credit_card_off</span>
+                    <h3 class="font-body-sans text-[18px] font-bold text-text-dark mb-2">No Credit Cards</h3>
+                    <p class="font-body-sans text-[14px] text-on-surface-variant">We accept Monero and Bitcoin via
+                        Lightning for truly anonymous payments.</p>
+                </div>
+            </div>
+        </section>
+        <section
+            class="px-margin-mobile md:px-margin-desktop pt-24 pb-0 flex flex-col items-center text-center relative overflow-visible z-10 min-h-[300px]">
+            <h2 class="font-display-pixel text-[18px] md:text-[28px] text-text-dark mb-6 z-10 relative uppercase">
+                Internet freedom <br>
+                <span class="text-primary-container">starts here.</span>
+            </h2>
+            <p
+                class="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl relative z-10 font-medium">
+                Start using Obscura for macOS, iOS, and Android today, or join our waitlist for other platforms.
+            </p>
+            <div class="flex items-center gap-6 mb-24 z-10 relative">
+                <button
+                    class="bg-primary-container text-white px-8 py-3.5 rounded-md font-body-sans text-[16px] font-medium hover:bg-primary-container/90 transition-transform hover:scale-105 flex items-center gap-2 shadow-sm">
+                    Get Started
+                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                </button>
+                <a class="flex items-center gap-2 text-on-surface-variant hover:text-text-dark transition-colors font-body-sans text-[14px] font-medium"
+                    href="#">
+                    <span class="material-symbols-outlined text-[18px]">info</span>
+                    Other platforms
+                </a>
+            </div>
+            <!-- Pixel Character Illustration -->
+        </section>
+    </main>
+    <!-- Footer Area -->
+    <div class="w-full relative z-10">
+        <!-- Pixel Character on Grass -->
+        <div class="relative w-full h-4 bg-grass-green z-30"
+            style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='16' height='16' fill='%2322C55E'/%3E%3Crect width='4' height='4' fill='%2316a34a'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%2316a34a'/%3E%3C/svg%3E&quot;); background-size: 8px 8px; image-rendering: pixelated;">
+            <div class="absolute bottom-0 left-[10%] w-[64px] h-[64px] z-40">
+            </div>
+        </div>
+        <!-- Footer Background -->
+        <footer class="bg-[#5A3714] text-white pt-24 pb-12 w-full relative z-10">
+            <div class="max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-24">
+                    <!-- Brand and Quote -->
+                    <div class="md:col-span-6 flex flex-col gap-8">
+                        <div class="flex items-center gap-8">
+                            <a class="font-display-pixel text-[32px] text-white tracking-tight" href="#">obscura</a>
+                            <a class="flex items-center gap-2 text-white hover:text-white/80 transition-colors text-[14px] font-medium"
+                                href="mailto:support@obscura.net">
+                                <span class="material-symbols-outlined text-[18px]">mail</span>
+                                support@obscura.net
+                            </a>
+                        </div>
+                        <div class="max-w-xl">
+                            <p class="text-white text-[16px] leading-relaxed font-medium">
+                                “We must defend our own privacy if we expect to have any. We must come together and
+                                create systems which allow anonymous transactions to take place.”
+                            </p>
+                            <p class="text-white/90 text-[12px] text-right mt-4">
+                                — Eric Hughes, <span class="font-bold">A Cypherpunk’s Manifesto (1993)</span>
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Links Columns -->
+                    <div class="md:col-span-2 flex flex-col gap-4">
+                        <span class="text-white font-bold text-[14px] mb-2">Jump To</span>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Next-Gen
+                            Privacy</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">How Obscura
+                            Works</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Superior
+                            Obfuscation</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">FAQ</a>
+                    </div>
+                    <div class="md:col-span-2 flex flex-col gap-4">
+                        <span class="text-white font-bold text-[14px] mb-2">Resources</span>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Service
+                            Status</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Blog</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Legal</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Source Code
+                            (GitHub)</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Cursed
+                            Knowledge</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Download for
+                            macOS</a>
+                    </div>
+                    <div class="md:col-span-2 flex flex-col gap-4">
+                        <span class="text-white font-bold text-[14px] mb-2">Community</span>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Discord</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Matrix
+                            Bridge</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Twitter / X</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Mastodon</a>
+                        <a class="text-white/90 hover:text-white transition-colors text-[13px]" href="#">Nostr (on
+                            Primal)</a>
+                    </div>
+                </div>
+                <!-- Bottom Bar -->
+                <div
+                    class="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-white/60 text-[12px] font-medium gap-4">
+                    <p class="">© 2026 Sovereign Engineering Inc. All rights reserved.</p>
+                    <p class="">WireGuard is a registered trademark of Jason A. Donenfeld.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+
+
+
+</body>
+
+</html>

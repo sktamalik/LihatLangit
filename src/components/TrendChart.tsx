@@ -1,185 +1,37 @@
-/**
- * Interactive weather trends chart (24h temperature & humidity).
- * Fixed: proper SVG rendering, correct axis labels, responsive design.
- */
-
 "use client";
-
 import type { WeatherForecast } from "@/types/weather";
 import { formatTime } from "@/lib/time";
-
-interface TrendChartProps {
-  forecast: WeatherForecast;
-}
-
-export default function TrendChart({ forecast }: TrendChartProps) {
-  const today = forecast.days[0];
-  if (!today || today.points.length === 0) return null;
-
-  const points = today.points;
-  const n = points.length;
-
-  // Guard against single-point data to avoid division by zero
-  const xScale = n > 1 ? (i: number) => (i / (n - 1)) * W : () => W / 2;
-
-  // Extract values with defaults
-  const temps: number[] = [];
-  const hums: number[] = [];
-  for (const p of points) {
-    temps.push(p.temperatureC ?? 25);
-    hums.push(p.humidityPct ?? 70);
-  }
-
-  const minT = Math.min(...temps);
-  const maxT = Math.max(...temps);
-  const rangeT = Math.max(maxT - minT, 1);
-
-  // SVG dimensions
-  const W = 1000;
-  const H = 180;
-  const PAD = 10; // vertical padding
-
-  // Map value to SVG Y coordinate
-  const toY = (val: number, min: number, range: number): number => {
-    return H - PAD - ((val - min) / range) * (H - 2 * PAD);
-  };
-
-  const tempMin = minT - 1;
-  const tempRange = rangeT + 2;
-  const humMin = 40;
-  const humRange = 50;
-
-  const tempPath = points
-    .map((_, i) => {
-      const x = xScale(i);
-      const y = toY(temps[i], tempMin, tempRange);
-      return `${i === 0 ? "M" : "L"}${x},${y}`;
-    })
-    .join(" ");
-
-  const humPath = points
-    .map((_, i) => {
-      const x = xScale(i);
-      const y = toY(hums[i], humMin, humRange);
-      return `${i === 0 ? "M" : "L"}${x},${y}`;
-    })
-    .join(" ");
-
-  // Time labels: show 5 evenly spaced labels
-  const labelInterval = Math.max(1, Math.floor(n / 5));
-  const timeLabels = points.filter((_, i) => i % labelInterval === 0 || i === n - 1);
-
-  return (
-    <section className="weather-card rounded-3xl p-card-padding sky-shadow">
+export default function TrendChart({forecast}:{forecast:WeatherForecast}){
+  const today=forecast.days[0];if(!today||today.points.length===0)return null;
+  const points=today.points;const n=points.length;
+  const xS=n>1?(i:number)=>(i/(n-1))*W:()=>W/2;
+  const temps=points.map(p=>p.temperatureC??25);const hums=points.map(p=>p.humidityPct??70);
+  const minT=Math.min(...temps),maxT=Math.max(...temps),rangeT=Math.max(maxT-minT,1);
+  const W=1000,H=200,P=10;
+  const toY=(v:number,min:number,r:number)=>H-P-((v-min)/r)*(H-2*P);
+  const tPath=points.map((_,i)=>`${i===0?"M":"L"}${xS(i)},${toY(temps[i],minT-1,rangeT+2)}`).join(" ");
+  const hPath=points.map((_,i)=>`${i===0?"M":"L"}${xS(i)},${toY(hums[i],40,50)}`).join(" ");
+  const li=Math.max(1,Math.floor(n/5));const tl=points.filter((_,i)=>i%li===0||i===n-1);
+  return(
+    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
-        <h2 className="font-geist text-headline-md font-semibold text-primary">Tren Cuaca 24 Jam</h2>
-        <div className="flex gap-4 font-label-sm text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#0ea5e9]"></span> Suhu
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-[#f59e0b]"></span> Kelembapan
-          </div>
+        <h3 className="font-body-sans text-[20px] font-semibold text-text-dark">Tren Cuaca 24 Jam</h3>
+        <div className="flex items-center gap-4 text-[12px] font-body-sans text-on-surface-variant font-medium">
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-primary-container"></div> Suhu</div>
+          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#FDE047]"></div> Kelembapan</div>
         </div>
       </div>
-
-      <div className="w-full h-[200px] relative">
-        <svg
-          className="w-full h-full"
-          preserveAspectRatio="none"
-          viewBox={`0 0 ${W} ${H}`}
-          style={{ overflow: "visible" }}
-        >
-          <defs>
-            <linearGradient id="trend-gradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#0ea5e9" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.05" />
-            </linearGradient>
-          </defs>
-
-          {/* Temperature area */}
-          <path
-            d={`${tempPath} L${W},${H} L0,${H} Z`}
-            fill="url(#trend-gradient)"
-          />
-
-          {/* Temperature line */}
-          <path
-            d={tempPath}
-            fill="none"
-            stroke="#0ea5e9"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          {/* Humidity line */}
-          <path
-            d={humPath}
-            fill="none"
-            stroke="#f59e0b"
-            strokeWidth="2"
-            strokeDasharray="6 3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-
-          {/* Data point dots — only on visible label points to reduce noise */}
-          {points.map((_, i) => {
-            const x = xScale(i);
-            const yTemp = toY(temps[i], tempMin, tempRange);
-            if (n > 12 && i % 2 !== 0) return null;
-            return (
-              <circle
-                key={`t${i}`}
-                cx={x}
-                cy={yTemp}
-                r="3"
-                fill="#0ea5e9"
-                className="cursor-pointer"
-              />
-            );
-          })}
+      <div className="w-full h-[240px] relative mt-6">
+        <svg className="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox={`0 0 ${W} ${H}`}>
+          <defs><linearGradient id="tg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff5a22" stopOpacity="0.2"/><stop offset="100%" stopColor="#ff5a22" stopOpacity="0"/></linearGradient></defs>
+          <path d={`${tPath} L${W},${H} L0,${H} Z`} fill="url(#tg2)"/>
+          <path d={tPath} fill="none" stroke="#ff5a22" strokeWidth="3" strokeLinecap="round"/>
+          <path d={hPath} fill="none" stroke="#FDE047" strokeWidth="2" strokeDasharray="8 8" strokeLinecap="round"/>
+          {points.map((_,i)=>{if(n>12&&i%2!==0)return null;return(<circle key={`t${i}`} cx={xS(i)} cy={toY(temps[i],minT-1,rangeT+2)} r="5" fill="#ff5a22"/>);})}
         </svg>
-
-        {/* Temperature value labels — sit well above the line */}
-        {points.map((_, i) => {
-          if (n > 12 && i % 2 !== 0) return null;
-          const xPct = n > 1 ? (i / (n - 1)) * 100 : 50;
-          const ySvg = toY(temps[i], tempMin, tempRange);
-          const yPx = (ySvg / H) * 200;
-          return (
-            <span key={`tl${i}`}
-              className="absolute text-[11px] font-geist font-bold text-[#0ea5e9] leading-none pointer-events-none z-10 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]"
-              style={{ left: `${xPct}%`, top: `${yPx - 26}px`, transform: "translateX(-50%)" }}
-            >
-              {Math.round(temps[i])}°
-            </span>
-          );
-        })}
-        {/* Humidity value labels — sit below the dashed line */}
-        {points.map((_, i) => {
-          if (n > 12 && i % 2 !== 0) return null;
-          const xPct = n > 1 ? (i / (n - 1)) * 100 : 50;
-          const ySvg = toY(hums[i], humMin, humRange);
-          const yPx = (ySvg / H) * 200;
-          return (
-            <span key={`hl${i}`}
-              className="absolute text-[10px] font-geist font-semibold text-[#f59e0b] leading-none pointer-events-none z-10 drop-shadow-[0_1px_2px_rgba(255,255,255,0.9)]"
-              style={{ left: `${xPct}%`, top: `${yPx + 14}px`, transform: "translateX(-50%)" }}
-            >
-              {Math.round(hums[i])}%
-            </span>
-          );
-        })}
-
-        {/* X-axis labels */}
-        <div className="absolute -bottom-1 left-0 right-0 flex justify-between px-1 text-outline font-label-sm text-[10px] pointer-events-none">
-          {timeLabels.map((p, i) => (
-            <span key={i}>{formatTime(p.localDateTime)}</span>
-          ))}
-        </div>
+        {n>0&&(<><div className="absolute top-[20px] left-0 text-[13px] text-primary-container font-bold bg-white px-2 rounded">{Math.round(temps[0])}°</div>
+        <div className="absolute bottom-[20px] right-0 text-[13px] text-primary-container font-bold bg-white px-2 rounded">{Math.round(temps[n-1])}°</div></>)}
+        <div className="absolute -bottom-6 left-0 right-0 flex justify-between px-1 text-[13px] text-text-muted font-medium">{tl.map((p,i)=><span key={i}>{formatTime(p.localDateTime)}</span>)}</div>
       </div>
-    </section>
-  );
+    </div>);
 }

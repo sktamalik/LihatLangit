@@ -110,7 +110,7 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
       </button>
 
       {isOpen && results.length > 0 && (
-        <ul id="region-search-results" className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-outline-variant/30 overflow-hidden z-[999] max-h-64 overflow-y-auto shadow-lg animate-fade-in-up" role="listbox">
+        <ul id="region-search-results" className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-outline-variant overflow-hidden z-[9999] max-h-64 overflow-y-auto shadow-[0_8px_30px_rgba(0,0,0,0.12)] animate-fade-in-up" role="listbox">
           {results.map((region, index) => (
             <li
               key={region.adm4}
