@@ -28,7 +28,7 @@ export default function WeatherMap({ forecast }: { forecast: WeatherForecast }) 
           shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
         });
         if (destroyed || !mapContainer.current || mapInstance.current) return;
-        const map = L.map(mapContainer.current, { center: [lat, lon], zoom: 10, zoomControl: false, attributionControl: false });
+        const map = L.map(mapContainer.current, { center: [lat, lon], zoom: 10, zoomControl: false, attributionControl: false, scrollWheelZoom: false });
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
         const marker = L.marker([lat, lon]).addTo(map);
         marker.bindPopup(`<div style="font-family:Inter,sans-serif;font-size:13px"><b>${village}</b><br/>${district}, ${city}</div>`);

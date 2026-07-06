@@ -146,4 +146,9 @@
 .leaflet-container {
   font-family: var(--font-body-sans) !important;
   border-radius: 1rem !important;
+  z-index: 0 !important;
 }
+.leaflet-pane { z-index: 0 !important; }
+.leaflet-top,
+.leaflet-bottom { z-index: 10 !important; }
+.leaflet-control { z-index: 10 !important; }

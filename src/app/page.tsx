@@ -25,6 +25,26 @@ export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const prevStatusRef = useRef<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string>("hero");
+
+  // ── Intersection observer: track which section is visible ──
+  useEffect(() => {
+    const sections = document.querySelectorAll("section[id], div[id]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        }
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+    );
+    sections.forEach((el) => {
+      if (el.id) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [state.status]);
 
   useEffect(() => {
     if (prevStatusRef.current === state.status) return;
@@ -39,6 +59,22 @@ export default function DashboardPage() {
   }, [state]);
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // ── Nav link helper ──
+  const navLink = (id: string, label: string) => {
+    const isActive = activeSection === id;
+    return (
+      <a
+        onClick={() => scrollTo(id)}
+        className={`font-body-sans text-[14px] cursor-pointer transition-colors duration-200 border-b-2 pb-0.5 ${isActive
+          ? "text-primary-container border-primary-container font-semibold"
+          : "text-on-surface-variant border-transparent hover:text-primary-container"
+          }`}
+      >
+        {label}
+      </a>
+    );
+  };
 
   const featureCards = [
     { icon: "database", title: "Data Resmi BMKG", desc: "Seluruh data prakiraan cuaca berasal langsung dari Badan Meteorologi, Klimatologi, dan Geofisika Indonesia." },
@@ -60,10 +96,10 @@ export default function DashboardPage() {
             </a>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <a onClick={() => scrollTo("features")} className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px] cursor-pointer">Fitur <span className="material-symbols-outlined text-[16px]">expand_more</span></a>
-            <a onClick={() => scrollTo("app-preview")} className="text-text-dark font-semibold border-b-2 border-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px] cursor-pointer">Dashboard <span className="material-symbols-outlined text-[16px]">expand_more</span></a>
-            <a onClick={() => scrollTo("peta-cuaca")} className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans text-[14px] cursor-pointer">Peta Cuaca</a>
-            <a onClick={() => scrollTo("peringatan-dini")} className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans text-[14px] cursor-pointer">Peringatan</a>
+            {navLink("app-preview", "Dashboard")}
+            {navLink("features", "Fitur")}
+            {navLink("peta-cuaca", "Peta Cuaca")}
+            {navLink("peringatan-dini", "Peringatan")}
             <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[16px]">open_in_new</span></a>
           </div>
           <div className="flex items-center gap-4">
@@ -88,7 +124,7 @@ export default function DashboardPage() {
             Cuaca akurat <br /><span className="text-primary-container">langsung dari BMKG</span>
           </h1>
           <p className="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl font-medium">
-            LihatLangit memberikan <span className="font-bold text-text-dark italic">prakiraan cuaca</span> tingkat desa/kelurahan berdasarkan <span className="font-bold text-text-dark">data resmi BMKG</span>.
+            LihatLangit memberikan prakiraan cuaca tingkat desa/kelurahan berdasarkan data resmi BMKG.
           </p>
           <div className="flex flex-col items-center gap-6 mb-4">
             <button onClick={() => scrollTo("hero-search")} className="bg-primary-container text-white px-8 py-3.5 rounded-md font-body-sans text-[18px] font-medium hover:bg-primary-container/90 transition-transform hover:scale-105 flex items-center gap-2 shadow-sm cursor-pointer">
@@ -163,7 +199,7 @@ export default function DashboardPage() {
 
         {/* DATA DASHBOARD */}
         {state.status === "ready" && (
-          <div id="features" className="px-4 md:px-8 pb-24 pt-12 w-full max-w-[1800px] mx-auto flex flex-col gap-8">
+          <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1800px] mx-auto flex flex-col gap-8">
             <h3 className="font-display-pixel text-[14px] md:text-[18px] text-text-dark text-center uppercase">
               Visualisasi Data Real-Time <span className="text-primary-container">dari BMKG.</span>
             </h3>

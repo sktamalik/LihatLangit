@@ -23,10 +23,7 @@ export default function HourlyForecast({forecast}:{forecast:WeatherForecast}){
     <div id="prakiraan-hari-ini" className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-body-sans text-[20px] font-semibold text-text-dark">Prakiraan Hari Ini</h3>
-        <div className="flex items-center gap-4 text-[12px] font-body-sans text-on-surface-variant font-medium">
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-primary-container"></div> Suhu</div>
-          <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-[#FDE047]"></div> Kelembapan</div>
-        </div>
+        <span className="text-[11px] text-primary-container font-medium font-body-sans bg-primary-container/10 px-3 py-1 rounded-full">24 Jam</span>
       </div>
       <div className="flex gap-3 overflow-x-auto pt-2 pb-2">
         {slots.map(({hour,point})=>{
