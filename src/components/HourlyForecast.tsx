@@ -1,7 +1,7 @@
 "use client";
 import type { WeatherForecast } from "@/types/weather";
 import { formatTime } from "@/lib/time";
-import { getSunTimes, getMoonPhase } from "@/lib/envCalculations";
+import { getSunTimes } from "@/lib/envCalculations";
 
 const icons: Record<string,string>={"cerah":"clear_day","cerah berawan":"partly_cloudy_day","berawan":"cloudy","berawan tebal":"cloud","hujan ringan":"rainy_light","hujan sedang":"rainy","hujan lebat":"rainy_heavy","hujan petir":"thunderstorm"};
 const colors: Record<string,string>={"cerah":"text-amber-400","cerah berawan":"text-amber-400","berawan":"text-slate-400","berawan tebal":"text-slate-500","hujan ringan":"text-sky-500","hujan sedang":"text-blue-500","hujan lebat":"text-blue-600","hujan petir":"text-purple-500"};
@@ -10,7 +10,7 @@ function gc(d:string){const k=Object.keys(colors).find(x=>d.toLowerCase().includ
 
 export default function HourlyForecast({forecast}:{forecast:WeatherForecast}){
   const today=forecast.days[0],tomorrow=forecast.days[1];if(!today)return null;
-  const now=new Date();const sun=getSunTimes(now,forecast.region.latitude,forecast.region.longitude,forecast.region.timezone);const moon=getMoonPhase(now);
+  const now=new Date();const sun=getSunTimes(now,forecast.region.latitude,forecast.region.longitude,forecast.region.timezone);
   let tMin=Infinity,tMax=-Infinity,tDom="";const cc:Record<string,number>={};
   if(tomorrow){for(const p of tomorrow.points){if(p.temperatureC!==null){tMin=Math.min(tMin,p.temperatureC);tMax=Math.max(tMax,p.temperatureC);}cc[p.weatherDescription]=(cc[p.weatherDescription]||0)+1;}tDom=Object.entries(cc).sort((a,b)=>b[1]-a[1])[0]?.[0]||"—";}
   const tomorrowDate=new Date(now);tomorrowDate.setDate(tomorrowDate.getDate()+1);

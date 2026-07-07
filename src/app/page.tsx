@@ -56,7 +56,8 @@ export default function DashboardPage() {
       else if (state.status === "geo-no-match") setToast({ message: "Lokasi tidak ditemukan.", type: "error" });
     }, 0);
     return () => clearTimeout(id);
-  }, [state]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.status]);
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
