@@ -172,6 +172,7 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
             </span>
             <span
               className={`material-symbols-outlined text-[28px] md:text-[36px] mb-2 ${isPast ? "text-gray-400" : gc(point.weatherDescription)}`}
+              style={{ fontVariationSettings: "'FILL' 1" }}
             >
               {isPast ? "schedule" : gi(point.weatherDescription)}
             </span>
