@@ -9,7 +9,7 @@ const DESCRIPTION = "Dashboard prakiraan cuaca Indonesia berdasarkan data resmi 
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL), title: TITLE, description: DESCRIPTION,
-  icons: { icon: "/favicon.ico", apple: "/apple-touch-icon.png" },
+  icons: { icon: "/Favicon.png", apple: "/apple-touch-icon.png" },
   openGraph: { title: TITLE, description: DESCRIPTION, url: SITE_URL, siteName: "LihatLangit", images: [{ url: OG_IMAGE, secureUrl: OG_IMAGE, width: 1200, height: 630, alt: "LihatLangit — Prakiraan Cuaca Indonesia via BMKG" }], locale: "id_ID", type: "website" },
   twitter: { card: "summary_large_image", title: "LihatLangit", description: DESCRIPTION, images: [OG_IMAGE] },
 };

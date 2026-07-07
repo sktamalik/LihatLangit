@@ -102,6 +102,19 @@
     background-color: var(--color-primary-container);
     color: var(--color-on-primary);
   }
+
+  /* Pixel font — disable anti-aliasing & letter-spacing for sharp rendering */
+  h1[class*="font-display-pixel"],
+  h2[class*="font-display-pixel"],
+  h3[class*="font-display-pixel"],
+  [class*="font-display-pixel"] {
+    -webkit-font-smoothing: none;
+    -moz-osx-font-smoothing: unset;
+    font-smooth: never;
+    text-rendering: optimizeSpeed;
+    letter-spacing: 0 !important;
+  }
+
   .material-symbols-outlined {
     font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   }

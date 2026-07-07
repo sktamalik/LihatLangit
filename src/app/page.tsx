@@ -99,9 +99,8 @@ export default function DashboardPage() {
       <nav className="sticky top-0 w-full z-50 border-b border-outline-variant bg-white">
         <div className="flex justify-between items-center px-5 md:px-20 py-4 max-w-full">
           <div className="flex items-center gap-4">
-            <a href="#" className="font-display-pixel text-[16px] text-text-dark flex items-center gap-2 no-underline">
-              <Image src="/icon.png" alt="" width={24} height={24} className="w-6 h-6" />
-              lihatlangit
+            <a href="#" className="flex items-center no-underline">
+              <Image src="/Headericon.png" alt="LihatLangit" width={180} height={48} className="h-10 w-auto" priority />
             </a>
           </div>
           <div className="hidden md:flex items-center gap-6">
@@ -129,7 +128,7 @@ export default function DashboardPage() {
             <span className="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">Baru</span>
             <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px]">arrow_forward</span></span>
           </div>
-          <h1 className="font-display-pixel text-[24px] md:text-[36px] lg:text-[48px] text-text-dark leading-[1.3] mb-6 max-w-4xl uppercase tracking-tight">
+          <h1 className="font-display-pixel text-[24px] md:text-[40px] lg:text-[48px] text-text-dark leading-[32px] md:leading-[48px] lg:leading-[56px] mb-6 max-w-4xl uppercase">
             Cuaca akurat <br /><span className="text-primary-container">langsung dari BMKG</span>
           </h1>
           <p className="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl font-medium">
@@ -209,7 +208,7 @@ export default function DashboardPage() {
         {/* DATA DASHBOARD */}
         {state.status === "ready" && (
           <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1800px] mx-auto flex flex-col gap-8">
-            <h3 className="font-display-pixel text-[14px] md:text-[18px] text-text-dark text-center uppercase">
+            <h3 className="font-display-pixel text-[16px] md:text-[24px] text-text-dark text-center uppercase leading-[24px] md:leading-[32px]">
               Visualisasi Data Real-Time <span className="text-primary-container">dari BMKG.</span>
             </h3>
             <TrendChart forecast={state.forecast} />
@@ -245,7 +244,7 @@ export default function DashboardPage() {
       {/* BOTTOM: CTA + 3 Cards + Source + Grass + Footer */}
       <div>
         <section className="px-5 md:px-20 pb-12 pt-12 w-full max-w-6xl mx-auto flex flex-col items-center">
-          <h3 className="font-display-pixel text-[14px] md:text-[18px] text-text-dark text-center mb-20 uppercase">
+          <h3 className="font-display-pixel text-[16px] md:text-[24px] text-text-dark text-center mb-20 uppercase leading-[24px] md:leading-[32px]">
             Cuaca akurat dari sumber <span className="text-primary-container">terpercaya.</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
@@ -274,10 +273,12 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-24">
               <div className="md:col-span-6 flex flex-col gap-8">
                 <div className="flex items-center gap-8">
-                  <a href="#" className="font-display-pixel text-[32px] text-white tracking-tight no-underline">lihatlangit</a>
-                  <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white hover:text-white/80 transition-colors text-[14px] font-medium no-underline"><span className="material-symbols-outlined text-[18px]">open_in_new</span> data.bmkg.go.id</a>
+                  <a href="#" className="flex items-center no-underline">
+                    <Image src="/Footericon.png" alt="LihatLangit" width={200} height={48} className="h-12 w-auto" />
+                  </a>
+                  <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 pt-4 text-white hover:text-white/80 transition-colors text-[14px] font-medium no-underline"><span className="material-symbols-outlined text-[18px]">open_in_new</span> data.bmkg.go.id</a>
                 </div>
-                <div className="max-w-xl"><p className="text-white text-[16px] leading-relaxed font-medium">&ldquo;Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.&rdquo;</p><p className="text-white/90 text-[12px] text-right mt-4">— Data untuk <span className="font-bold">Indonesia</span></p></div>
+                <div className="max-w-xl"><p className="text-white text-[17px] leading-relaxed font-medium">&ldquo;Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.&rdquo;</p></div>
               </div>
               <div className="md:col-span-2 flex flex-col gap-4"><span className="text-white font-bold text-[14px] mb-2">Navigasi</span><a onClick={() => scrollTo("hero")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Dashboard</a><a onClick={() => scrollTo("features")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Prakiraan</a><a onClick={() => scrollTo("peta-cuaca")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Peta</a><a onClick={() => scrollTo("peringatan-dini")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Peringatan</a></div>
               <div className="md:col-span-2 flex flex-col gap-4"><span className="text-white font-bold text-[14px] mb-2">Sumber</span><a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[13px] no-underline">BMKG Data</a><a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[13px] no-underline">BMKG Site</a></div>
