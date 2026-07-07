@@ -78,7 +78,7 @@ export default function WeatherMap({ forecast }: { forecast: WeatherForecast }) 
           <span className="text-[12px] font-bold text-grass-green font-body-sans">{village}</span>
         </div>
       </div>
-      <div ref={mapContainer} className="w-full h-[450px] rounded-lg overflow-hidden bg-background-sky/30">
+      <div ref={mapContainer} className="w-full h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px] rounded-lg overflow-hidden bg-background-sky/30">
         {!mapReady && !loadError && (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-sm text-text-muted font-body-sans">Memuat peta...</span>

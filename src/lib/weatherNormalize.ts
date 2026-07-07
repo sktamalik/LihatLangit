@@ -87,7 +87,10 @@ export function normalizeBmkgForecast(
   };
 
   // ── Analysis date ──
-  const analysisDateUtc = raw.analysis_date ?? null;
+  // Try top-level first, then extract from first available slot
+  const analysisDateUtc = raw.analysis_date
+    ?? raw.data?.[0]?.cuaca?.[0]?.[0]?.analysis_date
+    ?? null;
 
   // ── No data array ──
   if (!raw.data || !Array.isArray(raw.data) || raw.data.length === 0) {

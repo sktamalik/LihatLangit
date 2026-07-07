@@ -97,25 +97,25 @@ export default function DashboardPage() {
 
       {/* NAVBAR — only element with elevated z-index */}
       <nav className="sticky top-0 w-full z-50 bg-white">
-        <div className="flex justify-between items-center px-5 md:px-20 py-4 max-w-full">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-between items-center px-4 sm:px-5 md:px-20 py-3 md:py-4 max-w-full">
+          <div className="flex items-center gap-2 sm:gap-4">
             <a href="#" className="flex items-center no-underline">
-              <Image src="/Headericon.png" alt="LihatLangit" width={180} height={48} className="h-10 w-auto" priority />
+              <Image src="/Headericon.png" alt="LihatLangit" width={120} height={32} className="h-8 sm:h-9 md:h-10 w-auto" priority />
             </a>
           </div>
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-3 lg:gap-6">
             {navLink("app-preview", "Dashboard")}
             {navLink("features", "Fitur")}
             {navLink("peta-cuaca", "Peta Cuaca")}
             {navLink("peringatan-dini", "Peringatan")}
-            <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[16px]">open_in_new</span></a>
+            <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[12px] lg:text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[14px] lg:text-[16px]">open_in_new</span></a>
           </div>
-          <div className="flex items-center gap-4">
-            <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="hidden md:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[14px] disabled:opacity-50">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="hidden sm:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[12px] sm:text-[14px] disabled:opacity-50">
               {state.status === "ready" ? state.forecast.region.city : "Lokasi Saya"}
             </button>
-            <button onClick={() => scrollTo("hero")} className="bg-primary-container text-white px-6 py-2 rounded-md font-body-sans text-[16px] font-medium hover:bg-primary-container/90 transition-colors flex items-center gap-1 cursor-pointer">
-              Mulai <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            <button onClick={() => scrollTo("hero")} className="bg-primary-container text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-md font-body-sans text-[13px] sm:text-[16px] font-medium hover:bg-primary-container/90 transition-colors flex items-center gap-1 cursor-pointer">
+              Mulai <span className="material-symbols-outlined text-[14px] sm:text-[18px]">arrow_forward</span>
             </button>
           </div>
         </div>
@@ -271,22 +271,22 @@ export default function DashboardPage() {
         <div className="w-full h-4" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='16' height='16' fill='%2322C55E'/%3E%3Crect width='4' height='4' fill='%2316a34a'/%3E%3Crect x='8' y='8' width='4' height='4' fill='%2316a34a'/%3E%3C/svg%3E\")", backgroundSize: "8px 8px", imageRendering: "pixelated" }} />
 
         <footer className="bg-[#5A3714] text-white pt-24 pb-12 w-full">
-          <div className="max-w-7xl mx-auto px-5 md:px-20">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-24">
-              <div className="md:col-span-6 flex flex-col gap-8">
-                <div className="flex items-center gap-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-5 md:px-20">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 mb-24">
+              <div className="md:col-span-6 flex flex-col gap-6 md:gap-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                   <a href="#" className="flex items-center no-underline">
-                    <Image src="/Footericon.png" alt="LihatLangit" width={200} height={48} className="h-12 w-auto" />
+                    <Image src="/Footericon.png" alt="LihatLangit" width={140} height={40} className="h-10 sm:h-11 md:h-12 w-auto" />
                   </a>
-                  <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 pt-4 text-white hover:text-white/80 transition-colors text-[14px] font-medium no-underline"><span className="material-symbols-outlined text-[18px]">open_in_new</span> data.bmkg.go.id</a>
+                  <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white hover:text-white/80 transition-colors text-[13px] sm:text-[14px] font-medium no-underline"><span className="material-symbols-outlined text-[16px] sm:text-[18px]">open_in_new</span> data.bmkg.go.id</a>
                 </div>
-                <div className="max-w-xl"><p className="text-white text-[17px] leading-relaxed font-medium">&ldquo;Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.&rdquo;</p></div>
+                <div className="max-w-xl"><p className="text-white text-[15px] sm:text-[16px] md:text-[17px] leading-relaxed font-medium">&ldquo;Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.&rdquo;</p></div>
               </div>
-              <div className="md:col-span-2 flex flex-col gap-4"><span className="text-white font-bold text-[14px] mb-2">Navigasi</span><a onClick={() => scrollTo("hero")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Dashboard</a><a onClick={() => scrollTo("features")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Prakiraan</a><a onClick={() => scrollTo("peta-cuaca")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Peta</a><a onClick={() => scrollTo("peringatan-dini")} className="text-white/90 hover:text-white transition-colors text-[13px] cursor-pointer no-underline">Peringatan</a></div>
-              <div className="md:col-span-2 flex flex-col gap-4"><span className="text-white font-bold text-[14px] mb-2">Sumber</span><a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[13px] no-underline">BMKG Data</a><a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[13px] no-underline">BMKG Site</a></div>
-              <div className="md:col-span-2 flex flex-col gap-4"><span className="text-white font-bold text-[14px] mb-2">Komunitas</span><a href="#" className="text-white/90 hover:text-white transition-colors text-[13px] no-underline">GitHub</a><a href="#" className="text-white/90 hover:text-white transition-colors text-[13px] no-underline">Twitter</a></div>
+              <div className="md:col-span-2 flex flex-col gap-3 md:gap-4"><span className="text-white font-bold text-[13px] md:text-[14px] mb-2">Navigasi</span><a onClick={() => scrollTo("hero")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Dashboard</a><a onClick={() => scrollTo("features")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Prakiraan</a><a onClick={() => scrollTo("peta-cuaca")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Peta</a><a onClick={() => scrollTo("peringatan-dini")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Peringatan</a></div>
+              <div className="md:col-span-2 flex flex-col gap-3 md:gap-4"><span className="text-white font-bold text-[13px] md:text-[14px] mb-2">Sumber</span><a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] no-underline">BMKG Data</a><a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] no-underline">BMKG Site</a></div>
+              <div className="md:col-span-2 flex flex-col gap-3 md:gap-4"><span className="text-white font-bold text-[13px] md:text-[14px] mb-2">Komunitas</span><a href="#" className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] no-underline">GitHub</a><a href="#" className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] no-underline">Twitter</a></div>
             </div>
-            <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-white/60 text-[12px] font-medium gap-4">
+            <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-white/60 text-[11px] sm:text-[12px] font-medium gap-4">
               <p>© 2026 LihatLangit. Dibuat oleh sktafolio.</p>
               <p>Data bersumber dari BMKG Indonesia.</p>
             </div>

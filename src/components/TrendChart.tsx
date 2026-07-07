@@ -110,7 +110,7 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
       </div>
 
       {/* ── Scrollable wrapper for mobile ── */}
-      <div className="overflow-x-auto -mx-4 sm:-mx-6 md:-mx-8 px-4 sm:px-6 md:px-8">
+      <div className="overflow-x-auto">
         <svg
           className="block"
           viewBox={`0 0 ${W} ${H}`}

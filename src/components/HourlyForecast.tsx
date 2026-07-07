@@ -151,40 +151,41 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
         </span>
       </div>
 
-      <div className="flex gap-4 md:gap-5 overflow-x-auto pt-3 pb-3">
-        {slots.map(({ key, isNow, isPast, point }) => (
-          <div
-            key={key}
-            className={`flex-shrink-0 flex flex-col items-center pt-5 pb-4 px-4 md:px-5 rounded-2xl min-w-[85px] md:min-w-[110px] transition-all ${
-              isNow
-                ? "bg-accent-container/50 border border-accent/30 shadow-sm -translate-y-1"
-                : isPast
-                ? "opacity-40"
-                : "hover:bg-white/60 cursor-pointer"
-            }`}
-          >
-            <span
-              className={`font-body-sans text-sm md:text-base mb-2 ${
-                isNow ? "text-primary-container font-bold" : "text-on-surface-variant"
+      <div className="overflow-x-auto pt-3 pb-3">
+        <div className="flex gap-2 sm:gap-3 md:gap-4 w-max">
+          {slots.map(({ key, isNow, isPast, point }) => (
+            <div
+              key={key}
+              className={`flex-shrink-0 flex flex-col items-center pt-3 pb-2 px-3 sm:px-4 md:px-5 rounded-2xl min-w-[70px] sm:min-w-[80px] md:min-w-[95px] transition-all ${
+                isNow
+                  ? "bg-accent-container/50 border border-accent/30 shadow-sm -translate-y-1"
+                  : isPast
+                  ? "opacity-40"
+                  : "hover:bg-white/60 cursor-pointer"
               }`}
             >
-              {formatTime(point.localDateTime)}
-            </span>
-            <span
-              className={`material-symbols-outlined text-[28px] md:text-[36px] mb-2 ${isPast ? "text-gray-400" : gc(point.weatherDescription)}`}
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              {isPast ? "schedule" : gi(point.weatherDescription)}
-            </span>
-            <span
-              className={`font-body-sans font-semibold ${
-                isNow ? "text-primary-container text-[20px] md:text-[24px]" : isPast ? "text-gray-400 text-[16px] md:text-[18px]" : "text-text-dark text-[16px] md:text-[18px]"
-              }`}
-            >
-              {point.temperatureC !== null ? `${Math.round(point.temperatureC)}°` : "--"}
-            </span>
-          </div>
-        ))}
+              <span
+                className={`font-body-sans text-xs sm:text-sm md:text-base mb-1 sm:mb-2 ${
+                  isNow ? "text-primary-container font-bold" : "text-on-surface-variant"
+                }`}
+              >
+                {formatTime(point.localDateTime)}
+              </span>
+              <span
+                className={`material-symbols-outlined text-[24px] sm:text-[28px] md:text-[32px] mb-1 sm:mb-2 ${isPast ? "text-gray-400" : gc(point.weatherDescription)}`}
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                {isPast ? "schedule" : gi(point.weatherDescription)}
+              </span>
+              <span
+                className={`font-body-sans font-semibold ${
+                  isNow ? "text-primary-container text-[16px] sm:text-[18px] md:text-[20px]" : isPast ? "text-gray-400 text-[14px] sm:text-[16px] md:text-[17px]" : "text-text-dark text-[14px] sm:text-[16px] md:text-[17px]"
+                }`}
+              >
+                {point.temperatureC !== null ? `${Math.round(point.temperatureC)}°` : "--"}
+              </span>
+            </div>
+          ))}
 
         {/* Sun info card */}
         <div className="flex-shrink-0 flex flex-col items-start p-4 md:p-5 rounded-2xl min-w-[160px] md:min-w-[180px] bg-gradient-to-br from-indigo-50/80 to-indigo-100/40 border border-indigo-100/60">
@@ -228,6 +229,7 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
             </span>
           </button>
         )}
+        </div>
       </div>
     </div>
   );
