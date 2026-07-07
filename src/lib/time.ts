@@ -101,4 +101,20 @@ export function getTimezoneAbbr(timezone?: string): string {
   return "WIB";
 }
 
+/**
+ * Format BMKG analysis_date string without browser timezone interference.
+ * BMKG sends dates like "2026-07-03T00:00:00" without timezone info.
+ * Parsing via new Date() shifts it to browser local time — we avoid that.
+ */
+export function formatAnalysisDate(isoString: string, timezone?: string): string {
+  // Parse manually — match BMKG "2026-07-03T00:00:00" format
+  const match = isoString.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  if (!match) return isoString;
+
+  const [, , m, d, h, min] = match;
+  const monthIdx = parseInt(m, 10) - 1;
+  const tzAbbr = getTimezoneAbbr(timezone);
+  return `${parseInt(d, 10)} ${MONTHS_SHORT[monthIdx]}, ${h}:${min} ${tzAbbr}`;
+}
+
 export { DAYS, MONTHS_LONG, MONTHS_SHORT };

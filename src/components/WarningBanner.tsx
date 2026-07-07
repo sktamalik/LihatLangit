@@ -14,8 +14,14 @@ export default function WarningBanner() {
   const [filter, setFilter] = useState<string>("semua");
   const [showAll, setShowAll] = useState(false);
 
-  useEffect(() => {
+  const fetchWarnings = () => {
     fetch("/api/warnings").then((r) => r.json()).then((data) => { setWarnings(data.warnings ?? []); setLoading(false); }).catch(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchWarnings();
+    const timer = setInterval(fetchWarnings, 5 * 60 * 1000); // refresh every 5 min
+    return () => clearInterval(timer);
   }, []);
 
   const loadDetail = async (link: string) => {

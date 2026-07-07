@@ -49,13 +49,21 @@ export default function DashboardPage() {
   useEffect(() => {
     if (prevStatusRef.current === state.status) return;
     prevStatusRef.current = state.status;
-    const id = setTimeout(() => {
-      if (state.status === "ready") setToast({ message: `Data cuaca ${state.forecast.region.village} berhasil dimuat`, type: "success" });
-      else if (state.status === "error") setToast({ message: state.error.message, type: "error" });
-      else if (state.status === "geo-denied") setToast({ message: "Izin lokasi ditolak.", type: "error" });
-      else if (state.status === "geo-no-match") setToast({ message: "Lokasi tidak ditemukan.", type: "error" });
-    }, 0);
-    return () => clearTimeout(id);
+
+    // Defer toast via microtask — avoids setState-in-effect without setTimeout(0)
+    queueMicrotask(() => {
+      if (state.status === "ready") {
+        setToast({ message: `Data cuaca ${state.forecast.region.village} berhasil dimuat`, type: "success" });
+      } else if (state.status === "error") {
+        setToast({ message: state.error.message, type: "error" });
+      } else if (state.status === "geo-denied") {
+        setToast({ message: "Izin lokasi ditolak. Coba cari wilayah secara manual.", type: "error" });
+      } else if (state.status === "geo-no-match") {
+        setToast({ message: "Lokasi tidak ditemukan dalam database.", type: "error" });
+      } else if (state.status === "geolocating") {
+        setToast({ message: "Mendeteksi lokasi Anda...", type: "info" });
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.status]);
 
@@ -236,7 +244,7 @@ export default function DashboardPage() {
 
       {/* BOTTOM: CTA + 3 Cards + Source + Grass + Footer */}
       <div>
-        <section className="px-5 md:px-20 pb-24 pt-12 w-full max-w-6xl mx-auto flex flex-col items-center">
+        <section className="px-5 md:px-20 pb-12 pt-12 w-full max-w-6xl mx-auto flex flex-col items-center">
           <h3 className="font-display-pixel text-[14px] md:text-[18px] text-text-dark text-center mb-20 uppercase">
             Cuaca akurat dari sumber <span className="text-primary-container">terpercaya.</span>
           </h3>

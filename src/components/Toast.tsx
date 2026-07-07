@@ -1,6 +1,6 @@
 /**
- * Toast notification — auto-dismissing popup for success/error/info.
- * Positioned top-right with compact size.
+ * Toast notification — slide-down popup with progress bar.
+ * Positioned top-center on mobile, top-right on desktop.
  */
 
 "use client";
@@ -19,124 +19,137 @@ interface ToastProps {
   onDismiss: () => void;
 }
 
-const DURATION_MS = 4000;
+const DURATION_MS = 4500;
+const ANIMATION_MS = 300;
 
-const ACCENT_MAP: Record<ToastType, string> = {
-  success: "bg-emerald-500",
-  error: "bg-red-500",
-  info: "bg-sky-500",
-};
-
-const BADGE_BG: Record<ToastType, string> = {
-  success: "bg-emerald-100 text-emerald-600",
-  error: "bg-red-100 text-red-600",
-  info: "bg-sky-100 text-sky-600",
-};
-
-const ICON_MAP: Record<ToastType, string> = {
-  success: "check_circle",
-  error: "warning",
-  info: "wb_sunny",
-};
-
-const PROGRESS_BG: Record<ToastType, string> = {
-  success: "bg-emerald-300",
-  error: "bg-red-300",
-  info: "bg-sky-300",
+const STYLES: Record<ToastType, {
+  accent: string;
+  iconBg: string;
+  iconColor: string;
+  progressBg: string;
+  icon: string;
+}> = {
+  success: {
+    accent: "border-l-emerald-500",
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
+    progressBg: "bg-emerald-400",
+    icon: "check_circle",
+  },
+  error: {
+    accent: "border-l-red-500",
+    iconBg: "bg-red-50",
+    iconColor: "text-red-600",
+    progressBg: "bg-red-400",
+    icon: "error",
+  },
+  info: {
+    accent: "border-l-sky-500",
+    iconBg: "bg-sky-50",
+    iconColor: "text-sky-600",
+    progressBg: "bg-sky-400",
+    icon: "info",
+  },
 };
 
 export default function Toast({ toast, onDismiss }: ToastProps) {
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(100);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const dismissRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
+  const onDismissRef = useRef(onDismiss);
+
+  // Sync onDismiss ref — render-safe, no deps
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  });
 
   useEffect(() => {
     if (!toast) return;
 
-    const showTimer = setTimeout(() => {
+    // Reset & animate in
+    const frame = requestAnimationFrame(() => {
       setVisible(true);
       setProgress(100);
-    }, 10);
-
+    });
     startTimeRef.current = Date.now();
 
+    // Progress bar tick
     progressRef.current = setInterval(() => {
       const elapsed = Date.now() - startTimeRef.current;
       const remaining = Math.max(0, 100 - (elapsed / DURATION_MS) * 100);
       setProgress(remaining);
     }, 30);
 
-    timerRef.current = setTimeout(() => {
+    // Auto-dismiss via ref — stable regardless of parent re-renders
+    dismissRef.current = setTimeout(() => {
       setVisible(false);
       if (progressRef.current) clearInterval(progressRef.current);
-      timerRef.current = setTimeout(onDismiss, 300);
+      dismissRef.current = setTimeout(() => onDismissRef.current(), ANIMATION_MS);
     }, DURATION_MS);
 
     return () => {
-      clearTimeout(showTimer);
-      if (timerRef.current) clearTimeout(timerRef.current);
+      cancelAnimationFrame(frame);
+      if (dismissRef.current) clearTimeout(dismissRef.current);
       if (progressRef.current) clearInterval(progressRef.current);
     };
-  }, [toast, onDismiss]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [toast]);
 
   const handleClose = () => {
     setVisible(false);
-    if (timerRef.current) clearTimeout(timerRef.current);
+    if (dismissRef.current) clearTimeout(dismissRef.current);
     if (progressRef.current) clearInterval(progressRef.current);
-    setTimeout(onDismiss, 300);
+    setTimeout(() => onDismissRef.current(), ANIMATION_MS);
   };
 
   if (!toast) return null;
 
+  const s = STYLES[toast.type];
+
   return (
     <div
-      className={`fixed top-19 right-4 left-4 md:left-auto z-[9999] md:w-[340px] transition-all duration-300 select-none ${visible
-        ? "opacity-100 translate-x-0"
-        : "opacity-0 translate-x-8 pointer-events-none"
+      className={`fixed top-19 right-4 left-4 md:left-auto z-[9999] md:w-[380px] transition-all duration-300 select-none ${visible
+        ? "opacity-100 translate-y-0"
+        : "opacity-0 -translate-y-4 pointer-events-none"
         }`}
     >
-      <div className="relative bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.10),0_1px_4px_rgba(0,0,0,0.04)] overflow-hidden">
-        {/* Accent bar */}
-        <div className={`h-0.5 ${ACCENT_MAP[toast.type]}`} />
-
+      <div
+        className={`relative bg-white rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.12),0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden border border-slate-100 border-l-[4px] ${s.accent}`}
+      >
         {/* Content row */}
-        <div className="flex items-start gap-2.5 px-3 pt-2.5 pb-1.5">
-          {/* Icon badge */}
+        <div className="flex items-start gap-3 px-4 pt-4 pb-2">
+          {/* Icon */}
           <div
-            className={`shrink-0 w-[30px] h-[30px] rounded-lg ${BADGE_BG[toast.type]} flex items-center justify-center`}
+            className={`shrink-0 w-10 h-10 rounded-xl ${s.iconBg} flex items-center justify-center`}
           >
-            <span className="material-symbols-outlined text-[18px]">
-              {ICON_MAP[toast.type]}
+            <span className={`material-symbols-outlined text-[28px] ${s.iconColor}`}>
+              {s.icon}
             </span>
           </div>
 
-          {/* Text */}
+          {/* Message */}
           <div className="flex-1 min-w-0 pt-0.5">
-            <p className="text-[12px] font-semibold text-[#0c4a6e] font-geist leading-tight">
-              {toast.type === "success" && "Berhasil"}
-              {toast.type === "error" && "Gagal"}
-              {toast.type === "info" && "Informasi"}
-            </p>
-            <p className="text-[11px] text-slate-500 font-geist mt-0.5 leading-snug">
+            <p className="text-[14px] font-semibold text-slate-800 leading-snug">
               {toast.message}
             </p>
           </div>
 
-          {/* Close */}
+          {/* Close button */}
           <button
             onClick={handleClose}
-            className="shrink-0 -mr-0.5 -mt-0.5 w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            aria-label="Tutup notifikasi"
           >
-            <span className="material-symbols-outlined text-[16px]">close</span>
+            <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
         </div>
 
         {/* Progress bar */}
-        <div className="mx-3 mb-2 h-1 bg-slate-100 rounded-full overflow-hidden">
+        <div className="mx-4 mb-3 h-[3px] bg-slate-100 rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full transition-[width] duration-100 ease-linear ${PROGRESS_BG[toast.type]}`}
+            className={`h-full rounded-full transition-[width] duration-100 ease-linear ${s.progressBg}`}
             style={{ width: `${progress}%` }}
           />
         </div>
