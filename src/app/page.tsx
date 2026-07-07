@@ -128,8 +128,8 @@ export default function DashboardPage() {
             <span className="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">Baru</span>
             <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px]">arrow_forward</span></span>
           </div>
-          <h1 className="font-display-pixel text-[24px] md:text-[40px] lg:text-[48px] text-text-dark leading-[32px] md:leading-[48px] lg:leading-[56px] mb-6 max-w-4xl uppercase">
-            Cuaca akurat <br /><span className="text-primary-container">langsung dari BMKG</span>
+          <h1 className="font-display-pixel text-[24px] md:text-[40px] lg:text-[48px] text-text-dark leading-[32px] md:leading-[48px] lg:leading-[56px] mb-6 max-w-4xl uppercase" style={{ wordSpacing: '-0.2em' }}>
+            Cuaca akurat <span className="text-primary-container">langsung dari BMKG</span>
           </h1>
           <p className="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl font-medium">
             LihatLangit memberikan prakiraan cuaca tingkat desa/kelurahan berdasarkan data resmi BMKG.

@@ -112,7 +112,8 @@
     -moz-osx-font-smoothing: unset;
     font-smooth: never;
     text-rendering: optimizeSpeed;
-    letter-spacing: 0 !important;
+    letter-spacing: -0.05em !important;
+    word-spacing: -0.15em !important;
   }
 
   .material-symbols-outlined {
