@@ -38,7 +38,7 @@ export default function WarningBanner() {
   if (loading || warnings.length === 0) return null;
 
   return (
-    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant">
+    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-body-sans text-[20px] font-semibold text-text-dark flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse-soft" />
@@ -46,7 +46,7 @@ export default function WarningBanner() {
         </h3>
         <div className="flex items-center gap-4 text-[12px] font-body-sans text-on-surface-variant font-medium">
           <span className="text-[11px] text-red-500 font-body-sans">({filtered.length} wilayah)</span>
-          <select value={filter} onChange={(e) => { setFilter(e.target.value); setShowAll(false); }} className="text-[11px] bg-white border border-outline-variant rounded-lg px-2 py-1 text-text-dark font-body-sans outline-none">
+          <select value={filter} onChange={(e) => { setFilter(e.target.value); setShowAll(false); }} className="text-[11px] bg-white rounded-lg px-2 py-1 text-text-dark font-body-sans outline-none">
             {provinces.map((p) => (<option key={p} value={p}>{p === "semua" ? "Semua Provinsi" : p}</option>))}
           </select>
           <a href="https://www.bmkg.go.id/alerts/nowcast/id" target="_blank" rel="noopener noreferrer" className="text-[11px] text-primary-container hover:underline font-body-sans shrink-0">Sumber ↗</a>
@@ -55,7 +55,7 @@ export default function WarningBanner() {
 
       <div className="space-y-2">
         {displayed.map((w) => (
-          <div key={w.link + w.region} className="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden">
+          <div key={w.link + w.region} className="bg-surface-container-lowest rounded-xl overflow-hidden">
             <button onClick={() => { setExpanded(expanded === w.link ? null : w.link); loadDetail(w.link); }} className="w-full flex items-start gap-3 p-4 text-left hover:bg-surface-container-low transition-colors">
               <span className="material-symbols-outlined text-amber-500 text-[18px]">warning</span>
               <div className="flex-1 min-w-0">
@@ -66,7 +66,7 @@ export default function WarningBanner() {
               <span className="material-symbols-outlined text-text-muted text-[18px] mt-1 transition-transform" style={{ transform: expanded === w.link ? "rotate(180deg)" : "" }}>expand_more</span>
             </button>
             {expanded === w.link && (
-              <div className="px-4 pb-4 pt-0 border-t border-outline-variant/30">
+              <div className="px-4 pb-4 pt-0">
                 {detailLoading === w.link ? <p className="text-xs text-text-muted py-2">Memuat detail...</p> :
                  details[w.link] ? (
                   <div className="text-[12px] text-text-dark space-y-2 pt-2">

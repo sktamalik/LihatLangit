@@ -100,7 +100,7 @@ export default function WeekForecast({ forecast }: { forecast: WeatherForecast }
   return (
     <div
       id="prakiraan-3-hari"
-      className="bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant h-full flex flex-col"
+      className="bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] h-full flex flex-col"
     >
       <h3 className="font-body-sans text-[20px] font-semibold text-text-dark mb-1">
         Prakiraan 3 Hari
@@ -109,7 +109,7 @@ export default function WeekForecast({ forecast }: { forecast: WeatherForecast }
         Ringkasan cuaca harian berdasarkan data per 3 jam dari BMKG. Suhu, kelembapan, angin, dan tutupan awan ditampilkan dalam rentang 24 jam. Data diperbarui mengikuti jadwal pembaruan resmi BMKG.
       </p>
 
-      <div className="space-y-3 md:space-y-4 flex-grow flex flex-col justify-center">
+      <div className="divide-y divide-outline-variant/20 space-y-3 md:space-y-4 flex-grow flex flex-col justify-center">
         {forecast.days.map((day, idx) => {
           const { min, max } = tempRange(day.points);
           const hum = avgH(day.points);
@@ -125,7 +125,7 @@ export default function WeekForecast({ forecast }: { forecast: WeatherForecast }
           return (
             <div
               key={day.date}
-              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-3 ${sz.row} rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors border border-outline-variant/30 hover:border-outline-variant cursor-pointer`}
+              className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 md:gap-3 ${sz.row} rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer`}
             >
               {/* ── Left: label + weather icon + desc ── */}
               <div className="flex items-center gap-2 md:gap-3 min-w-0">

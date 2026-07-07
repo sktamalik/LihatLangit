@@ -70,15 +70,15 @@ export default function WeatherMap({ forecast }: { forecast: WeatherForecast }) 
   }, [mapReady, lat, lon, village, district, city, temp]);
 
   return (
-    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant">
+    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-body-sans text-[20px] font-semibold text-text-dark">Peta Cuaca — {city}</h3>
+        <h3 className="font-body-sans text-[20px] font-semibold text-text-dark">Peta Cuaca {city}</h3>
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-grass-green/10 border border-grass-green/20">
           <span className="w-2 h-2 rounded-full bg-grass-green animate-pulse" />
           <span className="text-[12px] font-bold text-grass-green font-body-sans">{village}</span>
         </div>
       </div>
-      <div ref={mapContainer} className="w-full h-[450px] rounded-lg overflow-hidden bg-background-sky/30 border border-outline-variant/30">
+      <div ref={mapContainer} className="w-full h-[450px] rounded-lg overflow-hidden bg-background-sky/30">
         {!mapReady && !loadError && (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-sm text-text-muted font-body-sans">Memuat peta...</span>

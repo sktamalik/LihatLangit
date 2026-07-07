@@ -96,7 +96,7 @@ export default function DashboardPage() {
       <Toast toast={toast} onDismiss={() => setToast(null)} />
 
       {/* NAVBAR — only element with elevated z-index */}
-      <nav className="sticky top-0 w-full z-50 border-b border-outline-variant bg-white">
+      <nav className="sticky top-0 w-full z-50 bg-white">
         <div className="flex justify-between items-center px-5 md:px-20 py-4 max-w-full">
           <div className="flex items-center gap-4">
             <a href="#" className="flex items-center no-underline">
@@ -124,7 +124,7 @@ export default function DashboardPage() {
       <main className="flex-grow">
         {/* HERO */}
         <section id="hero" className="flex flex-col items-center justify-center text-center px-5 md:px-20 pt-24 pb-12 w-full max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white border border-outline-variant mb-10 shadow-sm">
+          <div className="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white mb-10 shadow-sm">
             <span className="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">Baru</span>
             <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px]">arrow_forward</span></span>
           </div>
@@ -147,10 +147,10 @@ export default function DashboardPage() {
               </a>
             </div>
           </div>
-          {state.status === "geo-denied" && <div className="mt-4 bg-white rounded-lg px-4 py-2 text-sm text-text-muted border border-outline-variant">Izin lokasi ditolak.</div>}
-          {state.status === "geo-no-match" && <div className="mt-4 bg-white rounded-lg px-4 py-2 text-sm text-text-muted border border-outline-variant">Lokasi tidak ditemukan.</div>}
+          {state.status === "geo-denied" && <div className="mt-4 bg-white rounded-lg px-4 py-2 text-sm text-text-muted">Izin lokasi ditolak.</div>}
+          {state.status === "geo-no-match" && <div className="mt-4 bg-white rounded-lg px-4 py-2 text-sm text-text-muted">Lokasi tidak ditemukan.</div>}
           <div id="hero-search" className="w-full max-w-3xl mt-8">
-            <div className="bg-white flex items-center rounded-full px-6 py-4 border border-outline-variant shadow-sm">
+            <div className="bg-white flex items-center rounded-full px-6 py-4 shadow-sm">
               <span className="material-symbols-outlined text-outline mr-3 text-[24px]">search</span>
               <RegionSearch onSelect={searchAndSelect} />
             </div>
@@ -159,7 +159,7 @@ export default function DashboardPage() {
 
         {/* APP UI MOCKUP */}
         <section id="app-preview" className="px-5 md:px-20 py-12 w-full flex justify-center">
-          <div className="w-full max-w-4xl bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-outline-variant overflow-hidden flex flex-col md:flex-row min-h-[500px]">
+          <div className="w-full max-w-4xl bg-white rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row min-h-[500px]">
             <div className="w-full md:w-64 bg-surface-bright flex flex-col pt-4 pb-6 px-4">
               <div className="flex gap-2 mb-8 mt-2">
                 <div className="w-3 h-3 rounded-full bg-[#FF5F56]" /><div className="w-3 h-3 rounded-full bg-[#FFBD2E]" /><div className="w-3 h-3 rounded-full bg-[#27C93F]" />
@@ -171,7 +171,7 @@ export default function DashboardPage() {
                 <a onClick={() => scrollTo("peringatan-dini")} className="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium cursor-pointer no-underline"><span className="material-symbols-outlined text-[20px] text-text-muted">warning</span> Peringatan</a>
               </nav>
             </div>
-            <div className="flex-grow bg-white p-6 md:p-8 flex flex-col border-l border-outline-variant/50">
+            <div className="flex-grow bg-white p-6 md:p-8 flex flex-col">
               <h2 className="font-body-sans text-[20px] font-semibold text-text-dark mb-6">{state.status === "ready" ? state.forecast.region.district : "Selamat Datang"}</h2>
               {state.status === "loading" && <WeatherLoadingState />}
               {state.status === "error" && <WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} />}
@@ -189,7 +189,7 @@ export default function DashboardPage() {
                       const tMin = Math.min(...day.points.map(p => p.temperatureC ?? 999));
                       const tMax = Math.max(...day.points.map(p => p.temperatureC ?? -999));
                       return (
-                        <div key={day.date} className="border border-outline-variant rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
+                        <div key={day.date} className="rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
                           <div className="flex items-center gap-4">
                             <span className="material-symbols-outlined text-primary-container text-[24px]">{day.points[0]?.weatherDescription.toLowerCase().includes("hujan") ? "rainy" : day.points[0]?.weatherDescription.toLowerCase().includes("awan") ? "cloud" : "clear_day"}</span>
                             <div><h5 className="font-body-sans text-[14px] font-medium text-text-dark">{day.label}</h5><p className="font-body-sans text-[12px] text-on-surface-variant">{day.points[0]?.weatherDescription ?? "—"}</p></div>
@@ -207,16 +207,18 @@ export default function DashboardPage() {
 
         {/* DATA DASHBOARD */}
         {state.status === "ready" && (
-          <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1800px] mx-auto flex flex-col gap-8">
+          <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto flex flex-col gap-8">
             <h3 className="font-display-pixel text-[16px] md:text-[24px] text-text-dark text-center uppercase leading-[24px] md:leading-[32px]">
               Visualisasi Data Real-Time <span className="text-primary-container">dari BMKG.</span>
             </h3>
             <TrendChart forecast={state.forecast} />
-            <div id="peta-cuaca" className="w-full"><WeatherMap forecast={state.forecast} /></div>
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 w-full">
-              <div className="md:col-span-5"><WeatherSummary forecast={state.forecast} /></div>
-              <div className="md:col-span-7"><WeekForecast forecast={state.forecast} /></div>
+            {/* Row: Card Celsius (40%) + Peta Cuaca (60%) */}
+            <div className="grid grid-cols-1 md:grid-cols-10 gap-8 w-full items-stretch">
+              <div className="md:col-span-4 h-full"><WeatherSummary forecast={state.forecast} /></div>
+              <div id="peta-cuaca" className="md:col-span-6 h-full"><WeatherMap forecast={state.forecast} /></div>
             </div>
+            {/* Row: Prakiraan 3 Hari — full width */}
+            <div className="w-full"><WeekForecast forecast={state.forecast} /></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
               <EnviroMetrics forecast={state.forecast} />
               <SeaConditions forecast={state.forecast} />
@@ -249,7 +251,7 @@ export default function DashboardPage() {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
             {featureCards.map((card) => (
-              <div key={card.title} className="bg-white rounded-2xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-outline-variant flex flex-col items-center text-center">
+              <div key={card.title} className="bg-white rounded-2xl p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col items-center text-center">
                 <div className="w-16 h-16 bg-primary-container/10 rounded-xl flex items-center justify-center mb-6">
                   <span className="material-symbols-outlined text-primary-container text-[32px]">{card.icon}</span>
                 </div>
