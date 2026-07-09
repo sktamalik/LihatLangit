@@ -137,8 +137,6 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
     }
   }
 
-  // DEBUG: Log jumlah slot
-  console.log("DEBUG - Today slots:", slots.length, slots.map(s => s.key));
 
   return (
     <div id="prakiraan-hari-ini" className="w-full bg-white rounded-[16px] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
