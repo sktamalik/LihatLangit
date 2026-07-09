@@ -126,10 +126,10 @@ export default function DashboardPage() {
       <main className="flex-grow">
         {/* HERO */}
         <section id="hero" className="flex flex-col items-center justify-center text-center px-5 md:px-20 pt-24 pb-12 w-full max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white mb-10 shadow-sm">
+          <a href="#hero-search" className="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white mb-10 shadow-sm hover:shadow-md transition-shadow no-underline cursor-pointer">
             <span className="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">Baru</span>
-            <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px]">arrow_forward</span></span>
-          </div>
+            <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px] animate-arrow-slide">arrow_forward</span></span>
+          </a>
           <h1 className="font-display-pixel text-[24px] md:text-[40px] lg:text-[48px] text-text-dark leading-[32px] md:leading-[48px] lg:leading-[56px] mb-6 max-w-4xl uppercase" style={{ wordSpacing: '-0.2em' }}>
             Cuaca akurat <span className="text-primary-container">langsung dari BMKG</span>
           </h1>

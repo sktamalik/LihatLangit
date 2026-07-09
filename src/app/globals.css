@@ -149,6 +149,12 @@
 @utility animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
 @utility animate-pulse-soft { animation: pulse-soft 2s ease-in-out infinite; }
 
+@keyframes arrow-slide {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(4px); }
+}
+@utility animate-arrow-slide { animation: arrow-slide 1.2s ease-in-out infinite; }
+
 /* ── Card Utility ── */
 @utility card-surface {
   background: var(--color-surface);
