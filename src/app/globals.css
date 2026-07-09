@@ -155,6 +155,12 @@
 }
 @utility animate-arrow-slide { animation: arrow-slide 1.2s ease-in-out infinite; }
 
+@keyframes float-sun {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+@utility animate-float-sun { animation: float-sun 4s ease-in-out infinite; }
+
 /* ── Card Utility ── */
 @utility card-surface {
   background: var(--color-surface);

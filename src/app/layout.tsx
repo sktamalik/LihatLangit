@@ -50,8 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=block" rel="stylesheet" />
       </head>
       <body className="bg-background-sky text-text-dark font-body-sans antialiased min-h-screen flex flex-col relative">
-        {/* Pixel Sun */}
-        <div className="absolute top-24 right-[8%] w-24 h-24 z-0 rounded-full bg-[#FDE047] shadow-[0_0_40px_rgba(253,224,71,0.6)]" />
+        {/* Pixel Sun — floating up/down */}
+        <div className="absolute top-24 right-[8%] w-24 h-24 z-0 rounded-full bg-[#FDE047] shadow-[0_0_40px_rgba(253,224,71,0.6)] animate-float-sun" />
 
         {/* ═══ Clouds — overflow-visible agar tidak kepotong saat drifting ═══ */}
         <div className="fixed inset-0 pointer-events-none overflow-visible z-0">
