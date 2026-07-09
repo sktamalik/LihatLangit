@@ -15,6 +15,23 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#E2F0F9" };
 
+/* ═══ Bird shape — 3 titik: sayap kiri, badan, sayap kanan, dengan animasi kepak ═══ */
+function BirdShape({ className, style }: { className: string; style?: React.CSSProperties }) {
+  return (
+    <div className={className} style={style}>
+      <svg viewBox="0 0 60 30" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" className="animate-wing">
+        <path d="
+          M 2 22
+          Q 15 4  30 14
+          Q 45 4  58 22
+          Q 45 10  30 18
+          Q 15 10  2 22 Z
+        " fill="#1a1a2e" opacity="0.65" />
+      </svg>
+    </div>
+  );
+}
+
 /* ═══ Cloud — single clean path with generous padding so edges never clip ═══ */
 function CloudShape({ className, style }: { className: string; style?: React.CSSProperties }) {
   return (
@@ -62,6 +79,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CloudShape className="absolute top-[20rem] right-[15%] w-46 h-22 opacity-75 hidden lg:block animate-cloud-drift" style={{ animationDelay: "10s" }} />
           <CloudShape className="absolute top-[36rem] left-[14%] w-42 h-20 opacity-80 hidden md:block animate-cloud-drift-slow" style={{ animationDelay: "13s" }} />
           <CloudShape className="absolute top-[50rem] right-[28%] w-36 h-18 opacity-60 hidden md:block animate-cloud-drift" style={{ animationDelay: "16s" }} />
+
+          {/* ═══ Birds — flying across the sky ═══ */}
+          <BirdShape className="absolute top-28 right-[20%] w-14 h-7 opacity-70 hidden md:block animate-bird-fly" style={{ animationDelay: "0s" }} />
+          <BirdShape className="absolute top-48 left-[10%] w-12 h-6 opacity-60 hidden md:block animate-bird-fly" style={{ animationDelay: "4s", animationDuration: "10s" }} />
+          <BirdShape className="absolute top-20 right-[30%] w-10 h-5 opacity-50 hidden lg:block animate-bird-fly" style={{ animationDelay: "8s", animationDuration: "12s" }} />
         </div>
 
         <div className="relative z-10 flex flex-col min-h-screen">{children}</div>
