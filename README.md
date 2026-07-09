@@ -20,10 +20,6 @@
   <a href="#api-endpoint"><strong>API</strong></a>
 </p>
 
-<br>
-
-<br>
-
 ## ✨ Fitur
 
 | Fitur | Deskripsi |
