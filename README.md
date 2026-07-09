@@ -22,10 +22,6 @@
 
 <br>
 
-<p align="center">
-  <img src="/Share.jpg" alt="LihatLangit Preview" width="100%">
-</p>
-
 <br>
 
 ## ✨ Fitur
