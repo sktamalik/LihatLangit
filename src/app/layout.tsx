@@ -81,9 +81,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CloudShape className="absolute top-[50rem] right-[28%] w-36 h-18 opacity-60 hidden md:block animate-cloud-drift" style={{ animationDelay: "16s" }} />
 
           {/* ═══ Birds — flying across the sky ═══ */}
-          <BirdShape className="absolute top-28 right-[20%] w-14 h-7 opacity-70 hidden md:block animate-bird-fly" style={{ animationDelay: "0s" }} />
-          <BirdShape className="absolute top-48 left-[10%] w-12 h-6 opacity-60 hidden md:block animate-bird-fly" style={{ animationDelay: "4s", animationDuration: "10s" }} />
-          <BirdShape className="absolute top-20 right-[30%] w-10 h-5 opacity-50 hidden lg:block animate-bird-fly" style={{ animationDelay: "8s", animationDuration: "12s" }} />
+          <BirdShape className="absolute top-48 right-[20%] w-14 h-7 opacity-70 hidden md:block animate-bird-fly" style={{ animationDelay: "0s" }} />
+          <BirdShape className="absolute top-72 left-[10%] w-12 h-6 opacity-60 hidden md:block animate-bird-fly" style={{ animationDelay: "4s", animationDuration: "10s" }} />
+          <BirdShape className="absolute top-30 right-[30%] w-10 h-5 opacity-50 hidden lg:block animate-bird-fly" style={{ animationDelay: "8s", animationDuration: "12s" }} />
         </div>
 
         <div className="relative z-10 flex flex-col min-h-screen">{children}</div>
