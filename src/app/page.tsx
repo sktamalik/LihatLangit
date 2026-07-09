@@ -10,7 +10,7 @@ import EnviroMetrics from "@/components/EnviroMetrics";
 import SeaConditions from "@/components/SeaConditions";
 import SunMoon from "@/components/SunMoon";
 import SmartTips from "@/components/SmartTips";
-import WeatherMap from "@/components/WeatherMap";
+import IndonesiaWeatherMap from "@/components/IndonesiaWeatherMap";
 import CommunityReports from "@/components/CommunityReports";
 import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
@@ -205,6 +205,11 @@ export default function DashboardPage() {
           </div>
         </section>
 
+        {/* PETA CUACA INDONESIA */}
+        <section id="peta-cuaca" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto">
+          <IndonesiaWeatherMap />
+        </section>
+
         {/* DATA DASHBOARD */}
         {state.status === "ready" && (
           <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto flex flex-col gap-8">
@@ -212,10 +217,9 @@ export default function DashboardPage() {
               Visualisasi Data Real-Time <span className="text-primary-container">dari BMKG.</span>
             </h3>
             <TrendChart forecast={state.forecast} />
-            {/* Row: Card Celsius (40%) + Peta Cuaca (60%) */}
+            {/* Row: Card Celsius (40%) — peta cuaca lokal dihapus, sudah ada peta Indonesia di atas */}
             <div className="grid grid-cols-1 md:grid-cols-10 gap-8 w-full items-stretch">
-              <div className="md:col-span-4 h-full"><WeatherSummary forecast={state.forecast} /></div>
-              <div id="peta-cuaca" className="md:col-span-6 h-full"><WeatherMap forecast={state.forecast} /></div>
+              <div className="md:col-span-10 h-full"><WeatherSummary forecast={state.forecast} /></div>
             </div>
             {/* Row: Prakiraan 3 Hari — full width */}
             <div className="w-full"><WeekForecast forecast={state.forecast} /></div>

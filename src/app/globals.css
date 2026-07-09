@@ -165,3 +165,28 @@
 .leaflet-top,
 .leaflet-bottom { z-index: 10 !important; }
 .leaflet-control { z-index: 10 !important; }
+
+/* ── Weather Map Popup ── */
+.weather-popup .leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+.weather-popup .leaflet-popup-content {
+  margin: 12px 14px !important;
+}
+.weather-popup .leaflet-popup-tip {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+}
+
+/* ── City temperature label ── */
+.city-temp-label {
+  background: none !important;
+  border: none !important;
+}
+
+/* ── Map legend ── */
+.weather-legend {
+  line-height: 1.4;
+}
