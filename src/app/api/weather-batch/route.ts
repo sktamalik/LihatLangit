@@ -4,20 +4,19 @@
  * Fetches weather forecasts for multiple adm4 codes in parallel.
  * Used by the national weather map to show conditions across Indonesia.
  *
- * Returns a map of adm4 → { region, temperatureC, weatherDescription, humidityPct, windSpeedKmh, iconUrl }.
+ * Returns a map of adm4 → { region, temperatureC, weatherDescription, ... }.
  * Failed lookups are omitted from the result (never returns partial errors).
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { isValidAdm4 } from "@/lib/adm4";
 import { fetchForecast } from "@/lib/bmkgClient";
-import { getCache } from "@/lib/cache";
+import { getCache, setCache } from "@/lib/cache";
 import { normalizeBmkgForecast } from "@/lib/weatherNormalize";
-import { getRegionByAdm4, toBmkgAdm4 } from "@/lib/regionSearch";
-import type { BmkgClientResult } from "@/lib/bmkgClient";
+import { getRegionByAdm4, toBmkgAdm4, findBmkgFallback } from "@/lib/regionSearch";
 import type { WeatherForecast } from "@/types/weather";
 
-const MAX_CODES = 40; // covers our 38 cities + buffer
+const MAX_CODES = 40;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -34,43 +33,77 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: `Maksimal ${MAX_CODES} kode adm4.` }, { status: 400 });
   }
 
-  // Validate all codes first
   for (const code of codes) {
     if (!isValidAdm4(code)) {
       return NextResponse.json({ error: `Kode adm4 tidak valid: ${code}` }, { status: 400 });
     }
   }
 
-  // ── Fetch all in parallel ──
+  // ── Fetch with concurrency limit + fallback ──
   const results: Record<string, WeatherForecast> = {};
-  const fetchPromises = codes.map(async (adm4) => {
-    // Check cache first
+  const CONCURRENCY = 5;
+
+  async function fetchOne(adm4: string): Promise<void> {
     const cacheKey = `weather:bmkg:adm4:${adm4}`;
+
+    // 1. Cache check
     const cached = getCache<WeatherForecast>(cacheKey);
     if (cached.status === "fresh") {
       results[adm4] = cached.payload;
       return;
     }
+    if (cached.status === "stale") {
+      // Keep stale as fallback, but still try to refresh
+    }
 
-    // Fetch from BMKG
+    // 2. Try BMKG-compatible code first, then original
     const bmkgAdm4 = toBmkgAdm4(adm4);
-    const bmkgResult = await fetchForecast(bmkgAdm4, 8000);
-    const result = bmkgResult.ok
-      ? bmkgResult
-      : bmkgAdm4 !== adm4
-        ? await fetchForecast(adm4, 8000)
-        : bmkgResult;
+    let result = await fetchForecast(bmkgAdm4, 8000);
+    if (!result.ok && bmkgAdm4 !== adm4) {
+      result = await fetchForecast(adm4, 8000);
+    }
 
-    if (!result.ok) return; // skip failed
+    // 3. If both failed, try expanded fallback (same as regular weather route)
+    if (!result.ok) {
+      const fallbackCandidates = await findBmkgFallback(adm4, 15);
+      for (const candidate of fallbackCandidates) {
+        if (candidate === bmkgAdm4 || candidate === adm4) continue;
+        const fb = await fetchForecast(candidate, 5000);
+        if (fb.ok) { result = fb; break; }
+      }
+    }
+
+    if (!result.ok) {
+      // 4. Return stale cache if available
+      if (cached.status === "stale") {
+        results[adm4] = cached.payload;
+      }
+      return;
+    }
 
     const region = await getRegionByAdm4(adm4);
     const normalized = normalizeBmkgForecast(result.data, region);
-    if (!normalized || normalized.days.length === 0) return;
+    if (!normalized || normalized.days.length === 0) {
+      if (cached.status === "stale") {
+        results[adm4] = cached.payload;
+      }
+      return;
+    }
 
+    // Save to cache
+    setCache(cacheKey, normalized);
     results[adm4] = normalized;
-  });
+  }
 
-  await Promise.allSettled(fetchPromises);
+  // Worker pool with concurrency limit
+  const queue = [...codes];
+  async function worker(): Promise<void> {
+    while (queue.length > 0) {
+      const code = queue.shift()!;
+      await fetchOne(code);
+    }
+  }
+  await Promise.allSettled(Array.from({ length: CONCURRENCY }, () => worker()));
 
   // ── Build lightweight response ──
   const summary: Record<string, {

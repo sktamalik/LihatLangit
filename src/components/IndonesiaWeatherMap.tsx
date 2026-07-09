@@ -79,8 +79,11 @@ export default function IndonesiaWeatherMap() {
           attributionControl: false,
           scrollWheelZoom: false,
           minZoom: 4,
-          maxZoom: 9,
-        });
+          maxZoom: 12,
+        }).setMaxBounds([
+          [-12, 94],
+          [7, 142],
+        ]);
 
         // OpenStreetMap tile layer
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -278,7 +281,7 @@ export default function IndonesiaWeatherMap() {
       <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
           <h3 className="font-body-sans text-[18px] md:text-[20px] font-semibold text-text-dark">
-            🗺️ Peta Prakiraan Cuaca Indonesia
+            Peta Prakiraan Cuaca Indonesia
           </h3>
           <span className="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-primary-container/10 border border-primary-container/20 text-primary-container text-[11px] font-bold font-body-sans">
             {new Date().toLocaleDateString("id-ID", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
