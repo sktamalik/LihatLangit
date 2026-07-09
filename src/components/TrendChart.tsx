@@ -56,8 +56,8 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
   const H = 260;            // taller to fit labels + time
   const PAD_T = 18;
   const PAD_B = 48;         // room for time labels below
-  const PAD_LEFT = 40;
-  const PAD_RIGHT = 50;     // more space for time labels
+  const PAD_LEFT = 20;      // padding kiri agar grafik tidak menempel tepi card
+  const PAD_RIGHT = 30;     // padding kanan agar grafik tidak menempel tepi card
   const PLOT_H = H - PAD_T - PAD_B;
 
   const toY = (v: number, min: number, r: number) =>
@@ -88,21 +88,19 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
         <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-[11px] sm:text-[12px] font-body-sans font-medium">
           <button
             onClick={() => setShowTemp(!showTemp)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer ${
-              showTemp
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer ${showTemp
                 ? "bg-primary-container/10 text-primary-container"
                 : "bg-gray-100 text-gray-400 line-through"
-            }`}
+              }`}
           >
             <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-opacity ${showTemp ? "bg-primary-container opacity-100" : "bg-gray-300 opacity-50"}`} /> Suhu
           </button>
           <button
             onClick={() => setShowHum(!showHum)}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer ${
-              showHum
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer ${showHum
                 ? "bg-yellow-100 text-yellow-700"
                 : "bg-gray-100 text-gray-400 line-through"
-            }`}
+              }`}
           >
             <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-opacity ${showHum ? "bg-[#FDE047] opacity-100" : "bg-gray-300 opacity-50"}`} /> Kelembapan
           </button>
