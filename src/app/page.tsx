@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
       <main className="flex-grow">
         {/* HERO */}
-        <section id="hero" className="flex flex-col items-center justify-center text-center px-5 md:px-20 pt-24 pb-12 w-full max-w-5xl mx-auto">
+        <section id="hero" className="flex flex-col items-center justify-center text-center px-5 md:px-20 pt-17 pb-12 w-full max-w-5xl mx-auto">
           <a href="#hero-search" className="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white mb-10 shadow-sm hover:shadow-md transition-shadow no-underline cursor-pointer">
             <span className="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">Baru</span>
             <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px] animate-arrow-slide">arrow_forward</span></span>
@@ -215,7 +215,7 @@ export default function DashboardPage() {
         {/* DATA DASHBOARD */}
         {state.status === "ready" && (
           <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto flex flex-col gap-8">
-            <h3 className="font-display-pixel text-[16px] md:text-[24px] text-text-dark text-center uppercase leading-[24px] md:leading-[32px]">
+            <h3 className="font-display-pixel text-[14px] xs:text-[16px] md:text-[22px] text-text-dark text-center uppercase leading-[20px] xs:leading-[24px] md:leading-[30px] tracking-[0.05em] max-w-3xl mx-auto">
               Visualisasi Data Real-Time <span className="text-primary-container">dari BMKG.</span>
             </h3>
             <TrendChart forecast={state.forecast} />
@@ -258,7 +258,7 @@ export default function DashboardPage() {
       {/* BOTTOM: CTA + 3 Cards + Source + Grass + Footer */}
       <div>
         <section className="px-5 md:px-20 pb-12 pt-12 w-full max-w-6xl mx-auto flex flex-col items-center">
-          <h3 className="font-display-pixel text-[16px] md:text-[24px] text-text-dark text-center mb-20 uppercase leading-[24px] md:leading-[32px]">
+          <h3 className="font-display-pixel text-[14px] xs:text-[16px] md:text-[22px] text-text-dark text-center mb-16 uppercase leading-[20px] xs:leading-[24px] md:leading-[30px] tracking-[0.05em] max-w-3xl mx-auto">
             Cuaca akurat dari sumber <span className="text-primary-container">terpercaya.</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">

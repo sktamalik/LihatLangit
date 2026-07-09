@@ -91,7 +91,6 @@ export default function IndonesiaWeatherMap() {
           attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(map);
 
-        L.control.zoom({ position: "bottomright" }).addTo(map);
         mapInstance.current = map;
 
         // Markers layer
@@ -268,6 +267,14 @@ export default function IndonesiaWeatherMap() {
     legendRef.current = new LegendControl({ position: "bottomleft" }).addTo(mapInstance.current);
   }, [mapReady]);
 
+  // ── Custom zoom controls ──
+  const handleZoomIn = () => {
+    mapInstance.current?.zoomIn();
+  };
+  const handleZoomOut = () => {
+    mapInstance.current?.zoomOut();
+  };
+
   // ── Retry ──
   const handleRetry = () => { fetchAllWeather(); };
 
@@ -351,6 +358,29 @@ export default function IndonesiaWeatherMap() {
             </span>
           </div>
         )}
+
+        {/* Custom zoom buttons — absolute di atas map, bebas event Leaflet */}
+        {mapReady && (
+          <div className="absolute bottom-5 right-4 z-[1100] flex flex-col gap-[1px]">
+            <button
+              onClick={handleZoomIn}
+              aria-label="Perbesar peta"
+              className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-t-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0"
+              style={{ borderBottom: '1px solid #e2e8f0', lineHeight: 1 }}
+            >
+              +
+            </button>
+            <button
+              onClick={handleZoomOut}
+              aria-label="Perkecil peta"
+              className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-b-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0"
+              style={{ lineHeight: 1 }}
+            >
+              −
+            </button>
+          </div>
+        )}
+
       </div>
 
       {/* Mobile legend (below map) */}

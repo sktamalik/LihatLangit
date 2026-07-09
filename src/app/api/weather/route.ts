@@ -155,21 +155,21 @@ export async function GET(request: NextRequest) {
   //   1. Direct code variants (0XXX↔1XXX)
   //   2. Other villages in same district
   //   3. Other districts in same city
-  //   4. Other cities in same province
-  // Each level uses a shorter timeout (4s) since these are probes.
+  // Each level uses a shorter timeout since these are probes.
   console.log(`[Weather] Exact adm4 ${adm4} failed, trying expanded fallback...`);
-  const fallbackCandidates = await findBmkgFallback(adm4, 25);
+  const fallbackCandidates = await findBmkgFallback(adm4, 20);
   let fallbackResult: BmkgClientResult | null = null;
   let fallbackCode: string | null = null;
   let fallbackAttempts = 0;
-  const MAX_FALLBACK_ATTEMPTS = 25;
+  const MAX_FALLBACK_ATTEMPTS = 10; // cap at 10 to avoid long waits
+  const FALLBACK_TIMEOUT = 3000; // 3s per probe — faster failure
 
   for (let fi = 0; fi < fallbackCandidates.length && fallbackAttempts < MAX_FALLBACK_ATTEMPTS; fi++) {
     const candidate = fallbackCandidates[fi];
     if (candidate === bmkgAdm4 || candidate === adm4) continue; // already tried
     fallbackAttempts++;
     console.log(`[Weather] Trying fallback #${fallbackAttempts}: adm4=${candidate}`);
-    fallbackResult = await fetchForecast(candidate, 5000); // 5s timeout for probes
+    fallbackResult = await fetchForecast(candidate, FALLBACK_TIMEOUT);
     if (fallbackResult.ok) {
       fallbackCode = candidate;
       console.log(`[Weather] Fallback SUCCESS (#${fallbackAttempts}) for adm4=${candidate}`);
