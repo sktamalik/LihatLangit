@@ -11,6 +11,8 @@ import SeaConditions from "@/components/SeaConditions";
 import SunMoon from "@/components/SunMoon";
 import SmartTips from "@/components/SmartTips";
 import IndonesiaWeatherMap from "@/components/IndonesiaWeatherMap";
+import BmkgPressRelease from "@/components/BmkgPressRelease";
+import BmkgInfoTabs from "@/components/BmkgInfoTabs";
 import CommunityReports from "@/components/CommunityReports";
 import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
@@ -246,6 +248,12 @@ export default function DashboardPage() {
           <div className="px-5 md:px-20 py-12 w-full max-w-5xl mx-auto"><WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} /></div>
         )}
       </main>
+
+      {/* BERITA & INFORMASI BMKG — sebelum footer */}
+      <section id="berita-bmkg" className="px-4 md:px-12 pb-4 pt-4 w-full max-w-[1280px] mx-auto flex flex-col gap-6">
+        <BmkgPressRelease />
+        <BmkgInfoTabs />
+      </section>
 
       {/* BOTTOM: CTA + 3 Cards + Source + Grass + Footer */}
       <div>
