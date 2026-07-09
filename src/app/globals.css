@@ -123,17 +123,17 @@
 
 /* ── Animations ── */
 @keyframes cloud-drift {
-  0%   { transform: translateX(0) translateY(0); }
-  25%  { transform: translateX(20px) translateY(-6px); }
-  50%  { transform: translateX(35px) translateY(0); }
-  75%  { transform: translateX(20px) translateY(4px); }
-  100% { transform: translateX(0) translateY(0); }
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(40px); }
+  50%  { transform: translateX(60px); }
+  75%  { transform: translateX(40px); }
+  100% { transform: translateX(0); }
 }
 @keyframes cloud-drift-slow {
-  0%   { transform: translateX(0) translateY(0); }
-  33%  { transform: translateX(-15px) translateY(-4px); }
-  66%  { transform: translateX(-30px) translateY(2px); }
-  100% { transform: translateX(0) translateY(0); }
+  0%   { transform: translateX(0); }
+  33%  { transform: translateX(-30px); }
+  66%  { transform: translateX(-50px); }
+  100% { transform: translateX(0); }
 }
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(16px); }
