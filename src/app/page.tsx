@@ -88,9 +88,9 @@ export default function DashboardPage() {
   };
 
   const featureCards = [
-    { icon: "database", title: "Data Resmi BMKG", desc: "Seluruh data prakiraan cuaca berasal langsung dari Badan Meteorologi, Klimatologi, dan Geofisika Indonesia." },
-    { icon: "travel_explore", title: "Cakupan Nasional", desc: "Cari prakiraan cuaca hingga level desa/kelurahan di seluruh Indonesia. Dari Sabang sampai Merauke." },
-    { icon: "schedule", title: "Selalu Update", desc: "Data prakiraan diperbarui secara berkala mengikuti jadwal pembaruan resmi dari BMKG." },
+    { icon: "database", title: "Data Resmi BMKG", desc: "Seluruh data prakiraan cuaca dan info cuaca Indonesia berasal langsung dari Badan Meteorologi, Klimatologi, dan Geofisika — sumber cuaca resmi Indonesia." },
+    { icon: "travel_explore", title: "Cakupan Nasional", desc: "Cek cuaca hingga level desa/kelurahan di seluruh Indonesia. Dari Sabang sampai Merauke — prakiraan cuaca akurat di mana pun Anda berada." },
+    { icon: "schedule", title: "Update Real-Time", desc: "Data prakiraan cuaca BMKG terkini yang diperbarui secara berkala. Cek suhu, kelembapan, dan peringatan dini cuaca ekstrem kapan saja." },
   ];
 
   return (
@@ -102,7 +102,7 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center px-4 sm:px-5 md:px-20 py-3 md:py-4 max-w-full">
           <div className="flex items-center gap-2 sm:gap-4">
             <a href="#" className="flex items-center no-underline">
-              <Image src="/Headericon.png" alt="LihatLangit" width={120} height={32} className="h-8 sm:h-9 md:h-10 w-auto" priority />
+              <Image src="/Headericon.png" alt="LihatLangit — Cek Cuaca Indonesia Real-Time dari BMKG" width={120} height={32} className="h-8 sm:h-9 md:h-10 w-auto" priority />
             </a>
           </div>
           <div className="hidden md:flex items-center gap-3 lg:gap-6">
@@ -131,21 +131,21 @@ export default function DashboardPage() {
             <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px] animate-arrow-slide">arrow_forward</span></span>
           </a>
           <h1 className="font-display-pixel text-[24px] md:text-[40px] lg:text-[48px] text-text-dark leading-[32px] md:leading-[48px] lg:leading-[56px] mb-6 max-w-4xl uppercase" style={{ wordSpacing: '-0.2em' }}>
-            Cuaca akurat <span className="text-primary-container">langsung dari BMKG</span>
+            Cek Cuaca Indonesia <span className="text-primary-container">Real-Time dari BMKG</span>
           </h1>
           <p className="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl font-medium">
-            LihatLangit memberikan prakiraan cuaca tingkat desa/kelurahan berdasarkan data resmi BMKG.
+            LihatLangit — aplikasi cek cuaca Indonesia terkini. Dapatkan prakiraan cuaca akurat hingga level desa/kelurahan berdasarkan data resmi BMKG. Cek suhu, kelembapan, angin, dan peringatan dini cuaca ekstrem.
           </p>
           <div className="flex flex-col items-center gap-6 mb-4">
             <button onClick={() => scrollTo("hero-search")} className="bg-primary-container text-white px-8 py-3.5 rounded-md font-body-sans text-[18px] font-medium hover:bg-primary-container/90 transition-transform hover:scale-105 flex items-center gap-2 shadow-sm cursor-pointer">
-              Cari Wilayah <span className="material-symbols-outlined">arrow_forward</span>
+              Cek Cuaca Sekarang <span className="material-symbols-outlined">arrow_forward</span>
             </button>
             <div className="flex items-center gap-6 text-on-surface-variant font-body-sans text-[14px] font-medium">
               <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="flex items-center gap-2 hover:text-text-dark transition-colors cursor-pointer disabled:opacity-50">
-                <span className="material-symbols-outlined text-[18px]">my_location</span> Gunakan Lokasi Saat Ini
+                <span className="material-symbols-outlined text-[18px]">my_location</span> Cek Cuaca di Lokasi Saya
               </button>
               <a onClick={() => scrollTo("peta-cuaca")} className="flex items-center gap-2 hover:text-text-dark transition-colors cursor-pointer no-underline">
-                <span className="material-symbols-outlined text-[18px]">map</span> Peta Interaktif
+                <span className="material-symbols-outlined text-[18px]">map</span> Peta Cuaca Indonesia
               </a>
             </div>
           </div>
@@ -216,8 +216,8 @@ export default function DashboardPage() {
         {state.status === "ready" && (
           <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto flex flex-col gap-8">
             <h3 className="font-display-pixel text-[14px] xs:text-[16px] md:text-[22px] text-text-dark text-center uppercase leading-[20px] xs:leading-[24px] md:leading-[30px] tracking-[0.05em] max-w-3xl mx-auto">
-              Visualisasi Data Real-Time <span className="text-primary-container">dari BMKG.</span>
-            </h3>
+            Cek Cuaca & Prakiraan <span className="text-primary-container">Real-Time dari BMKG.</span>
+          </h3>
             <TrendChart forecast={state.forecast} />
             {/* Row: Card Celsius (40%) — peta cuaca lokal dihapus, sudah ada peta Indonesia di atas */}
             <div className="grid grid-cols-1 md:grid-cols-10 gap-8 w-full items-stretch">
@@ -259,7 +259,7 @@ export default function DashboardPage() {
       <div>
         <section className="px-5 md:px-20 pb-12 pt-12 w-full max-w-6xl mx-auto flex flex-col items-center">
           <h3 className="font-display-pixel text-[14px] xs:text-[16px] md:text-[22px] text-text-dark text-center mb-16 uppercase leading-[20px] xs:leading-[24px] md:leading-[30px] tracking-[0.05em] max-w-3xl mx-auto">
-            Cuaca akurat dari sumber <span className="text-primary-container">terpercaya.</span>
+            Cek Cuaca Akurat dari Sumber <span className="text-primary-container">Terpercaya — BMKG.</span>
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
             {featureCards.map((card) => (
@@ -288,11 +288,13 @@ export default function DashboardPage() {
               <div className="md:col-span-6 flex flex-col gap-6 md:gap-8">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
                   <a href="#" className="flex items-center no-underline">
-                    <Image src="/Footericon.png" alt="LihatLangit" width={140} height={40} className="h-10 sm:h-11 md:h-12 w-auto" />
+                    <Image src="/Footericon.png" alt="LihatLangit — Prakiraan Cuaca Indonesia" width={140} height={40} className="h-10 sm:h-11 md:h-12 w-auto" />
                   </a>
                   <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-white hover:text-white/80 transition-colors text-[13px] sm:text-[14px] font-medium no-underline"><span className="material-symbols-outlined text-[16px] sm:text-[18px]">open_in_new</span> data.bmkg.go.id</a>
                 </div>
-                <div className="max-w-xl"><p className="text-white text-[15px] sm:text-[16px] md:text-[17px] leading-relaxed font-medium">&ldquo;Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.&rdquo;</p></div>
+                <div className="max-w-xl"><p className="text-white text-[15px] sm:text-[16px] md:text-[17px] leading-relaxed font-medium">&ldquo;Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.&rdquo;</p>
+                  <p className="text-white/60 text-[12px] mt-3">Cek cuaca Indonesia terkini — prakiraan cuaca BMKG, suhu udara, kelembapan, peringatan dini cuaca ekstrem, dan peta cuaca interaktif seluruh Indonesia.</p>
+                </div>
               </div>
               <div className="md:col-span-2 flex flex-col gap-3 md:gap-4"><span className="text-white font-bold text-[13px] md:text-[14px] mb-2">Navigasi</span><a onClick={() => scrollTo("hero")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Dashboard</a><a onClick={() => scrollTo("features")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Prakiraan</a><a onClick={() => scrollTo("peta-cuaca")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Peta</a><a onClick={() => scrollTo("peringatan-dini")} className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] cursor-pointer no-underline">Peringatan</a></div>
               <div className="md:col-span-2 flex flex-col gap-3 md:gap-4"><span className="text-white font-bold text-[13px] md:text-[14px] mb-2">Sumber</span><a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] no-underline">BMKG Data</a><a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-white/90 hover:text-white transition-colors text-[12px] md:text-[13px] no-underline">BMKG Site</a></div>

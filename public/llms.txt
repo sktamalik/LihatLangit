@@ -1,0 +1,38 @@
+# LihatLangit — Prakiraan Cuaca Indonesia
+> Dashboard prakiraan cuaca Indonesia berbasis data resmi BMKG. Cari cuaca hingga level desa/kelurahan, dapatkan prakiraan 3 hari dengan interval 3 jam, peringatan dini, peta interaktif, dan informasi lingkungan.
+
+## Tentang LihatLangit
+LihatLangit adalah aplikasi web untuk **cek cuaca Indonesia** secara real-time. Semua data bersumber langsung dari **BMKG (Badan Meteorologi, Klimatologi, dan Geofisika)** — sumber data cuaca resmi Indonesia. Cocok untuk masyarakat umum, petani, nelayan, pelaku perjalanan, dan siapa pun yang membutuhkan informasi cuaca akurat.
+
+## Fitur Utama
+- **Cek Cuaca Wilayah**: Cari prakiraan cuaca hingga level desa/kelurahan di seluruh Indonesia
+- **Prakiraan 3 Hari**: Data cuaca per 3 jam untuk hari ini, besok, dan lusa
+- **Peta Cuaca Interaktif**: Visualisasi suhu dan kondisi cuaca 40+ kota Indonesia
+- **Peringatan Dini BMKG**: Nowcast cuaca ekstrem real-time
+- **Info Lingkungan**: Indeks UV, kelembapan, kecepatan angin, tekanan udara, jarak pandang
+- **Kondisi Laut**: Tinggi gelombang dan arah angin laut
+- **Info Matahari & Bulan**: Waktu terbit, terbenam, dan fase bulan
+- **Tips Pintar**: Rekomendasi aktivitas berdasarkan cuaca terkini
+- **Berita BMKG**: Siaran pers dan informasi terkini dari BMKG
+
+## Dataset Wilayah
+Mencakup seluruh provinsi dan kota besar Indonesia — dari Sabang sampai Merauke — tersimpan dalam database lokal.
+
+## Link Penting
+- [Beranda](https://lihatlangit.vercel.app)
+- [Data BMKG](https://data.bmkg.go.id)
+- [GitHub Repository](https://github.com/sktamalik/LihatLangit)
+
+## Tech Stack
+- Next.js 16 (App Router) | React 19 | TypeScript | Tailwind CSS v4 | Leaflet | Vitest
+
+## Cara Menjalankan
+```bash
+git clone https://github.com/sktamalik/LihatLangit.git
+cd LihatLangit
+npm install
+npm run dev
+```
+
+## Kata Kunci
+cuaca, cek cuaca, lihat langit, prakiraan cuaca, BMKG, info cuaca, suhu udara, cuaca Indonesia, weather forecast Indonesia, cuaca hari ini, cuaca besok, peringatan dini cuaca, nowcast BMKG
