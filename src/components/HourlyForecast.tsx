@@ -79,6 +79,7 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
   // ── Find "now" slot using region-local time ──
   const localNow = formatLocalNow(forecast.region.timezone);
   const points = today.points;
+  const nearestPoint = forecast.nearestPoint;
 
   // ── Reconstruct full day slots (BMKG only provides future slots) ──
   // Expected slots: 01:00, 04:00, 07:00, 10:00, 13:00, 16:00, 19:00, 22:00
@@ -93,7 +94,7 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
   }
 
   // Build full day slots with all 8 time slots
-  const slots = expectedTimes.map((time, idx) => {
+  const slots = expectedTimes.map((time) => {
     const existingPoint = existingPointsMap.get(time);
     const localDateTime = `${todayDate}T${time}:00`;
     const isPast = localDateTime < localNow;
@@ -106,11 +107,30 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
         isPast: false,
         point: existingPoint,
       };
-    } else {
-      // Create placeholder for past slots
+    } else if (isPast && nearestPoint) {
+      // Use nearestPoint data for past slots
       return {
         key: time,
-        isNow: false, // Will be set later
+        isNow: false,
+        isPast,
+        point: {
+          localDateTime,
+          temperatureC: nearestPoint.temperatureC,
+          weatherDescription: nearestPoint.weatherDescription,
+          humidityPct: nearestPoint.humidityPct,
+          windSpeedKmh: nearestPoint.windSpeedKmh,
+          cloudCoverPct: nearestPoint.cloudCoverPct,
+          weatherDescriptionEn: nearestPoint.weatherDescriptionEn,
+          windDirection: nearestPoint.windDirection,
+          visibilityText: nearestPoint.visibilityText,
+          utcDateTime: "",
+        },
+      };
+    } else {
+      // Create placeholder for future slots without data
+      return {
+        key: time,
+        isNow: false,
         isPast,
         point: {
           localDateTime,
