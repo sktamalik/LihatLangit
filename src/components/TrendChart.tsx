@@ -52,7 +52,7 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
   const tRange = Math.max(tMax - tMin, 4);
 
   // ── Layout — fixed internal coordinates, responsive via viewBox ──
-  const W = 1000;
+  const W = 1380;
   const H = 260;            // taller to fit labels + time
   const PAD_T = 18;
   const PAD_B = 48;         // room for time labels below
@@ -89,8 +89,8 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
           <button
             onClick={() => setShowTemp(!showTemp)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer ${showTemp
-                ? "bg-primary-container/10 text-primary-container"
-                : "bg-gray-100 text-gray-400 line-through"
+              ? "bg-primary-container/10 text-primary-container"
+              : "bg-gray-100 text-gray-400 line-through"
               }`}
           >
             <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-opacity ${showTemp ? "bg-primary-container opacity-100" : "bg-gray-300 opacity-50"}`} /> Suhu
@@ -98,8 +98,8 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
           <button
             onClick={() => setShowHum(!showHum)}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer ${showHum
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-gray-100 text-gray-400 line-through"
+              ? "bg-yellow-100 text-yellow-700"
+              : "bg-gray-100 text-gray-400 line-through"
               }`}
           >
             <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full transition-opacity ${showHum ? "bg-[#FDE047] opacity-100" : "bg-gray-300 opacity-50"}`} /> Kelembapan
