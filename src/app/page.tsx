@@ -134,7 +134,7 @@ export default function DashboardPage() {
             Cek Cuaca Indonesia <span className="text-primary-container">Real-Time dari BMKG</span>
           </h1>
           <p className="font-body-sans text-[16px] md:text-[18px] text-on-surface-variant mb-10 max-w-2xl font-medium">
-            LihatLangit — aplikasi cek cuaca Indonesia terkini. Dapatkan prakiraan cuaca akurat hingga level desa/kelurahan berdasarkan data resmi BMKG. Cek suhu, kelembapan, angin, dan peringatan dini cuaca ekstrem.
+            LihatLangit, aplikasi cek cuaca Indonesia terkini. Dapatkan prakiraan cuaca akurat hingga level desa/kelurahan berdasarkan data resmi BMKG. Cek suhu, kelembapan, angin, dan peringatan dini cuaca ekstrem.
           </p>
           <div className="flex flex-col items-center gap-6 mb-4">
             <button onClick={() => scrollTo("hero-search")} className="bg-primary-container text-white px-8 py-3.5 rounded-md font-body-sans text-[18px] font-medium hover:bg-primary-container/90 transition-transform hover:scale-105 flex items-center gap-2 shadow-sm cursor-pointer">
@@ -216,8 +216,8 @@ export default function DashboardPage() {
         {state.status === "ready" && (
           <div id="features" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto flex flex-col gap-8">
             <h3 className="font-display-pixel text-[14px] xs:text-[16px] md:text-[22px] text-text-dark text-center uppercase leading-[20px] xs:leading-[24px] md:leading-[30px] tracking-[0.05em] max-w-3xl mx-auto">
-            Cek Cuaca & Prakiraan <span className="text-primary-container">Real-Time dari BMKG.</span>
-          </h3>
+              Cek Cuaca & Prakiraan <span className="text-primary-container">Real-Time dari BMKG.</span>
+            </h3>
             <TrendChart forecast={state.forecast} />
             {/* Row: Card Celsius (40%) — peta cuaca lokal dihapus, sudah ada peta Indonesia di atas */}
             <div className="grid grid-cols-1 md:grid-cols-10 gap-8 w-full items-stretch">

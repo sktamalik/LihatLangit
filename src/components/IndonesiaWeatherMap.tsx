@@ -30,6 +30,7 @@ export default function IndonesiaWeatherMap() {
   const [weatherData, setWeatherData] = useState<CityWeatherMap | null>(null);
   const [isFetching, setIsFetching] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [showIndicators, setShowIndicators] = useState(true);
 
   // ── Fetch weather for all cities ──
   const fetchAllWeather = useCallback(async () => {
@@ -71,7 +72,6 @@ export default function IndonesiaWeatherMap() {
 
         if (destroyed || !mapContainer.current || mapInstance.current) return;
 
-        // Indonesia bounds: lat from -11 to 6, lng from 95 to 141
         const map = L.map(mapContainer.current, {
           center: [-2.5, 118.0],
           zoom: 5,
@@ -85,7 +85,6 @@ export default function IndonesiaWeatherMap() {
           [7, 142],
         ]);
 
-        // OpenStreetMap tile layer
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
           maxZoom: 19,
           attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -93,7 +92,6 @@ export default function IndonesiaWeatherMap() {
 
         mapInstance.current = map;
 
-        // Markers layer
         markersLayerRef.current = L.layerGroup().addTo(map);
 
         requestAnimationFrame(() => map.invalidateSize());
@@ -126,7 +124,6 @@ export default function IndonesiaWeatherMap() {
       const color = data ? getWeatherColor(desc) : "#9ca3af";
       const label = data ? getWeatherLabel(desc) : "—";
 
-      // ── Circle marker with color indicator ──
       const circle = L.circle([city.latitude, city.longitude], {
         radius: temp != null ? 10000 + Math.abs(temp) * 2000 : 12000,
         color,
@@ -136,7 +133,6 @@ export default function IndonesiaWeatherMap() {
         opacity: 0.7,
       });
 
-      // ── Popup ──
       const tempStr = temp != null ? `${Math.round(temp)}°C` : "--";
       const humStr = data?.humidityPct != null ? `${data.humidityPct}%` : "--";
       const windStr = data?.windSpeedKmh != null ? `${data.windSpeedKmh} km/j` : "--";
@@ -145,7 +141,8 @@ export default function IndonesiaWeatherMap() {
         : `<span class="weather-emoji">${getWeatherEmoji(desc)}</span>`;
 
       const popupHtml = `
-        <div style="font-family:Inter,sans-serif;font-size:13px;line-height:1.5;min-width:160px">
+        <div style="font-family:Inter,sans-serif;font-size:13px;line-height:1.5;min-width:160px;position:relative">
+          <button class="popup-close-btn" data-adm4="${city.adm4}" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#0C4A6E;color:white;border:none;font-size:16px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:1000;line-height:1;padding:0">×</button>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
             ${iconHtml}
             <div>
@@ -167,9 +164,13 @@ export default function IndonesiaWeatherMap() {
         </div>
       `;
 
-      circle.bindPopup(popupHtml, { className: "weather-popup" });
+      const popup = L.popup({ className: "weather-popup", closeButton: false, autoClose: true })
+        .setContent(popupHtml)
+        .setLatLng([city.latitude, city.longitude]);
 
-      // ── Label with temperature ──
+      circle.bindPopup(popup);
+      markersLayerRef.current.addLayer(circle);
+
       const labelDiv = L.divIcon({
         className: "city-temp-label",
         html: `<div style="
@@ -197,9 +198,24 @@ export default function IndonesiaWeatherMap() {
         interactive: false,
       });
 
-      markersLayerRef.current.addLayer(circle);
       markersLayerRef.current.addLayer(labelMarker);
     }
+
+    // Event delegation for close buttons
+    const mapContainerEl = mapInstance.current.getContainer();
+    const handleClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains('popup-close-btn')) {
+        e.stopPropagation();
+        mapInstance.current?.closePopup();
+      }
+    };
+    
+    mapContainerEl.addEventListener('click', handleClick);
+    
+    return () => {
+      mapContainerEl.removeEventListener('click', handleClick);
+    };
   }, [mapReady, weatherData]);
 
   // ── Legend (added once on map ready) ──
@@ -267,18 +283,11 @@ export default function IndonesiaWeatherMap() {
     legendRef.current = new LegendControl({ position: "bottomleft" }).addTo(mapInstance.current);
   }, [mapReady]);
 
-  // ── Custom zoom controls ──
-  const handleZoomIn = () => {
-    mapInstance.current?.zoomIn();
-  };
-  const handleZoomOut = () => {
-    mapInstance.current?.zoomOut();
-  };
+  const handleZoomIn = () => { mapInstance.current?.zoomIn(); };
+  const handleZoomOut = () => { mapInstance.current?.zoomOut(); };
 
-  // ── Retry ──
   const handleRetry = () => { fetchAllWeather(); };
 
-  // ── Info bar ──
   const totalCities = INDONESIA_CITIES.length;
   const loadedCount = weatherData ? Object.keys(weatherData).length : 0;
 
@@ -302,26 +311,19 @@ export default function IndonesiaWeatherMap() {
             </span>
           )}
           {fetchError && !isFetching && (
-            <button
-              onClick={handleRetry}
-              className="flex items-center gap-1 text-[12px] text-error font-body-sans hover:underline cursor-pointer"
-            >
+            <button onClick={handleRetry} className="flex items-center gap-1 text-[12px] text-error font-body-sans hover:underline cursor-pointer">
               <span className="material-symbols-outlined text-[14px]">refresh</span> Gagal memuat, coba lagi
             </button>
           )}
           {weatherData && !isFetching && (
-            <span className="text-[11px] text-text-muted font-body-sans">
-              {loadedCount}/{totalCities} wilayah
-            </span>
+            <span className="text-[11px] text-text-muted font-body-sans">{loadedCount}/{totalCities} wilayah</span>
           )}
         </div>
       </div>
 
       {/* Map container */}
-      <div
-        ref={mapContainer}
-        className="w-full h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] rounded-lg overflow-hidden bg-background-sky/30 relative"
-      >
+      <div className={`w-full h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] rounded-lg overflow-hidden bg-background-sky/30 relative ${!showIndicators ? 'hide-legend' : ''}`}>
+        <div ref={mapContainer} className="w-full h-full">
         {!mapReady && !loadError && (
           <div className="w-full h-full flex items-center justify-center">
             <span className="text-sm text-text-muted font-body-sans">Memuat peta Indonesia...</span>
@@ -359,36 +361,36 @@ export default function IndonesiaWeatherMap() {
           </div>
         )}
 
-        {/* Custom zoom buttons — absolute di atas map, bebas event Leaflet */}
+        {/* Custom zoom buttons */}
         {mapReady && (
-          <div className="absolute bottom-5 right-4 z-[1100] flex flex-col gap-[1px]">
-            <button
-              onClick={handleZoomIn}
-              aria-label="Perbesar peta"
-              className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-t-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0"
-              style={{ borderBottom: '1px solid #e2e8f0', lineHeight: 1 }}
-            >
-              +
-            </button>
-            <button
-              onClick={handleZoomOut}
-              aria-label="Perkecil peta"
-              className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-b-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0"
-              style={{ lineHeight: 1 }}
-            >
-              −
-            </button>
+          <div className="absolute bottom-5 right-4 z-[1100] flex flex-col gap-[1px] leaflet-zoom-hide">
+            <button onClick={handleZoomIn} aria-label="Perbesar peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-t-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ borderBottom: '1px solid #e2e8f0', lineHeight: 1 }} type="button">+</button>
+            <button onClick={handleZoomOut} aria-label="Perkecil peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-b-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ lineHeight: 1 }} type="button">−</button>
           </div>
         )}
-
       </div>
+      </div>
+
+      {/* Toggle indikator cuaca */}
+      {mapReady && (
+        <div className="flex items-center gap-3 mt-2">
+          <button
+            onClick={() => setShowIndicators(!showIndicators)}
+            aria-label={showIndicators ? "Sembunyikan legenda cuaca" : "Tampilkan legenda cuaca"}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-outline-variant/40 shadow-sm text-[12px] font-body-sans text-text-dark hover:bg-surface-container-low transition-colors cursor-pointer"
+            type="button"
+          >
+            <span>{showIndicators ? "👁️" : "👁️‍🗨️"}</span>
+            <span>{showIndicators ? "Sembunyikan Legenda" : "Tampilkan Legenda"}</span>
+          </button>
+          {!showIndicators && <span className="text-[10px] text-text-muted font-body-sans">Legenda disembunyikan</span>}
+        </div>
+      )}
 
       {/* Mobile legend (below map) */}
       <div className="mt-3 md:hidden">
         <details className="text-[12px]">
-          <summary className="cursor-pointer text-text-muted font-body-sans font-medium mb-2">
-            📋 Indikator Cuaca
-          </summary>
+          <summary className="cursor-pointer text-text-muted font-body-sans font-medium mb-2">📋 Indikator Cuaca</summary>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5">
             {[
               { label: "Cerah", color: "#f59e0b" },

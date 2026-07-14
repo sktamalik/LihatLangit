@@ -199,11 +199,11 @@
 .weather-popup .leaflet-popup-content-wrapper {
   border-radius: 12px !important;
   padding: 0 !important;
-  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
 }
 .weather-popup .leaflet-popup-content {
   margin: 12px 14px !important;
+  overflow: visible !important;
 }
 .weather-popup .leaflet-popup-tip {
   box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
@@ -218,4 +218,9 @@
 /* ── Map legend ── */
 .weather-legend {
   line-height: 1.4;
+}
+
+/* ── Hide legend toggle ── */
+.hide-legend .weather-legend {
+  display: none !important;
 }

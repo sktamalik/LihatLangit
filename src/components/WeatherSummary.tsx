@@ -89,12 +89,12 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
         {/* Additional info section */}
         <div className="mt-4 pt-4 border-t border-white/30">
           <div className="flex items-center justify-between text-[12px]">
-            <span className="text-text-muted font-body-sans">Terasa seperti</span>
-            <span className="font-body-sans font-bold text-text-dark">{c?.temperatureC !== null ? `${Math.round(c!.temperatureC - 2)}°C` : "--"}</span>
+            <span className="text-text-muted font-body-sans">Kecepatan angin</span>
+            <span className="font-body-sans font-bold text-text-dark">{c?.windSpeedKmh !== null ? `${c!.windSpeedKmh} km/h` : "--"}</span>
           </div>
           <div className="flex items-center justify-between text-[12px] mt-2">
-            <span className="text-text-muted font-body-sans">Tekanan udara</span>
-            <span className="font-body-sans font-bold text-text-dark">1013 hPa</span>
+            <span className="text-text-muted font-body-sans">Tutupan awan</span>
+            <span className="font-body-sans font-bold text-text-dark">{c?.cloudCoverPct !== null ? `${c!.cloudCoverPct}%` : "--"}</span>
           </div>
         </div>
       </div>

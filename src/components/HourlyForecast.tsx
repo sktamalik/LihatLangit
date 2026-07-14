@@ -79,84 +79,25 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
   // ── Find "now" slot using region-local time ──
   const localNow = formatLocalNow(forecast.region.timezone);
   const points = today.points;
-  const nearestPoint = forecast.nearestPoint;
 
-  // ── Reconstruct full day slots (BMKG only provides future slots) ──
-  // Expected slots: 01:00, 04:00, 07:00, 10:00, 13:00, 16:00, 19:00, 22:00
-  const expectedTimes = ["01:00", "04:00", "07:00", "10:00", "13:00", "16:00", "19:00", "22:00"];
-  const todayDate = today.date; // YYYY-MM-DD
-
-  // Create map of existing points by time
-  const existingPointsMap = new Map<string, typeof points[0]>();
-  for (const p of points) {
-    const time = p.localDateTime.slice(11, 16);
-    existingPointsMap.set(time, p);
-  }
-
-  // Build full day slots with all 8 time slots
-  const slots = expectedTimes.map((time) => {
-    const existingPoint = existingPointsMap.get(time);
-    const localDateTime = `${todayDate}T${time}:00`;
-    const isPast = localDateTime < localNow;
-
-    if (existingPoint) {
-      // Use actual data
-      return {
-        key: time,
-        isNow: false, // Will be set later
-        isPast: false,
-        point: existingPoint,
-      };
-    } else if (isPast && nearestPoint) {
-      // Use nearestPoint data for past slots
-      return {
-        key: time,
-        isNow: false,
-        isPast,
-        point: {
-          localDateTime,
-          temperatureC: nearestPoint.temperatureC,
-          weatherDescription: nearestPoint.weatherDescription,
-          humidityPct: nearestPoint.humidityPct,
-          windSpeedKmh: nearestPoint.windSpeedKmh,
-          cloudCoverPct: nearestPoint.cloudCoverPct,
-          weatherDescriptionEn: nearestPoint.weatherDescriptionEn,
-          windDirection: nearestPoint.windDirection,
-          visibilityText: nearestPoint.visibilityText,
-          utcDateTime: "",
-        },
-      };
-    } else {
-      // Create placeholder for future slots without data
-      return {
-        key: time,
-        isNow: false,
-        isPast,
-        point: {
-          localDateTime,
-          temperatureC: null,
-          weatherDescription: "N/A",
-          humidityPct: null,
-          windSpeedKmh: null,
-          cloudCoverPct: null,
-          weatherDescriptionEn: undefined,
-          windDirection: null,
-          visibilityText: null,
-          utcDateTime: "",
-        },
-      };
-    }
-  });
-
-  // Find the "now" slot in the reconstructed array
-  // It should be the first slot that is >= current time and not in the past
-  for (let i = 0; i < slots.length; i++) {
-    if (slots[i].point.localDateTime >= localNow && !slots[i].isPast) {
-      slots[i].isNow = true;
-      break;
+  // ── Only show actual BMKG data slots (no fabrication) ──
+  // Mark which slot is closest to current time
+  let nearestIdx = 0;
+  let minDiff = Infinity;
+  for (let i = 0; i < points.length; i++) {
+    const diff = Math.abs(new Date(points[i].localDateTime).getTime() - Date.now());
+    if (diff < minDiff) {
+      minDiff = diff;
+      nearestIdx = i;
     }
   }
 
+  const slots = points.map((point, idx) => ({
+    key: point.localDateTime,
+    isNow: idx === nearestIdx,
+    isPast: point.localDateTime < localNow,
+    point,
+  }));
 
   return (
     <div id="prakiraan-hari-ini" className="w-full bg-white rounded-[16px] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
@@ -214,41 +155,59 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
             <div className="flex items-center gap-2">
               <span className="material-symbols-outlined text-[16px] md:text-[18px] text-orange-500">wb_twilight</span>
               <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                Terbenam <strong>{sun.sunset}</strong>
+                Terbit: <span className="font-semibold">{sun.sunrise}</span>
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px] md:text-[18px] text-amber-400">wb_sunny</span>
+              <span className="material-symbols-outlined text-[16px] md:text-[18px] text-indigo-500">nights_stay</span>
               <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                Terbit <strong>{tomorrowSun.sunrise}</strong>
+                Terbenam: <span className="font-semibold">{sun.sunset}</span>
               </span>
             </div>
           </div>
         </div>
 
-        {/* Tomorrow preview */}
+        {/* Tomorrow card */}
         {tomorrow && (
-          <button
-            onClick={scroll}
-            className="flex-shrink-0 flex flex-col items-center justify-center p-4 md:p-5 rounded-2xl min-w-[140px] md:min-w-[160px] bg-gradient-to-br from-orange-50/80 to-orange-100/40 hover:from-orange-100 hover:to-orange-200/40 transition-all cursor-pointer group"
-          >
-            <span className="text-[10px] md:text-[11px] font-semibold text-orange-700 uppercase tracking-wider mb-1 font-body-sans">
-              Besok
+          <div className="flex-shrink-0 flex flex-col items-start p-4 md:p-5 rounded-2xl min-w-[160px] md:min-w-[180px] bg-gradient-to-br from-amber-50/80 to-orange-50/40 border border-amber-100/60">
+            <span className="text-[10px] md:text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2 flex items-center gap-1">
+              <span className="material-symbols-outlined text-[14px] md:text-[16px]">calendar_today</span> Besok
             </span>
-            <span className={`material-symbols-outlined text-[28px] md:text-[32px] mb-1 ${gc(tDom)}`}>
-              {gi(tDom)}
-            </span>
-            <span className="flex items-center gap-2 text-[12px] md:text-[13px] font-semibold text-text-dark font-body-sans">
-              <span className="text-text-muted">{tMin !== Infinity ? `${Math.round(tMin)}°` : "--"}</span>
-              <span>{tMax !== -Infinity ? `${Math.round(tMax)}°` : "--"}</span>
-            </span>
-            <span className="text-[10px] md:text-[11px] text-primary-container mt-1 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 font-body-sans">
-              Lihat <span className="material-symbols-outlined text-[12px] md:text-[13px]">arrow_forward</span>
-            </span>
-          </button>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className={`material-symbols-outlined text-[16px] md:text-[18px] ${gc(tDom)}`}>{gi(tDom)}</span>
+                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans font-semibold truncate max-w-[100px]">{tDom}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px] md:text-[18px] text-red-400">thermostat</span>
+                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
+                  {Math.round(tMin)}° – {Math.round(tMax)}°
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px] md:text-[18px] text-orange-500">wb_twilight</span>
+                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
+                  {tomorrowSun.sunrise}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[16px] md:text-[18px] text-indigo-500">nights_stay</span>
+                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
+                  {tomorrowSun.sunset}
+                </span>
+              </div>
+            </div>
+          </div>
         )}
         </div>
       </div>
+
+      <button
+        onClick={scroll}
+        className="w-full py-2.5 text-[13px] font-medium text-primary-container hover:bg-primary-container/5 transition-colors rounded-lg font-body-sans flex items-center justify-center gap-1 cursor-pointer"
+      >
+        Lihat Prakiraan 3 Hari <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+      </button>
     </div>
   );
 }

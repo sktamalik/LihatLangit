@@ -19,7 +19,11 @@ export function estimateUVIndex(
   cloudCoverPct: number | null,
   latitude: number | undefined
 ): { value: number; label: string; color: string; tip: string } {
-  const hour = new Date(localDateTime).getHours();
+  // Parse hour directly from the string to avoid timezone confusion.
+  // localDateTime is in local time (e.g. "2026-07-03T10:00:00"), so
+  // we extract HH directly instead of using new Date().getHours().
+  const hourMatch = localDateTime.match(/T(\d{2})/);
+  const hour = hourMatch ? parseInt(hourMatch[1], 10) : 12;
   const lat = Math.abs(latitude ?? -5);
 
   let baseUV = 0;
