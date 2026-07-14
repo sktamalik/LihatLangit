@@ -59,23 +59,23 @@ export default function CommunityReports({ forecast }: { forecast: WeatherForeca
         </div>
       </div>
       <div className="divide-y divide-outline-variant/20 font-body-sans flex-grow flex flex-col justify-center">
-        <div className="flex items-center justify-between py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
-          <span className="text-[13px] md:text-[15px] text-primary-container font-bold w-20 md:w-24 shrink-0">Sumber</span>
+        <div className="flex items-center gap-2 py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
           <span className="material-symbols-outlined text-[20px] md:text-[24px] text-primary-container shrink-0">cloud_sync</span>
-          <span className="text-[13px] md:text-[15px] text-text-dark font-semibold flex-1 text-right">BMKG</span>
-          <span className="text-[12px] md:text-[15px] text-text-muted w-20 md:w-28 text-right shrink-0">Resmi</span>
+          <span className="text-[13px] md:text-[15px] text-primary-container font-bold shrink-0">Sumber</span>
+          <span className="flex-1 text-right text-[13px] md:text-[15px] text-text-dark font-semibold">BMKG</span>
+          <span className="text-[10px] md:text-[13px] text-text-muted shrink-0">Resmi</span>
         </div>
-        <div className="flex items-center justify-between py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
-          <span className="text-[13px] md:text-[15px] text-text-dark font-medium w-20 md:w-24 shrink-0">Analisis</span>
+        <div className="flex items-center gap-2 py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
           <span className="material-symbols-outlined text-[20px] md:text-[24px] text-grass-green shrink-0">schedule</span>
-          <span className="text-[13px] md:text-[15px] text-text-dark font-semibold flex-1 text-right truncate max-w-[120px] md:max-w-none">{analysisDisplay}</span>
-          <span className="text-[12px] md:text-[15px] text-text-muted w-20 md:w-28 text-right shrink-0">BMKG</span>
+          <span className="text-[13px] md:text-[15px] text-text-dark font-medium shrink-0">Analisis</span>
+          <span className="flex-1 text-right text-[13px] md:text-[15px] text-text-dark font-semibold truncate">{analysisDisplay}</span>
+          <span className="text-[10px] md:text-[13px] text-text-muted shrink-0">BMKG</span>
         </div>
-        <div className="flex items-center justify-between py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
-          <span className="text-[13px] md:text-[15px] text-text-dark font-medium w-20 md:w-24 shrink-0">Diambil</span>
+        <div className="flex items-center gap-2 py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
           <span className="material-symbols-outlined text-[20px] md:text-[24px] text-amber-600 shrink-0">history</span>
-          <span className="text-[13px] md:text-[15px] text-text-dark font-semibold flex-1 text-right truncate max-w-[120px] md:max-w-none">{formatDateTimeShort(forecast.fetchedAt)}</span>
-          <span className="text-[12px] md:text-[15px] text-text-muted w-20 md:w-28 text-right shrink-0">{statusLabel}</span>
+          <span className="text-[13px] md:text-[15px] text-text-dark font-medium shrink-0">Diambil</span>
+          <span className="flex-1 text-right text-[13px] md:text-[15px] text-text-dark font-semibold truncate">{formatDateTimeShort(forecast.fetchedAt)}</span>
+          <span className="text-[10px] md:text-[13px] text-text-muted shrink-0">{statusLabel}</span>
         </div>
       </div>
     </div>

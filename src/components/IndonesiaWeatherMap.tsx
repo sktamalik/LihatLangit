@@ -210,9 +210,9 @@ export default function IndonesiaWeatherMap() {
         mapInstance.current?.closePopup();
       }
     };
-    
+
     mapContainerEl.addEventListener('click', handleClick);
-    
+
     return () => {
       mapContainerEl.removeEventListener('click', handleClick);
     };
@@ -324,51 +324,51 @@ export default function IndonesiaWeatherMap() {
       {/* Map container */}
       <div className={`w-full h-[400px] sm:h-[500px] md:h-[550px] lg:h-[600px] rounded-lg overflow-hidden bg-background-sky/30 relative ${!showIndicators ? 'hide-legend' : ''}`}>
         <div ref={mapContainer} className="w-full h-full">
-        {!mapReady && !loadError && (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-sm text-text-muted font-body-sans">Memuat peta Indonesia...</span>
-          </div>
-        )}
-        {loadError && (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="flex items-center gap-1 text-text-muted font-body-sans">
-              <span className="material-symbols-outlined text-[14px]">map</span> Peta tidak dapat dimuat
-            </span>
-          </div>
-        )}
-        {mapReady && isFetching && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
-            <span className="text-[12px] text-text-muted font-body-sans flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
-              Mengambil data cuaca dari BMKG...
-            </span>
-          </div>
-        )}
-        {mapReady && fetchError && !isFetching && (
-          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-error-container/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
-            <span className="text-[12px] text-on-error-container font-body-sans flex items-center gap-2">
-              <span className="material-symbols-outlined text-[14px]">error_outline</span>
-              Gagal memuat data.{" "}
-              <button onClick={handleRetry} className="underline font-semibold cursor-pointer">Coba lagi</button>
-            </span>
-          </div>
-        )}
-        {mapReady && weatherData && !isFetching && !fetchError && (
-          <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-wrap justify-center gap-2">
-            <span className="text-[10px] bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 text-text-muted font-body-sans shadow-sm">
-              🟢 {loadedCount}/{totalCities} kota — Klik marker untuk detail
-            </span>
-          </div>
-        )}
+          {!mapReady && !loadError && (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-sm text-text-muted font-body-sans">Memuat peta Indonesia...</span>
+            </div>
+          )}
+          {loadError && (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="flex items-center gap-1 text-text-muted font-body-sans">
+                <span className="material-symbols-outlined text-[14px]">map</span> Peta tidak dapat dimuat
+              </span>
+            </div>
+          )}
+          {mapReady && isFetching && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+              <span className="text-[12px] text-text-muted font-body-sans flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
+                Mengambil data cuaca dari BMKG...
+              </span>
+            </div>
+          )}
+          {mapReady && fetchError && !isFetching && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] bg-error-container/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+              <span className="text-[12px] text-on-error-container font-body-sans flex items-center gap-2">
+                <span className="material-symbols-outlined text-[14px]">error_outline</span>
+                Gagal memuat data.{" "}
+                <button onClick={handleRetry} className="underline font-semibold cursor-pointer">Coba lagi</button>
+              </span>
+            </div>
+          )}
+          {mapReady && weatherData && !isFetching && !fetchError && (
+            <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-wrap justify-center gap-2">
+              <span className="text-[10px] bg-white/80 backdrop-blur-sm rounded-full px-3 py-1 text-text-muted font-body-sans shadow-sm">
+                🟢 {loadedCount}/{totalCities} kota — Klik marker untuk detail
+              </span>
+            </div>
+          )}
 
-        {/* Custom zoom buttons */}
-        {mapReady && (
-          <div className="absolute bottom-5 right-4 z-[1100] flex flex-col gap-[1px] leaflet-zoom-hide">
-            <button onClick={handleZoomIn} aria-label="Perbesar peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-t-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ borderBottom: '1px solid #e2e8f0', lineHeight: 1 }} type="button">+</button>
-            <button onClick={handleZoomOut} aria-label="Perkecil peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-b-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ lineHeight: 1 }} type="button">−</button>
-          </div>
-        )}
-      </div>
+          {/* Custom zoom buttons */}
+          {mapReady && (
+            <div className="absolute bottom-5 right-4 z-[1100] flex flex-col gap-[1px] leaflet-zoom-hide">
+              <button onClick={handleZoomIn} aria-label="Perbesar peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-t-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ borderBottom: '1px solid #e2e8f0', lineHeight: 1 }} type="button">+</button>
+              <button onClick={handleZoomOut} aria-label="Perkecil peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-b-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ lineHeight: 1 }} type="button">−</button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Toggle indikator cuaca */}
@@ -390,7 +390,7 @@ export default function IndonesiaWeatherMap() {
       {/* Mobile legend (below map) */}
       <div className="mt-3 md:hidden">
         <details className="text-[12px]">
-          <summary className="cursor-pointer text-text-muted font-body-sans font-medium mb-2">📋 Indikator Cuaca</summary>
+          <summary className="cursor-pointer text-text-muted font-body-sans font-medium mb-2">Indikator Cuaca</summary>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5">
             {[
               { label: "Cerah", color: "#f59e0b" },
