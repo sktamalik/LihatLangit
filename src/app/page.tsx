@@ -19,15 +19,18 @@ import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
 import Toast from "@/components/Toast";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
-import type { ErrorCode } from "@/types/weather";
+import type { ErrorCode, Region } from "@/types/weather";
 
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const prevStatusRef = useRef<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("hero");
+  const [mapZoomTarget, setMapZoomTarget] = useState<{lat: number; lng: number} | null>(null);
+  const userInitiatedZoomRef = useRef(false);
+  const prevAdm4Ref = useRef<string | null>(null);
 
   // ── Intersection observer: track which section is visible ──
   useEffect(() => {
@@ -69,6 +72,16 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.status]);
 
+  // ── Zoom peta ke wilayah yang dicari user ──
+  useEffect(() => {
+    if (state.status !== "ready") return;
+    const { latitude, longitude, adm4 } = state.forecast.region;
+    if (latitude != null && longitude != null && userInitiatedZoomRef.current && prevAdm4Ref.current !== adm4) {
+      prevAdm4Ref.current = adm4;
+      setMapZoomTarget({ lat: latitude, lng: longitude });
+    }
+  }, [state]);
+
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   // ── Nav link helper ──
@@ -86,6 +99,16 @@ export default function DashboardPage() {
       </a>
     );
   };
+
+  const handleSearchAndSelect = useCallback((region: Region) => {
+    userInitiatedZoomRef.current = true;
+    searchAndSelect(region);
+  }, [searchAndSelect]);
+
+  const handleGeolocation = useCallback(() => {
+    userInitiatedZoomRef.current = true;
+    requestGeolocation();
+  }, [requestGeolocation]);
 
   const featureCards = [
     { icon: "database", title: "Data Resmi BMKG", desc: "Seluruh data prakiraan cuaca dan info cuaca Indonesia berasal langsung dari Badan Meteorologi, Klimatologi, dan Geofisika — sumber cuaca resmi Indonesia." },
@@ -113,7 +136,7 @@ export default function DashboardPage() {
             <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[12px] lg:text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[14px] lg:text-[16px]">open_in_new</span></a>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
-            <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="hidden sm:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[12px] sm:text-[14px] disabled:opacity-50">
+            <button onClick={handleGeolocation} disabled={state.status === "geolocating"} className="hidden sm:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[12px] sm:text-[14px] disabled:opacity-50">
               {state.status === "ready" ? state.forecast.region.city : "Lokasi Saya"}
             </button>
             <button onClick={() => scrollTo("hero")} className="bg-primary-container text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-md font-body-sans text-[13px] sm:text-[16px] font-medium hover:bg-primary-container/90 transition-colors flex items-center gap-1 cursor-pointer">
@@ -141,7 +164,7 @@ export default function DashboardPage() {
               Cek Cuaca Sekarang <span className="material-symbols-outlined">arrow_forward</span>
             </button>
             <div className="flex items-center gap-6 text-on-surface-variant font-body-sans text-[14px] font-medium">
-              <button onClick={requestGeolocation} disabled={state.status === "geolocating"} className="flex items-center gap-2 hover:text-text-dark transition-colors cursor-pointer disabled:opacity-50">
+              <button onClick={handleGeolocation} disabled={state.status === "geolocating"} className="flex items-center gap-2 hover:text-text-dark transition-colors cursor-pointer disabled:opacity-50">
                 <span className="material-symbols-outlined text-[18px]">my_location</span> Cek Cuaca di Lokasi Saya
               </button>
               <a onClick={() => scrollTo("peta-cuaca")} className="flex items-center gap-2 hover:text-text-dark transition-colors cursor-pointer no-underline">
@@ -154,7 +177,7 @@ export default function DashboardPage() {
           <div id="hero-search" className="w-full max-w-3xl mt-8">
             <div className="bg-white flex items-center rounded-full px-6 py-4 shadow-sm">
               <span className="material-symbols-outlined text-outline mr-3 text-[24px]">search</span>
-              <RegionSearch onSelect={searchAndSelect} />
+              <RegionSearch onSelect={handleSearchAndSelect} />
             </div>
           </div>
         </section>
@@ -209,7 +232,7 @@ export default function DashboardPage() {
 
         {/* PETA CUACA INDONESIA */}
         <section id="peta-cuaca" className="px-4 md:px-12 pb-8 pt-8 w-full max-w-[1280px] mx-auto">
-          <IndonesiaWeatherMap />
+          <IndonesiaWeatherMap zoomToRegion={mapZoomTarget} />
         </section>
 
         {/* DATA DASHBOARD */}

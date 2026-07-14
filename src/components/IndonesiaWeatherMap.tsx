@@ -17,8 +17,18 @@ interface CityWeather {
 
 type CityWeatherMap = Record<string, CityWeather>;
 
+interface ZoomTarget {
+  lat: number;
+  lng: number;
+}
+
+interface IndonesiaWeatherMapProps {
+  /** When set, the map flies to this location (lat/lng) */
+  zoomToRegion?: ZoomTarget | null;
+}
+
 /** Peta cuaca seluruh Indonesia dengan indikator warna seperti BMKG */
-export default function IndonesiaWeatherMap() {
+export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -281,6 +291,32 @@ export default function IndonesiaWeatherMap() {
     });
 
     legendRef.current = new LegendControl({ position: "bottomleft" }).addTo(mapInstance.current);
+  }, [mapReady]);
+
+  // ── Fly to searched region when zoomToRegion prop changes ──
+  const pendingZoomRef = useRef<ZoomTarget | null>(null);
+
+  useEffect(() => {
+    if (!zoomToRegion) return;
+    if (mapInstance.current && mapReady) {
+      mapInstance.current.flyTo([zoomToRegion.lat, zoomToRegion.lng], 10, {
+        duration: 1.5,
+      });
+    } else {
+      pendingZoomRef.current = zoomToRegion;
+    }
+  }, [zoomToRegion, mapReady]);
+
+  // Apply pending zoom once map becomes ready
+  useEffect(() => {
+    if (mapReady && pendingZoomRef.current && mapInstance.current) {
+      mapInstance.current.flyTo(
+        [pendingZoomRef.current.lat, pendingZoomRef.current.lng],
+        10,
+        { duration: 1.5 }
+      );
+      pendingZoomRef.current = null;
+    }
   }, [mapReady]);
 
   const handleZoomIn = () => { mapInstance.current?.zoomIn(); };
