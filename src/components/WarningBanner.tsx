@@ -38,18 +38,18 @@ export default function WarningBanner() {
   if (loading || warnings.length === 0) return null;
 
   return (
-    <div className="w-full bg-white rounded-[16px] p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="font-body-sans text-[20px] font-semibold text-text-dark flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse-soft" />
-          Peringatan Dini Cuaca BMKG
+    <div className="w-full bg-white rounded-[16px] p-4 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4 md:mb-6">
+        <h3 className="font-body-sans text-[16px] md:text-[20px] font-semibold text-text-dark flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse-soft shrink-0" />
+          <span className="truncate">Peringatan Dini Cuaca BMKG</span>
         </h3>
-        <div className="flex items-center gap-4 text-[12px] font-body-sans text-on-surface-variant font-medium">
-          <span className="text-[11px] text-red-500 font-body-sans">({filtered.length} wilayah)</span>
-          <select value={filter} onChange={(e) => { setFilter(e.target.value); setShowAll(false); }} className="text-[11px] bg-white rounded-lg px-2 py-1 text-text-dark font-body-sans outline-none">
+        <div className="flex items-center gap-2 sm:gap-4 text-[11px] sm:text-[12px] font-body-sans text-on-surface-variant font-medium flex-wrap">
+          <span className="text-[11px] sm:text-[12px] text-red-500 font-body-sans whitespace-nowrap">({filtered.length} wilayah)</span>
+          <select value={filter} onChange={(e) => { setFilter(e.target.value); setShowAll(false); }} className="text-[11px] sm:text-[12px] bg-white rounded-lg px-2 py-1 text-text-dark font-body-sans outline-none border border-outline-variant/30 max-w-[130px] sm:max-w-none truncate">
             {provinces.map((p) => (<option key={p} value={p}>{p === "semua" ? "Semua Provinsi" : p}</option>))}
           </select>
-          <a href="https://www.bmkg.go.id/alerts/nowcast/id" target="_blank" rel="noopener noreferrer" className="text-[11px] text-primary-container hover:underline font-body-sans shrink-0">Sumber ↗</a>
+          <a href="https://www.bmkg.go.id/alerts/nowcast/id" target="_blank" rel="noopener noreferrer" className="text-[11px] sm:text-[12px] text-primary-container hover:underline font-body-sans shrink-0 whitespace-nowrap">Sumber ↗</a>
         </div>
       </div>
 

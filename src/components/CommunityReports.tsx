@@ -43,39 +43,39 @@ export default function CommunityReports({ forecast }: { forecast: WeatherForeca
     : "text-grass-green bg-grass-green/10 border-grass-green/20";
 
   return (
-    <div className="w-full bg-white rounded-[16px] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-      <div className="flex justify-between items-center mb-4">
+    <div className="w-full h-full bg-white rounded-[16px] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col">
+      <div className="flex justify-between items-start mb-3 md:mb-4">
         <div>
-          <h3 className="font-body-sans text-[20px] font-semibold text-text-dark flex items-center gap-2">
-            <span className="material-symbols-outlined text-[20px] text-primary-container">monitoring</span> Status Data
+          <h3 className="font-body-sans text-[18px] md:text-[20px] font-semibold text-text-dark flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px] md:text-[20px] text-primary-container">monitoring</span> Status Data
           </h3>
-          <p className="text-[11px] text-text-muted font-body-sans mt-1">
+          <p className="text-[10px] md:text-[11px] text-text-muted font-body-sans mt-0.5">
             Diperbarui {ageLabel}
           </p>
         </div>
-        <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${statusColor}`}>
-          <span className={`w-2 h-2 rounded-full ${forecast.fromCache && !forecast.isStale ? "bg-sky-500" : forecast.isStale ? "bg-amber-500" : "bg-grass-green"} ${!forecast.fromCache || forecast.isStale ? "animate-pulse" : ""}`} />
-          <span className={`text-[12px] font-bold font-body-sans`}>{statusLabel}</span>
+        <div className={`flex items-center gap-1.5 px-2 md:px-2.5 py-0.5 md:py-1 rounded-full border ${statusColor}`}>
+          <span className={`w-1.5 md:w-2 h-1.5 md:h-2 rounded-full ${forecast.fromCache && !forecast.isStale ? "bg-sky-500" : forecast.isStale ? "bg-amber-500" : "bg-grass-green"} ${!forecast.fromCache || forecast.isStale ? "animate-pulse" : ""}`} />
+          <span className={`text-[10px] md:text-[11px] font-bold font-body-sans`}>{statusLabel}</span>
         </div>
       </div>
-      <div className="divide-y divide-outline-variant/20 font-body-sans">
-        <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
-          <span className="text-[15px] text-primary-container font-bold w-24">Sumber</span>
-          <span className="material-symbols-outlined text-[24px] text-primary-container">cloud_sync</span>
-          <span className="text-[15px] text-text-dark font-semibold flex-1 text-right">BMKG</span>
-          <span className="text-[15px] text-text-muted w-28 text-right">Resmi</span>
+      <div className="divide-y divide-outline-variant/20 font-body-sans flex-grow flex flex-col justify-center">
+        <div className="flex items-center justify-between py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+          <span className="text-[13px] md:text-[15px] text-primary-container font-bold w-20 md:w-24 shrink-0">Sumber</span>
+          <span className="material-symbols-outlined text-[20px] md:text-[24px] text-primary-container shrink-0">cloud_sync</span>
+          <span className="text-[13px] md:text-[15px] text-text-dark font-semibold flex-1 text-right">BMKG</span>
+          <span className="text-[12px] md:text-[15px] text-text-muted w-20 md:w-28 text-right shrink-0">Resmi</span>
         </div>
-        <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
-          <span className="text-[15px] text-text-dark font-medium w-24">Analisis</span>
-          <span className="material-symbols-outlined text-[24px] text-grass-green">schedule</span>
-          <span className="text-[15px] text-text-dark font-semibold flex-1 text-right">{analysisDisplay}</span>
-          <span className="text-[15px] text-text-muted w-28 text-right">BMKG</span>
+        <div className="flex items-center justify-between py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+          <span className="text-[13px] md:text-[15px] text-text-dark font-medium w-20 md:w-24 shrink-0">Analisis</span>
+          <span className="material-symbols-outlined text-[20px] md:text-[24px] text-grass-green shrink-0">schedule</span>
+          <span className="text-[13px] md:text-[15px] text-text-dark font-semibold flex-1 text-right truncate max-w-[120px] md:max-w-none">{analysisDisplay}</span>
+          <span className="text-[12px] md:text-[15px] text-text-muted w-20 md:w-28 text-right shrink-0">BMKG</span>
         </div>
-        <div className="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
-          <span className="text-[15px] text-text-dark font-medium w-24">Diambil</span>
-          <span className="material-symbols-outlined text-[24px] text-amber-600">history</span>
-          <span className="text-[15px] text-text-dark font-semibold flex-1 text-right">{formatDateTimeShort(forecast.fetchedAt)}</span>
-          <span className="text-[15px] text-text-muted w-28 text-right">{statusLabel}</span>
+        <div className="flex items-center justify-between py-2.5 md:py-3 px-2 md:px-3 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low transition-colors">
+          <span className="text-[13px] md:text-[15px] text-text-dark font-medium w-20 md:w-24 shrink-0">Diambil</span>
+          <span className="material-symbols-outlined text-[20px] md:text-[24px] text-amber-600 shrink-0">history</span>
+          <span className="text-[13px] md:text-[15px] text-text-dark font-semibold flex-1 text-right truncate max-w-[120px] md:max-w-none">{formatDateTimeShort(forecast.fetchedAt)}</span>
+          <span className="text-[12px] md:text-[15px] text-text-muted w-20 md:w-28 text-right shrink-0">{statusLabel}</span>
         </div>
       </div>
     </div>

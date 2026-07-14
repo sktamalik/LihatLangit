@@ -3,32 +3,43 @@ import type { WeatherForecast } from "@/types/weather";
 import { formatTime } from "@/lib/time";
 import { getSunTimes } from "@/lib/envCalculations";
 
-const icons: Record<string, string> = {
-  cerah: "clear_day", "cerah berawan": "partly_cloudy_day",
-  berawan: "cloudy", "berawan tebal": "cloud",
-  "hujan ringan": "rainy_light", "hujan sedang": "rainy",
-  "hujan lebat": "rainy_heavy", "hujan petir": "thunderstorm",
-};
-const colors: Record<string, string> = {
-  cerah: "text-amber-400", "cerah berawan": "text-amber-400",
-  berawan: "text-slate-400", "berawan tebal": "text-slate-500",
-  "hujan ringan": "text-sky-500", "hujan sedang": "text-blue-500",
-  "hujan lebat": "text-blue-600", "hujan petir": "text-purple-500",
-};
-
-function gi(d: string) {
-  const k = Object.keys(icons).find((x) => d.toLowerCase().includes(x));
-  return icons[k ?? ""] ?? "partly_cloudy_day";
+/** Icon mapping — lebih variatif, solid (FILL=1) */
+function getWeatherIcon(desc: string, isPast: boolean, isNow: boolean): string {
+  if (isPast) return "history";
+  const d = desc.toLowerCase();
+  if (d.includes("petir")) return "thunderstorm";
+  if (d.includes("hujan lebat")) return "rainy_heavy";
+  if (d.includes("hujan sedang")) return "rainy";
+  if (d.includes("hujan ringan")) return "rainy_light";
+  if (d.includes("hujan")) return "rainy";
+  if (d.includes("berawan tebal")) return "cloud";
+  if (d.includes("berawan")) return "cloudy";
+  if (d.includes("kabut")) return "foggy";
+  if (d.includes("cerah berawan")) return isNow ? "partly_cloudy_day" : "wb_cloudy";
+  if (d.includes("cerah")) return "sunny";
+  if (d.includes("angin")) return "air";
+  return "partly_cloudy_day";
 }
-function gc(d: string) {
-  const k = Object.keys(colors).find((x) => d.toLowerCase().includes(x));
-  return colors[k ?? ""] ?? "text-primary-container";
+
+/** Warna icon */
+function iconColor(desc: string, isPast: boolean): string {
+  if (isPast) return "text-gray-400";
+  const d = desc.toLowerCase();
+  if (d.includes("petir")) return "text-purple-500";
+  if (d.includes("hujan")) return "text-sky-500";
+  if (d.includes("berawan tebal")) return "text-slate-500";
+  if (d.includes("berawan")) return "text-slate-400";
+  if (d.includes("kabut")) return "text-gray-400";
+  if (d.includes("cerah berawan")) return "text-amber-400";
+  if (d.includes("cerah")) return "text-amber-500";
+  if (d.includes("angin")) return "text-teal-400";
+  return "text-primary-container";
 }
 
 /** Build "YYYY-MM-DDTHH:MM" string in the region's local time */
 function formatLocalNow(timezone?: string): string {
   const now = new Date();
-  let offsetMinutes = 7 * 60; // default WIB
+  let offsetMinutes = 7 * 60;
   if (timezone) {
     const tzMap: Record<string, number> = {
       "Asia/Jakarta": 7 * 60,
@@ -76,12 +87,10 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
   const scroll = () =>
     document.getElementById("prakiraan-3-hari")?.scrollIntoView({ behavior: "smooth", block: "start" });
 
-  // ── Find "now" slot using region-local time ──
+  // ── Find "now" slot ──
   const localNow = formatLocalNow(forecast.region.timezone);
   const points = today.points;
 
-  // ── Only show actual BMKG data slots (no fabrication) ──
-  // Mark which slot is closest to current time
   let nearestIdx = 0;
   let minDiff = Infinity;
   for (let i = 0; i < points.length; i++) {
@@ -99,114 +108,105 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
     point,
   }));
 
+  /** Base card — all cards in the scroll row share this */
+  const card = "flex-shrink-0 flex flex-col items-center justify-center rounded-xl border transition-all";
+
   return (
-    <div id="prakiraan-hari-ini" className="w-full bg-white rounded-[16px] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="font-body-sans text-[20px] font-semibold text-text-dark">
+    <div id="prakiraan-hari-ini" className="w-full h-full bg-white rounded-[16px] p-4 md:p-5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-3">
+        <h3 className="font-body-sans text-[18px] md:text-[20px] font-semibold text-text-dark">
           Prakiraan Hari Ini
         </h3>
-        <span className="text-[11px] text-primary-container font-medium font-body-sans bg-primary-container/10 px-3 py-1 rounded-full">
-          {points.length} Slot
+        <span className="text-[10px] md:text-[11px] text-primary-container font-medium font-body-sans bg-primary-container/10 px-2.5 py-0.5 rounded-full">
+          {points.length} slot
         </span>
       </div>
 
-      <div className="overflow-x-auto pt-3 pb-3">
-        <div className="flex gap-2 sm:gap-3 md:gap-4 w-max">
-          {slots.map(({ key, isNow, isPast, point }) => (
-            <div
-              key={key}
-              className={`flex-shrink-0 flex flex-col items-center pt-3 pb-2 px-3 sm:px-4 md:px-5 rounded-2xl min-w-[70px] sm:min-w-[80px] md:min-w-[95px] transition-all ${
-                isNow
-                  ? "bg-accent-container/50 border border-accent/30 shadow-sm -translate-y-1"
-                  : isPast
-                  ? "opacity-40"
-                  : "hover:bg-white/60 cursor-pointer"
-              }`}
-            >
-              <span
-                className={`font-body-sans text-xs sm:text-sm md:text-base mb-1 sm:mb-2 ${
-                  isNow ? "text-primary-container font-bold" : "text-on-surface-variant"
+      {/* Scroll row */}
+      <div className="overflow-x-auto pt-1 pl-1 pb-1 flex-grow">
+        <div className="flex gap-2.5 w-max h-full items-stretch">
+          {/* Weather slots */}
+          {slots.map(({ key, isNow, isPast, point }) => {
+            const icon = getWeatherIcon(point.weatherDescription, isPast, isNow);
+            return (
+              <div
+                key={key}
+                className={`${card} w-[70px] sm:w-[78px] gap-0.5 ${
+                  isNow
+                    ? "bg-accent-container/60 border-accent/30 shadow-sm ring-1 ring-accent/20"
+                    : isPast
+                    ? "bg-white border-outline-variant/20 opacity-35"
+                    : "bg-white border-outline-variant/20 hover:bg-surface-container-low cursor-pointer"
                 }`}
               >
-                {formatTime(point.localDateTime)}
-              </span>
-              <span
-                className={`material-symbols-outlined text-[24px] sm:text-[28px] md:text-[32px] mb-1 sm:mb-2 ${isPast ? "text-gray-400" : gc(point.weatherDescription)}`}
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                {isPast ? "schedule" : gi(point.weatherDescription)}
-              </span>
-              <span
-                className={`font-body-sans font-semibold ${
-                  isNow ? "text-primary-container text-[16px] sm:text-[18px] md:text-[20px]" : isPast ? "text-gray-400 text-[14px] sm:text-[16px] md:text-[17px]" : "text-text-dark text-[14px] sm:text-[16px] md:text-[17px]"
-                }`}
-              >
-                {point.temperatureC !== null ? `${Math.round(point.temperatureC)}°` : "--"}
-              </span>
-            </div>
-          ))}
+                <span className={`font-body-sans text-[11px] ${isNow ? "text-primary-container font-bold" : "text-on-surface-variant"}`}>
+                  {formatTime(point.localDateTime)}
+                </span>
+                <span
+                  className={`material-symbols-outlined text-[24px] sm:text-[26px] ${iconColor(point.weatherDescription, isPast)}`}
+                  style={{ fontVariationSettings: "'FILL' 1, 'wght' 300" }}
+                >
+                  {icon}
+                </span>
+                <span className={`font-body-sans font-bold text-[14px] ${isNow ? "text-primary-container" : isPast ? "text-gray-400" : "text-text-dark"}`}>
+                  {point.temperatureC !== null ? `${Math.round(point.temperatureC)}°` : "--"}
+                </span>
+              </div>
+            );
+          })}
 
-        {/* Sun info card */}
-        <div className="flex-shrink-0 flex flex-col items-start p-4 md:p-5 rounded-2xl min-w-[160px] md:min-w-[180px] bg-gradient-to-br from-indigo-50/80 to-indigo-100/40 border border-indigo-100/60">
-          <span className="text-[10px] md:text-[11px] font-semibold text-indigo-600 uppercase tracking-wider mb-2 flex items-center gap-1">
-            <span className="material-symbols-outlined text-[14px] md:text-[16px]">brightness_low</span> Matahari
-          </span>
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px] md:text-[18px] text-orange-500">wb_twilight</span>
-              <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                Terbit: <span className="font-semibold">{sun.sunrise}</span>
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px] md:text-[18px] text-indigo-500">nights_stay</span>
-              <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                Terbenam: <span className="font-semibold">{sun.sunset}</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Tomorrow card */}
-        {tomorrow && (
-          <div className="flex-shrink-0 flex flex-col items-start p-4 md:p-5 rounded-2xl min-w-[160px] md:min-w-[180px] bg-gradient-to-br from-amber-50/80 to-orange-50/40 border border-amber-100/60">
-            <span className="text-[10px] md:text-[11px] font-semibold text-amber-700 uppercase tracking-wider mb-2 flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px] md:text-[16px]">calendar_today</span> Besok
-            </span>
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className={`material-symbols-outlined text-[16px] md:text-[18px] ${gc(tDom)}`}>{gi(tDom)}</span>
-                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans font-semibold truncate max-w-[100px]">{tDom}</span>
+          {/* Sun info */}
+          <div className={`${card} w-[120px] sm:w-[136px] bg-gradient-to-br from-indigo-50/90 to-indigo-100/40 border-indigo-100/60 gap-1 px-2`}>
+            <span className="text-[10px] font-semibold text-indigo-600 uppercase tracking-wider">Matahari</span>
+            <div className="flex flex-col items-center gap-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[15px] text-orange-500" style={{ fontVariationSettings: "'FILL' 1" }}>wb_twilight</span>
+                <span className="text-[12px] md:text-[13px] text-on-surface font-body-sans font-semibold">{sun.sunrise}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] md:text-[18px] text-red-400">thermostat</span>
-                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                  {Math.round(tMin)}° – {Math.round(tMax)}°
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] md:text-[18px] text-orange-500">wb_twilight</span>
-                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                  {tomorrowSun.sunrise}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[16px] md:text-[18px] text-indigo-500">nights_stay</span>
-                <span className="text-[11px] md:text-[12px] text-on-surface font-body-sans">
-                  {tomorrowSun.sunset}
-                </span>
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[15px] text-indigo-500" style={{ fontVariationSettings: "'FILL' 1" }}>nights_stay</span>
+                <span className="text-[12px] md:text-[13px] text-on-surface font-body-sans font-semibold">{sun.sunset}</span>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Tomorrow card */}
+          {tomorrow && (
+            <div className={`${card} w-[130px] sm:w-[150px] bg-gradient-to-br from-amber-50/90 to-orange-100/30 border-amber-100/60 gap-1 px-2`}>
+              <span className="text-[10px] font-semibold text-amber-700 uppercase tracking-wider">Besok</span>
+              <div className="flex flex-col items-center gap-0.5">
+                <div className="flex items-center gap-1.5">
+                  <span className={`material-symbols-outlined text-[15px] ${iconColor(tDom, false)}`} style={{ fontVariationSettings: "'FILL' 1, 'wght' 300" }}>{getWeatherIcon(tDom, false, false)}</span>
+                  <span className={`text-[12px] md:text-[13px] font-semibold font-body-sans truncate max-w-[80px] ${iconColor(tDom, false)}`}>{tDom}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-[15px] text-red-400" style={{ fontVariationSettings: "'FILL' 1" }}>thermostat</span>
+                  <span className="text-[12px] md:text-[13px] text-on-surface font-body-sans font-semibold">{Math.round(tMin)}°–{Math.round(tMax)}°</span>
+                </div>
+                <div className="flex items-center gap-2 text-[10px] text-text-muted font-body-sans">
+                  <span className="flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[12px] text-orange-400" style={{ fontVariationSettings: "'FILL' 1" }}>wb_twilight</span>
+                    {tomorrowSun.sunrise}
+                  </span>
+                  <span className="text-outline/40">•</span>
+                  <span className="flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[12px] text-indigo-400" style={{ fontVariationSettings: "'FILL' 1" }}>nights_stay</span>
+                    {tomorrowSun.sunset}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Footer */}
       <button
         onClick={scroll}
-        className="w-full py-2.5 text-[13px] font-medium text-primary-container hover:bg-primary-container/5 transition-colors rounded-lg font-body-sans flex items-center justify-center gap-1 cursor-pointer"
+        className="w-full py-2 text-[12px] font-medium text-primary-container hover:bg-primary-container/5 transition-colors rounded-lg font-body-sans flex items-center justify-center gap-1 cursor-pointer mt-2"
       >
-        Lihat Prakiraan 3 Hari <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
+        Detail 3 hari <span className="material-symbols-outlined text-[16px]">arrow_downward</span>
       </button>
     </div>
   );
