@@ -29,6 +29,8 @@ function isRateLimited(ip: string): boolean {
   const recent = timestamps.filter((t) => now - t < window);
 
   if (recent.length >= RATE_LIMIT_MAX) {
+    // Jangan push request yang ditolak ke array
+    requestLog.set(ip, recent);
     return true;
   }
 
