@@ -94,7 +94,8 @@ export default function HourlyForecast({ forecast }: { forecast: WeatherForecast
   let nearestIdx = 0;
   let minDiff = Infinity;
   for (let i = 0; i < points.length; i++) {
-    const diff = Math.abs(new Date(points[i].localDateTime).getTime() - Date.now());
+    // Compare localDateTime strings directly (both are in region's local time)
+    const diff = Math.abs(new Date(points[i].localDateTime).getTime() - new Date(localNow).getTime());
     if (diff < minDiff) {
       minDiff = diff;
       nearestIdx = i;

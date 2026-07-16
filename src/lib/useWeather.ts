@@ -67,9 +67,7 @@ export function useWeather() {
     if (refreshTimerRef.current) return; // only set up once
     refreshTimerRef.current = setInterval(() => {
       const adm4 = currentAdm4Ref.current ?? DEFAULT_REGION.adm4;
-      if (currentAdm4Ref.current) {
-        fetchWeather(adm4, true);
-      }
+      fetchWeather(adm4, true);
     }, REFRESH_INTERVAL_MS);
     return () => {
       if (refreshTimerRef.current) clearInterval(refreshTimerRef.current);

@@ -84,7 +84,7 @@ export default function WarningBanner() {
         ))}
         {filtered.length > 2 && (
           <button onClick={() => setShowAll(!showAll)} className="w-full py-2 text-center text-[12px] text-primary-container font-body-sans font-medium hover:bg-surface-container-low rounded-xl transition-colors">
-            {showAll ? "Tampilkan lebih sedikit" : `+${filtered.length - 3} peringatan lainnya — Lihat semua`}
+            {showAll ? "Tampilkan lebih sedikit" : `+${filtered.length - 2} peringatan lainnya — Lihat semua`}
           </button>
         )}
         {filtered.length === 0 && <p className="text-center text-xs text-text-muted py-3 font-body-sans">Tidak ada peringatan aktif untuk {filter}.</p>}

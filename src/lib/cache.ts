@@ -38,10 +38,18 @@ function diskPath(key: string): string {
   return path.join(CACHE_DIR, `${safeKey}.json`);
 }
 
+/**
+ * Store original key mapping for disk persistence.
+ * Maps sanitized filename → original key for reconstruction after restart.
+ */
+const keyMapping = new Map<string, string>();
+
 function saveToDisk<T>(key: string, entry: CacheEntry<T>): void {
   if (!CACHE_DIR) return;
   try {
-    fs.writeFileSync(diskPath(key), JSON.stringify(entry), "utf-8");
+    const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "_");
+    keyMapping.set(safeKey, key); // Store original key
+    fs.writeFileSync(diskPath(key), JSON.stringify({ originalKey: key, ...entry }), "utf-8");
   } catch {
     // Non-fatal — in-memory still works
   }
@@ -51,7 +59,10 @@ function loadFromDisk<T>(key: string): CacheEntry<T> | null {
   if (!CACHE_DIR) return null;
   try {
     const raw = fs.readFileSync(diskPath(key), "utf-8");
-    return JSON.parse(raw) as CacheEntry<T>;
+    const parsed = JSON.parse(raw);
+    // Extract entry fields, ignoring the originalKey metadata field
+    const { originalKey: _ok, ...entry } = parsed;
+    return entry as CacheEntry<T>;
   } catch {
     return null;
   }
@@ -72,12 +83,12 @@ function loadAllFromDisk(): void {
     const files = fs.readdirSync(CACHE_DIR);
     for (const file of files) {
       if (!file.endsWith(".json")) continue;
-      const key = file.replace(/\.json$/, "");
-      // Reconstruct original key — this is lossy for special chars
-      // but works for our alphanumeric cache keys
       try {
         const raw = fs.readFileSync(path.join(CACHE_DIR, file), "utf-8");
-        const entry = JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        // Use originalKey if available (new format), otherwise fall back to filename
+        const key = parsed.originalKey || file.replace(/\.json$/, "");
+        const { originalKey: _ok, ...entry } = parsed;
         store.set(key, entry);
       } catch {
         // skip corrupted entries
