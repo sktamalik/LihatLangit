@@ -18,15 +18,12 @@ import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
-import Toast from "@/components/Toast";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import type { ErrorCode, Region } from "@/types/weather";
 
 export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
-  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
-  const prevStatusRef = useRef<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mapZoomTarget, setMapZoomTarget] = useState<{lat: number; lng: number} | null>(null);
@@ -50,27 +47,6 @@ export default function DashboardPage() {
       if (el.id) observer.observe(el);
     });
     return () => observer.disconnect();
-  }, [state.status]);
-
-  useEffect(() => {
-    if (prevStatusRef.current === state.status) return;
-    prevStatusRef.current = state.status;
-
-    // Defer toast via microtask — avoids setState-in-effect without setTimeout(0)
-    queueMicrotask(() => {
-      if (state.status === "ready") {
-        setToast({ message: `Data cuaca ${state.forecast.region.village} berhasil dimuat`, type: "success" });
-      } else if (state.status === "error") {
-        setToast({ message: state.error.message, type: "error" });
-      } else if (state.status === "geo-denied") {
-        setToast({ message: "Izin lokasi ditolak. Coba cari wilayah secara manual.", type: "error" });
-      } else if (state.status === "geo-no-match") {
-        setToast({ message: "Lokasi tidak ditemukan dalam database.", type: "error" });
-      } else if (state.status === "geolocating") {
-        setToast({ message: "Mendeteksi lokasi Anda...", type: "info" });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.status]);
 
   // ── Zoom peta ke wilayah yang dicari user ──
@@ -119,7 +95,6 @@ export default function DashboardPage() {
 
   return (
     <>
-      <Toast toast={toast} onDismiss={() => setToast(null)} />
 
       {/* NAVBAR — only element with elevated z-index */}
       <nav className="sticky top-0 w-full z-50 bg-white relative">
