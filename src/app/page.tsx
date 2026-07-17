@@ -18,6 +18,8 @@ import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
+import SearchNotif from "@/components/SearchNotif";
+import type { SearchNotifState } from "@/components/SearchNotif";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import type { ErrorCode, Region } from "@/types/weather";
@@ -26,7 +28,8 @@ export default function DashboardPage() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mapZoomTarget, setMapZoomTarget] = useState<{lat: number; lng: number} | null>(null);
+  const [searchNotif, setSearchNotif] = useState<SearchNotifState | null>(null);
+  const [mapZoomTarget, setMapZoomTarget] = useState<{ lat: number; lng: number } | null>(null);
   const userInitiatedZoomRef = useRef(false);
   const prevAdm4Ref = useRef<string | null>(null);
 
@@ -80,6 +83,7 @@ export default function DashboardPage() {
   const handleSearchAndSelect = useCallback((region: Region) => {
     userInitiatedZoomRef.current = true;
     searchAndSelect(region);
+    setSearchNotif({ village: region.village, district: region.district });
   }, [searchAndSelect]);
 
   const handleGeolocation = useCallback(() => {
@@ -95,6 +99,7 @@ export default function DashboardPage() {
 
   return (
     <>
+      <SearchNotif notif={searchNotif} onDismiss={() => setSearchNotif(null)} />
 
       {/* NAVBAR — only element with elevated z-index */}
       <nav className="sticky top-0 w-full z-50 bg-white relative">
@@ -168,11 +173,10 @@ export default function DashboardPage() {
                         scrollTo(item.id);
                         setMobileMenuOpen(false);
                       }}
-                      className={`font-body-sans text-[15px] cursor-pointer transition-all duration-200 py-3 px-4 rounded-xl flex items-center gap-3 ${
-                        isActive
-                          ? "text-primary-container bg-primary-container/10 font-semibold"
-                          : "text-on-surface-variant hover:text-primary-container hover:bg-gray-50"
-                      }`}
+                      className={`font-body-sans text-[15px] cursor-pointer transition-all duration-200 py-3 px-4 rounded-xl flex items-center gap-3 ${isActive
+                        ? "text-primary-container bg-primary-container/10 font-semibold"
+                        : "text-on-surface-variant hover:text-primary-container hover:bg-gray-50"
+                        }`}
                     >
                       <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                       {item.label}
@@ -210,7 +214,7 @@ export default function DashboardPage() {
 
       <main className="flex-grow">
         {/* HERO */}
-        <section id="hero" className="flex flex-col items-center justify-center text-center px-5 md:px-20 pt-17 pb-12 w-full max-w-5xl mx-auto">
+        <section id="hero" className="flex flex-col items-center justify-center text-center px-5 md:px-20 pt-15 pb-12 w-full max-w-5xl mx-auto">
           <a href="#hero-search" className="inline-flex items-center gap-3 pr-4 pl-1 py-1 rounded-full bg-white mb-10 shadow-sm hover:shadow-md transition-shadow no-underline cursor-pointer">
             <span className="px-3 py-1 rounded-full bg-primary-container text-white font-body-sans text-[12px] font-bold">Baru</span>
             <span className="font-body-sans text-[14px] text-primary-container font-medium flex items-center gap-1">Data real-time dari BMKG <span className="material-symbols-outlined text-[16px] animate-arrow-slide">arrow_forward</span></span>
