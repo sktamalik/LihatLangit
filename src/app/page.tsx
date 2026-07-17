@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
   const prevStatusRef = useRef<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>("hero");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mapZoomTarget, setMapZoomTarget] = useState<{lat: number; lng: number} | null>(null);
   const userInitiatedZoomRef = useRef(false);
   const prevAdm4Ref = useRef<string | null>(null);
@@ -121,13 +122,14 @@ export default function DashboardPage() {
       <Toast toast={toast} onDismiss={() => setToast(null)} />
 
       {/* NAVBAR — only element with elevated z-index */}
-      <nav className="sticky top-0 w-full z-50 bg-white">
+      <nav className="sticky top-0 w-full z-50 bg-white relative">
         <div className="flex justify-between items-center px-4 sm:px-5 md:px-20 py-3 md:py-4 max-w-full">
           <div className="flex items-center gap-2 sm:gap-4">
             <a href="#" className="flex items-center no-underline">
               <Image src="/Headericon.png" alt="LihatLangit — Cek Cuaca Indonesia Real-Time dari BMKG" width={120} height={32} className="h-8 sm:h-9 md:h-10 w-auto" priority />
             </a>
           </div>
+          {/* Desktop nav links */}
           <div className="hidden md:flex items-center gap-3 lg:gap-6">
             {navLink("app-preview", "Dashboard")}
             {navLink("features", "Fitur")}
@@ -135,15 +137,100 @@ export default function DashboardPage() {
             {navLink("peringatan-dini", "Peringatan")}
             <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[12px] lg:text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[14px] lg:text-[16px]">open_in_new</span></a>
           </div>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button onClick={handleGeolocation} disabled={state.status === "geolocating"} className="hidden sm:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[12px] sm:text-[14px] disabled:opacity-50">
+          {/* Right side: desktop location button + mobile hamburger */}
+          <div className="flex items-center gap-2">
+            {/* Desktop only: Lokasi Saya button */}
+            <button onClick={handleGeolocation} disabled={state.status === "geolocating"} className="hidden md:block text-primary-container font-body-sans font-medium hover:text-primary transition-colors duration-200 text-[14px] disabled:opacity-50 cursor-pointer">
               {state.status === "ready" ? state.forecast.region.city : "Lokasi Saya"}
             </button>
-            <button onClick={() => scrollTo("hero")} className="bg-primary-container text-white px-3 sm:px-6 py-1.5 sm:py-2 rounded-md font-body-sans text-[13px] sm:text-[16px] font-medium hover:bg-primary-container/90 transition-colors flex items-center gap-1 cursor-pointer">
-              Mulai <span className="material-symbols-outlined text-[14px] sm:text-[18px]">arrow_forward</span>
+            {/* Mobile only: Hamburger button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden text-text-dark hover:text-primary-container transition-colors duration-200 p-1.5 cursor-pointer rounded-md hover:bg-gray-100"
+              aria-label={mobileMenuOpen ? "Tutup menu" : "Buka menu"}
+            >
+              <span className="material-symbols-outlined text-[26px]">
+                {mobileMenuOpen ? "close" : "menu"}
+              </span>
             </button>
           </div>
         </div>
+
+        {/* Mobile menu — sidebar dari kanan */}
+        {mobileMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/10 z-40 md:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            {/* Sidebar panel */}
+            <div className="fixed top-0 left-0 bottom-0 w-72 bg-white z-50 md:hidden flex flex-col shadow-[4px_0_20px_rgba(0,0,0,0.08)]">
+              {/* Sidebar header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+                <Image src="/Headericon.png" alt="LihatLangit" width={120} height={32} className="h-8 w-auto" />
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-text-dark hover:text-primary-container transition-colors duration-200 p-1 cursor-pointer rounded-md hover:bg-gray-100"
+                  aria-label="Tutup menu"
+                >
+                  <span className="material-symbols-outlined text-[24px]">close</span>
+                </button>
+              </div>
+              {/* Sidebar nav items */}
+              <div className="flex flex-col px-4 py-4 gap-1 flex-grow">
+                {[
+                  { id: "app-preview", label: "Dashboard", icon: "dashboard" },
+                  { id: "features", label: "Fitur", icon: "star" },
+                  { id: "peta-cuaca", label: "Peta Cuaca", icon: "map" },
+                  { id: "peringatan-dini", label: "Peringatan", icon: "warning" },
+                ].map((item) => {
+                  const isActive = activeSection === item.id;
+                  return (
+                    <a
+                      key={item.id}
+                      onClick={() => {
+                        scrollTo(item.id);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`font-body-sans text-[15px] cursor-pointer transition-all duration-200 py-3 px-4 rounded-xl flex items-center gap-3 ${
+                        isActive
+                          ? "text-primary-container bg-primary-container/10 font-semibold"
+                          : "text-on-surface-variant hover:text-primary-container hover:bg-gray-50"
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                      {item.label}
+                    </a>
+                  );
+                })}
+              </div>
+              {/* Sidebar footer */}
+              <div className="px-4 pb-5 flex flex-col gap-1 border-t border-gray-100 pt-4">
+                <button
+                  onClick={() => {
+                    handleGeolocation();
+                    setMobileMenuOpen(false);
+                  }}
+                  disabled={state.status === "geolocating"}
+                  className="font-body-sans text-[15px] text-primary-container font-medium hover:bg-primary-container/10 py-3 px-4 rounded-xl flex items-center gap-3 text-left transition-all duration-200 disabled:opacity-50 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-[20px]">my_location</span>
+                  {state.status === "ready" ? state.forecast.region.city : "Lokasi Saya"}
+                </button>
+                <a
+                  href="https://www.bmkg.go.id"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-body-sans text-[15px] text-on-surface-variant hover:text-primary-container py-3 px-4 rounded-xl flex items-center gap-3 no-underline transition-all duration-200 hover:bg-gray-50"
+                >
+                  <span className="material-symbols-outlined text-[20px]">open_in_new</span>
+                  BMKG
+                </a>
+              </div>
+            </div>
+          </>
+        )}
       </nav>
 
       <main className="flex-grow">
