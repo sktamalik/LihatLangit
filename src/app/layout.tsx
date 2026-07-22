@@ -36,6 +36,7 @@ export const metadata: Metadata = {
     locale: "id_ID", type: "website",
   },
   twitter: { card: "summary_large_image", title: TITLE, description: DESCRIPTION, images: [OG_IMAGE] },
+  verification: { google: "5ywu7PYLNVvs2SJ9jze6BegvNwztPKdcyOoKoWYiMBU" },
   alternates: { canonical: SITE_URL },
   category: "weather",
   classification: "Weather Forecast Indonesia",
