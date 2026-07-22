@@ -130,6 +130,60 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 "logo": `${SITE_URL}/Headericon.png`,
                 "description": "Dashboard prakiraan cuaca Indonesia berbasis data resmi BMKG.",
               },
+              {
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": [
+                  {
+                    "@type": "Question",
+                    "name": "Apa itu LihatLangit?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "LihatLangit adalah aplikasi web gratis untuk cek cuaca Indonesia secara real-time. Data prakiraan cuaca bersumber langsung dari BMKG (Badan Meteorologi, Klimatologi, dan Geofisika), sumber resmi cuaca Indonesia. Pengguna dapat mencari cuaca hingga level desa/kelurahan di seluruh wilayah Indonesia.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Bagaimana cara cek cuaca di LihatLangit?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Ketik nama kota, kecamatan, atau desa/kelurahan di kolom pencarian. LihatLangit akan menampilkan prakiraan cuaca 3 hari ke depan dengan interval 3 jam, termasuk suhu udara, kelembapan, kecepatan angin, dan kondisi langit. Data diperbarui secara berkala dari API resmi BMKG.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Apakah data cuaca LihatLangit akurat?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Ya. Semua data cuaca di LihatLangit bersumber langsung dari BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) — lembaga pemerintah resmi yang bertanggung jawab atas prakiraan cuaca di Indonesia. Data mencakup prakiraan cuaca, peringatan dini cuaca ekstrem, dan nowcast BMKG.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Kota dan wilayah mana saja yang tersedia di LihatLangit?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "LihatLangit mencakup seluruh wilayah Indonesia dari Sabang sampai Merauke, termasuk Jakarta, Bandung, Surabaya, Yogyakarta, Medan, Makassar, Denpasar (Bali), Semarang, Palembang, dan ribuan desa/kelurahan lainnya. Pencarian tersedia hingga level administrasi terkecil (ADM4).",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Apakah LihatLangit gratis?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "Ya, LihatLangit sepenuhnya gratis tanpa biaya berlangganan. Tidak perlu membuat akun atau login untuk menggunakan semua fitur termasuk prakiraan cuaca, peta interaktif, peringatan dini, dan informasi lingkungan.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    "name": "Apa perbedaan LihatLangit dengan aplikasi cuaca lainnya?",
+                    "acceptedAnswer": {
+                      "@type": "Answer",
+                      "text": "LihatLangit menggunakan data resmi BMKG sehingga prakiraan cuaca lebih relevan untuk kondisi Indonesia dibanding aplikasi berbasis data internasional. Fitur unggulan meliputi pencarian hingga level desa/kelurahan, peta cuaca interaktif 40+ kota, peringatan dini BMKG real-time, kondisi laut, indeks UV, dan berita BMKG terkini.",
+                    },
+                  },
+                ],
+              },
             ]),
           }}
         />
