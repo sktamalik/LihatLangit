@@ -49,7 +49,7 @@ async function getIndex(): Promise<IndexEntry[]> {
 
 async function loadIndex(): Promise<IndexEntry[]> {
   const dataPath = resolveDataPath();
-  const raw = fs.readFileSync(dataPath, "utf-8");
+  const raw = await fs.promises.readFile(dataPath, "utf-8");
   const regions: Region[] = JSON.parse(raw);
 
   return regions.map((r) => ({

@@ -50,20 +50,12 @@ export async function fetchForecast(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    console.log(`[BMKG] Fetching forecast for adm4=${adm4}`);
-    const start = performance.now();
-
     const response = await fetch(url, {
       signal: controller.signal,
       headers: { Accept: "application/json" },
     });
 
-    const duration = Math.round(performance.now() - start);
-
     if (!response.ok) {
-      console.error(
-        `[BMKG] HTTP ${response.status} for adm4=${adm4} (${duration}ms)`
-      );
       return {
         ok: false,
         error: buildError(
@@ -78,18 +70,15 @@ export async function fetchForecast(
     try {
       raw = await response.json();
     } catch {
-      console.error(`[BMKG] Invalid JSON for adm4=${adm4} (${duration}ms)`);
       return {
         ok: false,
         error: buildError("PARSE_ERROR", "Invalid JSON response from BMKG"),
       };
     }
 
-    console.log(`[BMKG] Success for adm4=${adm4} (${duration}ms)`);
     return { ok: true, data: raw as BmkgRawResponse };
   } catch (err: unknown) {
     if (err instanceof DOMException && err.name === "AbortError") {
-      console.error(`[BMKG] Timeout for adm4=${adm4}`);
       return {
         ok: false,
         error: buildError("TIMEOUT", "BMKG request timed out"),
@@ -97,7 +86,6 @@ export async function fetchForecast(
     }
 
     const msg = err instanceof Error ? err.message : String(err);
-    console.error(`[BMKG] Error for adm4=${adm4}: ${msg}`);
     return {
       ok: false,
       error: buildError("HTTP_ERROR", msg),

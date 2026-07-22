@@ -38,17 +38,9 @@ function diskPath(key: string): string {
   return path.join(CACHE_DIR, `${safeKey}.json`);
 }
 
-/**
- * Store original key mapping for disk persistence.
- * Maps sanitized filename → original key for reconstruction after restart.
- */
-const keyMapping = new Map<string, string>();
-
 function saveToDisk<T>(key: string, entry: CacheEntry<T>): void {
   if (!CACHE_DIR) return;
   try {
-    const safeKey = key.replace(/[^a-zA-Z0-9_-]/g, "_");
-    keyMapping.set(safeKey, key); // Store original key
     fs.writeFileSync(diskPath(key), JSON.stringify({ originalKey: key, ...entry }), "utf-8");
   } catch {
     // Non-fatal — in-memory still works

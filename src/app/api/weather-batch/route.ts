@@ -52,10 +52,6 @@ export async function GET(request: NextRequest) {
       results[adm4] = cached.payload;
       return;
     }
-    if (cached.status === "stale") {
-      // Keep stale as fallback, but still try to refresh
-    }
-
     // 2. Try BMKG-compatible code first, then original
     const bmkgAdm4 = toBmkgAdm4(adm4);
     let result = await fetchForecast(bmkgAdm4, 8000);

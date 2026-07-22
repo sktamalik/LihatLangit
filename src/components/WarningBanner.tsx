@@ -3,8 +3,6 @@ import { useEffect, useState, useMemo } from "react";
 import type { WarningItem, WarningDetail } from "@/app/api/warnings/route";
 import { formatDateTimeShort } from "@/lib/time";
 
-function formatDate(dateStr: string): string { return formatDateTimeShort(dateStr); }
-
 export default function WarningBanner() {
   const [warnings, setWarnings] = useState<WarningItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,7 +59,7 @@ export default function WarningBanner() {
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-semibold text-text-dark">{w.region}</p>
                 <p className="text-[11px] text-on-surface-variant line-clamp-1">{w.title}</p>
-                <p className="text-[10px] text-text-muted mt-0.5">{formatDate(w.pubDate)}</p>
+                <p className="text-[10px] text-text-muted mt-0.5">{formatDateTimeShort(w.pubDate)}</p>
               </div>
               <span className="material-symbols-outlined text-text-muted text-[18px] mt-1 transition-transform" style={{ transform: expanded === w.link ? "rotate(180deg)" : "" }}>expand_more</span>
             </button>
@@ -74,8 +72,8 @@ export default function WarningBanner() {
                     <p><span className="font-semibold">Tingkat:</span> {details[w.link].severity} · {details[w.link].urgency} · {details[w.link].certainty}</p>
                     <p><span className="font-semibold">Wilayah:</span> {details[w.link].areaDesc}</p>
                     <p>{details[w.link].description}</p>
-                    {details[w.link].effective && <p><span className="font-semibold">Mulai:</span> {formatDate(details[w.link].effective)}</p>}
-                    {details[w.link].expires && <p><span className="font-semibold">Berakhir:</span> {formatDate(details[w.link].expires)}</p>}
+                    {details[w.link].effective && <p><span className="font-semibold">Mulai:</span> {formatDateTimeShort(details[w.link].effective)}</p>}
+                    {details[w.link].expires && <p><span className="font-semibold">Berakhir:</span> {formatDateTimeShort(details[w.link].expires)}</p>}
                   </div>
                 ) : <p className="text-xs text-text-muted py-2">Gagal memuat detail.</p>}
               </div>

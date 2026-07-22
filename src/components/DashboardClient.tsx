@@ -24,7 +24,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import type { ErrorCode, Region } from "@/types/weather";
 
-export default function DashboardPage() {
+export default function DashboardClient() {
   const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);

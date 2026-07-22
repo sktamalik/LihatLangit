@@ -1,9 +1,9 @@
+"use client";
+
 /**
  * Hook for fetching weather data and managing dashboard state.
  * Auto-loads Makassar on mount. Background-refreshes every 30 min.
  */
-
-"use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import type { Region, WeatherForecast, ApiError } from "@/types/weather";

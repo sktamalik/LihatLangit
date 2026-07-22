@@ -16,7 +16,6 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
   const [results, setResults] = useState<Region[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
-  const [pendingRegion, setPendingRegion] = useState<Region | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
@@ -45,7 +44,6 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
     setQuery(`${region.village}, ${region.district}`);
     setIsOpen(false);
     setResults([]);
-    setPendingRegion(null);
     onSelect(region);
   };
 
@@ -55,23 +53,16 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
     else if (e.key === "Enter") {
       e.preventDefault();
       if (activeIndex >= 0) commitRegion(results[activeIndex]);
-      else if (pendingRegion) commitRegion(pendingRegion);
     }
     else if (e.key === "Escape") { setIsOpen(false); inputRef.current?.blur(); }
   };
 
   const selectFromDropdown = (region: Region) => {
-    setQuery(`${region.village}, ${region.district}`);
-    setIsOpen(false);
-    setResults([]);
-    setPendingRegion(region);
-    inputRef.current?.focus();
+    commitRegion(region);
   };
 
   const handleSearchClick = () => {
-    if (pendingRegion) {
-      commitRegion(pendingRegion);
-    } else if (results.length > 0) {
+    if (results.length > 0) {
       commitRegion(results[0]);
     }
   };
@@ -90,7 +81,7 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
         ref={inputRef}
         type="text"
         value={query}
-        onChange={(e) => { setQuery(e.target.value); setPendingRegion(null); }}
+        onChange={(e) => setQuery(e.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={() => { if (results.length > 0) setIsOpen(true); }}
         placeholder="Cari Desa atau Kecamatan..."
@@ -102,7 +93,7 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
       />
       <button
         onClick={handleSearchClick}
-        disabled={!pendingRegion && results.length === 0}
+        disabled={results.length === 0}
         className="shrink-0 p-2.5 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed"
         aria-label="Cari cuaca"
       >
