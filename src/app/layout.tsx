@@ -29,7 +29,17 @@ export const metadata: Metadata = {
   creator: "Sktamalik_",
   publisher: "LihatLangit",
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 } },
-  icons: { icon: "/Favicon.png", apple: "/apple-touch-icon.png" },
+  icons: {
+    icon: [
+      { url: "/Favicon.png", type: "image/png" },
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/Favicon.png",
+  },
   openGraph: {
     title: TITLE, description: DESCRIPTION, url: SITE_URL, siteName: "LihatLangit",
     images: [{ url: OG_IMAGE, secureUrl: OG_IMAGE, width: 1200, height: 630, alt: "LihatLangit — Cek Prakiraan Cuaca Indonesia via BMKG" }],
