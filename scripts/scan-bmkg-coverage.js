@@ -8,9 +8,9 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
-const CONCURRENCY = 5;
+const CONCURRENCY = 1;
 const TIMEOUT_MS = 8000;
-const DELAY_MS = 250;
+const DELAY_MS = 1200;
 const OUT_PATH = path.join(__dirname, "../public/data/bmkg-coverage.json");
 
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }

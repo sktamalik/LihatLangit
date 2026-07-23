@@ -18,6 +18,31 @@ const DATA_CANDIDATES = [
   path.join(process.cwd(), "src", "data", "regions-adm4.json"),
 ];
 
+const COVERAGE_CANDIDATES = [
+  path.join(process.cwd(), "public", "data", "bmkg-coverage.json"),
+  path.join(process.cwd(), "src", "data", "bmkg-coverage.json"),
+];
+
+// Lazy-loaded coverage map: adm3 → known working adm4 code (or null = no data)
+let coverageCache: Record<string, string | null> | null = null;
+
+async function getCoverage(): Promise<Record<string, string | null>> {
+  if (coverageCache !== null) return coverageCache;
+  for (const p of COVERAGE_CANDIDATES) {
+    if (fs.existsSync(p)) {
+      try {
+        const raw = await fs.promises.readFile(p, "utf-8");
+        coverageCache = JSON.parse(raw);
+        return coverageCache!;
+      } catch {
+        // corrupt file — treat as empty
+      }
+    }
+  }
+  coverageCache = {};
+  return coverageCache;
+}
+
 function resolveDataPath(): string {
   for (const p of DATA_CANDIDATES) {
     if (fs.existsSync(p)) return p;
@@ -296,7 +321,8 @@ export function generateBmkgVariants(adm4: string): string[] {
  * Find BMKG-compatible adm4 codes from expanding scope.
  *
  * Strategy by level (each capped to ensure diversity across levels):
- *   0 (exact):     Direct variants of the requested adm4 code (cap 3)
+ *   C (coverage):  Known-working codes from bmkg-coverage.json — tried first
+ *   0 (exact):     Direct variants + adm3.1001-1010 probes (cap 13)
  *   1 (district):  adm3.1001 first, then other villages in same adm3 — cap 8
  *   2 (city):      Other districts in the same adm2 (kab/kota) — cap 10
  *   3 (province):  Other cities in the same adm1 (provinsi) — cap 10
@@ -343,8 +369,28 @@ export async function findBmkgFallback(
 
   const index = await getIndex();
 
-  // Level 0: Direct variants of the requested adm4 (cap 3)
+  // Level C: Coverage-guided — inject known-working codes first (highest confidence)
+  const coverage = await getCoverage();
+  const covCode = coverage[adm3];
+  if (covCode) addCandidate(covCode);
+  // Also check neighbouring districts in same city that have known coverage
+  const adm2Prefix = `${adm2}.`;
+  for (const [covAdm3, covAdm4] of Object.entries(coverage)) {
+    if (candidates.length >= maxCandidates) break;
+    if (covAdm4 && covAdm3 !== adm3 && (covAdm3 + ".").startsWith(adm2Prefix)) {
+      addCandidate(covAdm4);
+    }
+  }
+
+  if (candidates.length >= maxCandidates) return candidates;
+
+  // Level 0: Direct variants + adm3.1001-1010 probes (cap 13)
   addVariants(adm4, 3);
+  // Probe 1001-1010 for the same kecamatan — scan script confirms these have highest hit rate
+  for (let n = 1001; n <= 1010; n++) {
+    if (candidates.length >= maxCandidates) break;
+    addCandidate(`${adm3}.${n}`);
+  }
 
   if (candidates.length >= maxCandidates) return candidates;
 
