@@ -153,29 +153,31 @@ export async function GET(request: NextRequest) {
   }
 
   // ── BMKG failed — try expanded fallback ──
-  // The exact adm4 has no BMKG data. Try a broader set of candidates:
-  //   1. Direct code variants (0XXX↔1XXX)
-  //   2. Other villages in same district
-  //   3. Other districts in same city
-  // Each level uses a shorter timeout since these are probes.
   console.log(`[Weather] Exact adm4 ${adm4} failed, trying expanded fallback...`);
   const fallbackCandidates = await findBmkgFallback(adm4, 35);
   let fallbackResult: BmkgClientResult | null = null;
   let fallbackCode: string | null = null;
-  let fallbackAttempts = 0;
-  const MAX_FALLBACK_ATTEMPTS = 35;
-  const FALLBACK_TIMEOUT = 4000;
+  const FALLBACK_TIMEOUT = 3000;
+  const BATCH_SIZE = 5;
 
-  for (let fi = 0; fi < fallbackCandidates.length && fallbackAttempts < MAX_FALLBACK_ATTEMPTS; fi++) {
-    const candidate = fallbackCandidates[fi];
-    if (candidate === bmkgAdm4 || candidate === adm4) continue;
-    fallbackAttempts++;
-    console.log(`[Weather] Trying fallback #${fallbackAttempts}: adm4=${candidate}`);
-    fallbackResult = await fetchForecast(candidate, FALLBACK_TIMEOUT);
-    if (fallbackResult.ok) {
-      fallbackCode = candidate;
-      console.log(`[Weather] Fallback SUCCESS (#${fallbackAttempts}) for adm4=${candidate}`);
-      break;
+  // Probe in parallel batches — 5 concurrent requests per batch, stop on first success.
+  // Worst case: 7 batches × 3s = ~21s instead of 35 × 4s = ~140s serial.
+  const toTry = fallbackCandidates.filter(c => c !== bmkgAdm4 && c !== adm4);
+  outer: for (let i = 0; i < toTry.length; i += BATCH_SIZE) {
+    const batch = toTry.slice(i, i + BATCH_SIZE);
+    const results = await Promise.all(
+      batch.map(async (candidate) => {
+        const res = await fetchForecast(candidate, FALLBACK_TIMEOUT);
+        return { candidate, res };
+      })
+    );
+    for (const { candidate, res } of results) {
+      if (res.ok) {
+        fallbackResult = res;
+        fallbackCode = candidate;
+        console.log(`[Weather] Fallback SUCCESS: adm4=${candidate}`);
+        break outer;
+      }
     }
   }
 
