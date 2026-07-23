@@ -346,42 +346,44 @@ export async function findBmkgFallback(
   // Level 0: Direct variants of the requested adm4 (cap 3)
   addVariants(adm4, 3);
 
-  // Level 1: Other villages in the same district (adm3, cap 5)
+  // Level 1: Same district — inject adm3.1001 first (highest hit rate), then other villages (cap 8)
+  addCandidate(`${adm3}.1001`);
   const sameDistrict = await getVillagesByAdm3(adm3);
   let level1Added = 0;
   for (const village of sameDistrict) {
-    if (level1Added >= 5) break;
+    if (level1Added >= 8) break;
     if (village.adm4 === adm4) continue;
     const before = candidates.length;
-    addVariants(village.adm4, 1); // 1 variant per village
+    addVariants(village.adm4, 2);
     if (candidates.length > before) level1Added++;
   }
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 2: Other districts in the same city (adm2, cap 5)
+  // Level 2: Other districts in the same city (adm2, cap 10, use getAdm3Prefix for correctness)
   const cityPrefix = `${adm2}.`;
   const otherDistricts = new Set<string>();
   for (const entry of index) {
     if (entry.region.adm4.startsWith(cityPrefix)) {
-      const entryAdm3 = entry.region.adm4.slice(0, 8);
-      if (!entryAdm3.startsWith(adm3)) {
+      const entryAdm3 = getAdm3Prefix(entry.region.adm4);
+      if (entryAdm3 !== adm3) {
         otherDistricts.add(entryAdm3);
       }
     }
   }
   const otherDistrictsArr: string[] = [];
   otherDistricts.forEach((d) => otherDistrictsArr.push(d));
+  // Try adm3.1001 pattern first (highest chance of BMKG coverage)
   let level2Added = 0;
-  for (let di = 0; di < otherDistrictsArr.length && level2Added < 5; di++) {
+  for (let di = 0; di < otherDistrictsArr.length && level2Added < 10; di++) {
+    const knownCode = `${otherDistrictsArr[di]}.1001`;
+    const before = candidates.length;
+    addCandidate(knownCode);
     const firstVillage = index.find((e) =>
       e.region.adm4.startsWith(otherDistrictsArr[di])
     );
-    if (firstVillage) {
-      const before = candidates.length;
-      addVariants(firstVillage.region.adm4, 1);
-      if (candidates.length > before) level2Added++;
-    }
+    if (firstVillage) addVariants(firstVillage.region.adm4, 2);
+    if (candidates.length > before) level2Added++;
   }
 
   if (candidates.length >= maxCandidates) return candidates;
@@ -400,15 +402,16 @@ export async function findBmkgFallback(
   const otherCitiesArr: string[] = [];
   otherCities.forEach((c) => otherCitiesArr.push(c));
   let level3Added = 0;
-  for (let ci = 0; ci < otherCitiesArr.length && level3Added < 5; ci++) {
+  for (let ci = 0; ci < otherCitiesArr.length && level3Added < 10; ci++) {
+    // Try adm2.XX.01.1001 pattern first — highest BMKG coverage rate
+    const knownCode = `${otherCitiesArr[ci]}.01.1001`;
+    const before = candidates.length;
+    addCandidate(knownCode);
     const firstVillage = index.find((e) =>
       e.region.adm4.startsWith(otherCitiesArr[ci])
     );
-    if (firstVillage) {
-      const before = candidates.length;
-      addVariants(firstVillage.region.adm4, 1);
-      if (candidates.length > before) level3Added++;
-    }
+    if (firstVillage) addVariants(firstVillage.region.adm4, 2);
+    if (candidates.length > before) level3Added++;
   }
 
   if (candidates.length >= maxCandidates) return candidates;
