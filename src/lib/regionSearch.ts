@@ -297,9 +297,9 @@ export function generateBmkgVariants(adm4: string): string[] {
  *
  * Strategy by level (each capped to ensure diversity across levels):
  *   0 (exact):     Direct variants of the requested adm4 code (cap 3)
- *   1 (district):  Other villages in the same adm3 (kecamatan) — cap 5
- *   2 (city):      Other districts in the same adm2 (kab/kota) — cap 5
- *   3 (province):  Other cities in the same adm1 (provinsi) — cap 5
+ *   1 (district):  adm3.1001 first, then other villages in same adm3 — cap 8
+ *   2 (city):      Other districts in the same adm2 (kab/kota) — cap 10
+ *   3 (province):  Other cities in the same adm1 (provinsi) — cap 10
  *   4 (nearest):   Nearest villages from other provinces by coord — cap 5
  *   5 (any):       First village from each other province — cap 10
  *
@@ -345,6 +345,8 @@ export async function findBmkgFallback(
 
   // Level 0: Direct variants of the requested adm4 (cap 3)
   addVariants(adm4, 3);
+
+  if (candidates.length >= maxCandidates) return candidates;
 
   // Level 1: Same district — inject adm3.1001 first (highest hit rate), then other villages (cap 8)
   addCandidate(`${adm3}.1001`);
