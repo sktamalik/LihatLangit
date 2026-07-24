@@ -473,10 +473,12 @@ export async function findBmkgFallback(
   // Then iterate prioritized adm2 list
   let level3Added = 0;
   for (let ci = 0; ci < prioritizedAdm2.length && level3Added < 20; ci++) {
-    // Try adm2.XX.01.1001 pattern first — highest BMKG coverage rate
-    const knownCode = `${prioritizedAdm2[ci]}.01.1001`;
+    // Try adm2.XX.01.1001 AND adm2.XX.01.2001 — BMKG sometimes uses 2001 format
+    const knownCode1001 = `${prioritizedAdm2[ci]}.01.1001`;
+    const knownCode2001 = `${prioritizedAdm2[ci]}.01.2001`;
     const before = candidates.length;
-    addCandidate(knownCode);
+    addCandidate(knownCode1001);
+    addCandidate(knownCode2001);
     const firstVillage = index.find((e) =>
       e.region.adm4.startsWith(prioritizedAdm2[ci])
     );
