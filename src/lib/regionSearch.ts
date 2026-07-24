@@ -436,7 +436,7 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 3: Other cities in the same province (adm1, cap 5)
+  // Level 3: Other cities in the same province — prioritize cities (XX.71+) then coverage data (cap 20)
   const provPrefix = `${adm1}.`;
   const otherCities = new Set<string>();
   for (const entry of index) {
@@ -449,14 +449,36 @@ export async function findBmkgFallback(
   }
   const otherCitiesArr: string[] = [];
   otherCities.forEach((c) => otherCitiesArr.push(c));
+
+  // Split: cities (XX.71-XX.79) first — BMKG has data for kota/walikota more often
+  const cities = otherCitiesArr.filter((c) => {
+    const num = parseInt(c.slice(3, 5), 10);
+    return num >= 71 && num <= 79;
+  });
+  const kabupaten = otherCitiesArr.filter((c) => {
+    const num = parseInt(c.slice(3, 5), 10);
+    return num < 71 || num > 79;
+  });
+  const prioritizedAdm2 = [...cities, ...kabupaten];
+
+  // Inject coverage data for same province (known working codes)
+  const covEntries = Object.entries(coverage);
+  for (const [covAdm3, covAdm4] of covEntries) {
+    if (candidates.length >= maxCandidates) break;
+    if (covAdm4 && covAdm3.startsWith(provPrefix)) {
+      addCandidate(covAdm4);
+    }
+  }
+
+  // Then iterate prioritized adm2 list
   let level3Added = 0;
-  for (let ci = 0; ci < otherCitiesArr.length && level3Added < 10; ci++) {
+  for (let ci = 0; ci < prioritizedAdm2.length && level3Added < 20; ci++) {
     // Try adm2.XX.01.1001 pattern first — highest BMKG coverage rate
-    const knownCode = `${otherCitiesArr[ci]}.01.1001`;
+    const knownCode = `${prioritizedAdm2[ci]}.01.1001`;
     const before = candidates.length;
     addCandidate(knownCode);
     const firstVillage = index.find((e) =>
-      e.region.adm4.startsWith(otherCitiesArr[ci])
+      e.region.adm4.startsWith(prioritizedAdm2[ci])
     );
     if (firstVillage) addVariants(firstVillage.region.adm4, 2);
     if (candidates.length > before) level3Added++;
