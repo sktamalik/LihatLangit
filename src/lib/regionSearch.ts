@@ -488,7 +488,8 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 4: Nearest villages from other provinces by coordinates (cap 5)
+  // Level 4: Nearest villages from other provinces by coordinates (cap 10)
+  // Prefer provinces that actually have BMKG data (from coverage file)
   const coordsEntry = index.find(
     (e) =>
       e.region.adm4 === adm4 &&
@@ -497,9 +498,14 @@ export async function findBmkgFallback(
   );
   if (coordsEntry) {
     const { latitude, longitude } = coordsEntry.region;
+    const covProvs = new Set<string>();
+    for (const [covAdm3, covAdm4] of covEntries) {
+      if (covAdm4) covProvs.add(covAdm3.slice(0, 2));
+    }
     const nearest: Array<{ entry: IndexEntry; dist: number }> = [];
     for (const entry of index) {
-      if (entry.region.adm4.startsWith(provPrefix)) continue;
+      const entryProv = entry.region.adm4.slice(0, 2);
+      if (entryProv === adm1) continue; // skip same province
       if (entry.region.latitude == null || entry.region.longitude == null) continue;
       const d = haversineKm(
         latitude!,
@@ -507,31 +513,44 @@ export async function findBmkgFallback(
         entry.region.latitude!,
         entry.region.longitude!
       );
-      nearest.push({ entry, dist: d });
+      // Boost score for provinces known to have BMKG data
+      const score = covProvs.has(entryProv) ? d * 0.5 : d;
+      nearest.push({ entry, dist: score });
     }
     nearest.sort((a, b) => a.dist - b.dist);
+    // Deduplicate by province for diversity
+    const usedProvs = new Set<string>();
     let level4Added = 0;
-    for (let ni = 0; ni < nearest.length && level4Added < 5; ni++) {
+    for (let ni = 0; ni < nearest.length && level4Added < 10; ni++) {
+      const entryProv = nearest[ni].entry.region.adm4.slice(0, 2);
+      if (usedProvs.has(entryProv)) continue;
+      usedProvs.add(entryProv);
       const before = candidates.length;
       addVariants(nearest[ni].entry.region.adm4, 1);
+      addCandidate(nearest[ni].entry.region.adm4); // force original code too
       if (candidates.length > before) level4Added++;
     }
   }
 
-  // Level 5: First village from each other province (cap 10)
-  // Try the XX.01.01.1001 pattern first (known to have BMKG data for many provinces)
+  // Level 5: Best village from each other province (cap 15)
+  // Prefer coverage data, then cities (XX.71+), then fallback to 01.01.1001
   const otherProvs = new Set<string>();
   let level5Added = 0;
   for (const entry of index) {
-    if (level5Added >= 10) break;
+    if (level5Added >= 15) break;
     const entryProv = entry.region.adm4.slice(0, 2);
     if (entryProv === adm1) continue;
     if (otherProvs.has(entryProv)) continue;
     otherProvs.add(entryProv);
     const before = candidates.length;
 
-    // Try known-working pattern: XX.01.01.1001 (first district, first kelurahan)
-    addCandidate(`${entryProv}.01.01.1001`);
+    // Try coverage data first (highest confidence)
+    const covForProv = Object.entries(coverage).find(([k, v]) => k.startsWith(entryProv) && v);
+    if (covForProv?.[1]) addCandidate(covForProv[1]);
+
+    // Try city pattern: XX.71.01.1001 or XX.73.01.1001
+    addCandidate(`${entryProv}.71.01.1001`);
+    addCandidate(`${entryProv}.73.01.1001`);
 
     // Also try the first actual entry from this province
     if (candidates.length < maxCandidates) {
