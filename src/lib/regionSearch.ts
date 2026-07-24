@@ -394,21 +394,21 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 1: Same district — inject adm3.1001 first (highest hit rate), then other villages (cap 8)
+  // Level 1: Same district — inject adm3.1001 first (highest hit rate), then other villages (cap 5)
   addCandidate(`${adm3}.1001`);
   const sameDistrict = await getVillagesByAdm3(adm3);
   let level1Added = 0;
   for (const village of sameDistrict) {
-    if (level1Added >= 8) break;
+    if (level1Added >= 5) break;
     if (village.adm4 === adm4) continue;
     const before = candidates.length;
-    addVariants(village.adm4, 2);
+    addVariants(village.adm4, 1);
     if (candidates.length > before) level1Added++;
   }
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 2: Other districts in the same city (adm2, cap 10, use getAdm3Prefix for correctness)
+  // Level 2: Other districts in the same city (adm2, cap 6, use getAdm3Prefix for correctness)
   const cityPrefix = `${adm2}.`;
   const otherDistricts = new Set<string>();
   for (const entry of index) {
@@ -423,7 +423,7 @@ export async function findBmkgFallback(
   otherDistricts.forEach((d) => otherDistrictsArr.push(d));
   // Try adm3.1001 pattern first (highest chance of BMKG coverage)
   let level2Added = 0;
-  for (let di = 0; di < otherDistrictsArr.length && level2Added < 10; di++) {
+  for (let di = 0; di < otherDistrictsArr.length && level2Added < 6; di++) {
     const knownCode = `${otherDistrictsArr[di]}.1001`;
     const before = candidates.length;
     addCandidate(knownCode);
