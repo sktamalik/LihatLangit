@@ -273,7 +273,7 @@ export default function DashboardClient() {
                       <span className="material-symbols-outlined text-grass-green text-[24px]">verified</span>
                       <div><h3 className="font-body-sans text-[15px] font-semibold text-grass-green">{state.forecast.region.village}, {state.forecast.region.district}</h3><p className="font-body-sans text-[13px] text-on-surface-variant">{state.forecast.nearestPoint?.weatherDescription ?? "Data tersedia"}</p></div>
                     </div>
-                    <span className="px-3 py-1 bg-error-container text-on-error-container rounded-md font-body-sans text-[12px] font-medium">{state.forecast.nearestPoint?.temperatureC !== null ? `${Math.round(state.forecast.nearestPoint!.temperatureC)}°C` : "--"}</span>
+                    <span className="px-3 py-1 bg-error-container text-on-error-container rounded-md font-body-sans text-[12px] font-medium">{state.forecast.nearestPoint?.temperatureC != null ? `${Math.round(state.forecast.nearestPoint.temperatureC)}°C` : "--"}</span>
                   </div>
                   <div className="space-y-3">
                     {state.forecast.days.slice(0, 3).map((day) => {

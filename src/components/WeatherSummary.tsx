@@ -42,7 +42,7 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
           <span className={`material-symbols-outlined text-[64px] ${theme.color} drop-shadow-sm`}>{theme.icon}</span>
           <div>
             <h2 className="font-body-sans text-[56px] font-bold text-text-dark leading-none tracking-tighter">
-              {c?.temperatureC !== null ? `${Math.round(c!.temperatureC)}` : "--"}
+              {c?.temperatureC != null ? `${Math.round(c.temperatureC)}` : "--"}
               <span className="text-[22px] font-semibold text-text-muted ml-0.5">°C</span>
             </h2>
             <p className={`font-body-sans text-[14px] ${theme.color} font-bold uppercase tracking-wide`}>
