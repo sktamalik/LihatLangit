@@ -114,7 +114,63 @@ export function formatAnalysisDate(isoString: string, timezone?: string): string
   const [, , m, d, h, min] = match;
   const monthIdx = parseInt(m, 10) - 1;
   const tzAbbr = getTimezoneAbbr(timezone);
-  return `${parseInt(d, 10)} ${MONTHS_SHORT[monthIdx]}, ${h}:${min} ${tzAbbr}`;
+  return parseInt(d, 10) + " " + MONTHS_SHORT[monthIdx] + ", " + h + ":" + min + " " + tzAbbr;
+}
+
+
+/**
+ * Helper: compute UTC offset minutes from an IANA timezone string.
+ * Indonesia only uses WIB (+7), WITA (+8), WIT (+9).
+ */
+function getUtcOffsetMinutes(timezone?: string): number {
+  if (!timezone) return 7 * 60;
+  const tzMap: Record<string, number> = {
+    "Asia/Jakarta": 7 * 60,
+    "Asia/Makassar": 8 * 60,
+    "Asia/Jayapura": 9 * 60,
+  };
+  return tzMap[timezone] ?? 7 * 60;
+}
+
+/**
+ * Format current time as "YYYY-MM-DDTHH:MM" in the given IANA timezone.
+ */
+export function formatLocalNow(timezone?: string): string {
+  const offsetMinutes = getUtcOffsetMinutes(timezone);
+  const localMs = Date.now() + offsetMinutes * 60 * 1000;
+  const localDate = new Date(localMs);
+  const y = localDate.getUTCFullYear();
+  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(localDate.getUTCDate()).padStart(2, "0");
+  const h = String(localDate.getUTCHours()).padStart(2, "0");
+  const min = String(localDate.getUTCMinutes()).padStart(2, "0");
+  return y + "-" + m + "-" + d + "T" + h + ":" + min;
+}
+
+/**
+ * Get today's date string "YYYY-MM-DD" in the region's local timezone.
+ */
+export function getLocalTodayStr(timezone?: string): string {
+  const offsetMinutes = getUtcOffsetMinutes(timezone);
+  const localMs = Date.now() + offsetMinutes * 60 * 1000;
+  const localDate = new Date(localMs);
+  const y = localDate.getUTCFullYear();
+  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(localDate.getUTCDate()).padStart(2, "0");
+  return y + "-" + m + "-" + d;
+}
+
+/**
+ * Get tomorrow's date string "YYYY-MM-DD" in the region's local timezone.
+ */
+export function getLocalTomorrowStr(timezone?: string): string {
+  const offsetMinutes = getUtcOffsetMinutes(timezone);
+  const localMs = Date.now() + offsetMinutes * 60 * 1000 + 86400000;
+  const tomorrowDate = new Date(localMs);
+  const y = tomorrowDate.getUTCFullYear();
+  const m = String(tomorrowDate.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(tomorrowDate.getUTCDate()).padStart(2, "0");
+  return y + "-" + m + "-" + d;
 }
 
 export { DAYS, MONTHS_LONG, MONTHS_SHORT };
