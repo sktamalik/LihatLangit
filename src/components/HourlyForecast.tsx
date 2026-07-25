@@ -1,6 +1,6 @@
 "use client";
 import type { WeatherForecast } from "@/types/weather";
-import { formatTime } from "@/lib/time";
+import { formatTime, formatLocalNow } from "@/lib/time";
 import { getSunTimes } from "@/lib/envCalculations";
 
 /** Icon mapping — lebih variatif, solid (FILL=1) */
@@ -35,28 +35,7 @@ function iconColor(desc: string, isPast: boolean): string {
   if (d.includes("angin")) return "text-teal-400";
   return "text-primary-container";
 }
-
-/** Build "YYYY-MM-DDTHH:MM" string in the region's local time */
-function formatLocalNow(timezone?: string): string {
-  const now = new Date();
-  let offsetMinutes = 7 * 60;
-  if (timezone) {
-    const tzMap: Record<string, number> = {
-      "Asia/Jakarta": 7 * 60,
-      "Asia/Makassar": 8 * 60,
-      "Asia/Jayapura": 9 * 60,
-    };
-    offsetMinutes = tzMap[timezone] ?? 7 * 60;
-  }
-  const localMs = now.getTime() + offsetMinutes * 60 * 1000;
-  const localDate = new Date(localMs);
-  const y = localDate.getUTCFullYear();
-  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(localDate.getUTCDate()).padStart(2, "0");
-  const h = String(localDate.getUTCHours()).padStart(2, "0");
-  const min = String(localDate.getUTCMinutes()).padStart(2, "0");
-  return `${y}-${m}-${d}T${h}:${min}`;
-}
+
 
 export default function HourlyForecast({ forecast }: { forecast: WeatherForecast }) {
   const today = forecast.days[0];
