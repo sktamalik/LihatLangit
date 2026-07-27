@@ -18,6 +18,7 @@ import SourceAttribution from "@/components/SourceAttribution";
 import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
+import EarthquakeWarning from "@/components/EarthquakeWarning";
 import SearchNotif from "@/components/SearchNotif";
 import type { SearchNotifState } from "@/components/SearchNotif";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -325,6 +326,8 @@ export default function DashboardClient() {
               <HourlyForecast forecast={state.forecast} />
               <CommunityReports forecast={state.forecast} />
             </div>
+            {/* Info Gempa Bumi — full width, section terpisah */}
+            <div className="w-full"><EarthquakeWarning /></div>
             {/* Peringatan Dini — full width */}
             <div id="peringatan-dini" className="w-full"><WarningBanner /></div>
           </div>
