@@ -13,6 +13,7 @@ import type {
   WeatherDay,
   Region,
 } from "@/types/weather";
+import { formatLocalNow, getLocalTodayStr, getLocalTomorrowStr } from "@/lib/time";
 
 /** Safe number conversion: returns null for null/undefined/non-numeric */
 function safeNumber(val: string | number | null | undefined): number | null {
@@ -42,33 +43,6 @@ function extractDate(localDateTime: string): string {
   return localDateTime.slice(0, 10);
 }
 
-/**
- * Get current date string (YYYY-MM-DD) in the region's local timezone.
- * Indonesia only has 3 timezones: WIB (+7), WITA (+8), WIT (+9).
- */
-function getLocalTodayStr(timezone?: string): string {
-  const now = new Date();
-  let offsetMinutes = 7 * 60; // default WIB
-
-  if (timezone) {
-    const tzMap: Record<string, number> = {
-      "Asia/Jakarta": 7 * 60,
-      "Asia/Makassar": 8 * 60,
-      "Asia/Jayapura": 9 * 60,
-    };
-    offsetMinutes = tzMap[timezone] ?? 7 * 60;
-  }
-
-  const localMs = now.getTime() + offsetMinutes * 60 * 1000;
-  const localDate = new Date(localMs);
-
-  const y = localDate.getUTCFullYear();
-  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(localDate.getUTCDate()).padStart(2, "0");
-
-  return `${y}-${m}-${d}`;
-}
-
 /** Indonesian day label for a date string — timezone-aware */
 function dayLabel(dateStr: string, timezone?: string): string {
   const todayStr = getLocalTodayStr(timezone);
@@ -80,30 +54,6 @@ function dayLabel(dateStr: string, timezone?: string): string {
   const date = new Date(dateStr + "T00:00:00");
   const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
   return days[date.getDay()] ?? dateStr;
-}
-
-/** Get tomorrow's date string in the region's local timezone */
-function getLocalTomorrowStr(timezone?: string): string {
-  const now = new Date();
-  let offsetMinutes = 7 * 60;
-
-  if (timezone) {
-    const tzMap: Record<string, number> = {
-      "Asia/Jakarta": 7 * 60,
-      "Asia/Makassar": 8 * 60,
-      "Asia/Jayapura": 9 * 60,
-    };
-    offsetMinutes = tzMap[timezone] ?? 7 * 60;
-  }
-
-  const localMs = now.getTime() + offsetMinutes * 60 * 1000 + 86400000;
-  const tomorrowDate = new Date(localMs);
-
-  const y = tomorrowDate.getUTCFullYear();
-  const m = String(tomorrowDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(tomorrowDate.getUTCDate()).padStart(2, "0");
-
-  return `${y}-${m}-${d}`;
 }
 
 /**
@@ -277,31 +227,5 @@ export function getNearestForecastPoint(
   return points[points.length - 1];
 }
 
-/**
- * Get current time formatted as YYYY-MM-DDTHH:MM in a given IANA timezone.
- * Indonesia only has 3 timezones: WIB (+7), WITA (+8), WIT (+9).
- */
-function formatLocalNow(timezone?: string): string {
-  const now = new Date();
-  let offsetMinutes = 7 * 60; // default WIB
-
-  if (timezone) {
-    const tzMap: Record<string, number> = {
-      "Asia/Jakarta": 7 * 60,
-      "Asia/Makassar": 8 * 60,
-      "Asia/Jayapura": 9 * 60,
-    };
-    offsetMinutes = tzMap[timezone] ?? 7 * 60;
-  }
-
-  const localMs = now.getTime() + offsetMinutes * 60 * 1000;
-  const localDate = new Date(localMs);
-
-  const y = localDate.getUTCFullYear();
-  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(localDate.getUTCDate()).padStart(2, "0");
-  const h = String(localDate.getUTCHours()).padStart(2, "0");
-  const min = String(localDate.getUTCMinutes()).padStart(2, "0");
-
-  return `${y}-${m}-${d}T${h}:${min}`;
-}
+/** Re-export so callers don't break — preferred import path is @/lib/time */
+export { formatLocalNow } from "@/lib/time";

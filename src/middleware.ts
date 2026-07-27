@@ -22,14 +22,6 @@ interface RateLimitEntry {
 // Edge Runtime — state survives across requests in the same edge instance
 const rateLimitMap = new Map<string, RateLimitEntry>();
 
-// Periodic cleanup setiap 5 menit mencegah memory leak
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap) {
-    if (now >= entry.resetAt) rateLimitMap.delete(ip);
-  }
-}, 300_000).unref?.();
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -38,17 +30,25 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  const now = Date.now();
+
+  // Bersihkan entry expired setiap request (ganti setInterval yang tidak stabil di Edge)
+  if (rateLimitMap.size > 100) {
+    for (const [ip, entry] of rateLimitMap) {
+      if (now >= entry.resetAt) rateLimitMap.delete(ip);
+    }
+  }
+
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
     request.headers.get("x-real-ip") ??
     "unknown";
 
-  const now = Date.now();
   const entry = rateLimitMap.get(ip);
 
   if (entry && now < entry.resetAt) {
-    entry.count++;
-    if (entry.count > RATE_LIMIT_MAX) {
+    if (entry.count >= RATE_LIMIT_MAX) {
+      // Hit ke-31+ di-block, tapi tetap kirimkan resetAt yang benar
       return NextResponse.json(
         {
           error: {
@@ -60,6 +60,7 @@ export function middleware(request: NextRequest) {
         { status: 429 }
       );
     }
+    entry.count++;
   } else {
     // Reset entry — window baru
     rateLimitMap.set(ip, {
