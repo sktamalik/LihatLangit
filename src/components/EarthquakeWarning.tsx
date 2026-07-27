@@ -128,30 +128,39 @@ export default function EarthquakeWarning() {
       ) : (
         <div className="space-y-3">
           {gempa.slice(0, 5).map((g, idx) => {
-            const mag = parseFloat(g.magnitude) || 0;
-            const depth = parseInt(g.kedalaman) || 0;
+            const gAny = g as unknown as Record<string, string>;
+            const mag = parseFloat(gAny["Magnitude"] ?? gAny["magnitude"]) || 0;
+            const depth = parseInt(gAny["Kedalaman"] ?? gAny["kedalaman"]) || 0;
+            const wilayah = gAny["Wilayah"] ?? gAny["wilayah"] ?? "";
+            const tanggal = gAny["Tanggal"] ?? gAny["tanggal"] ?? "";
+            const jam = gAny["Jam"] ?? gAny["jam"] ?? "";
+            const kedalamanStr = gAny["Kedalaman"] ?? gAny["kedalaman"] ?? "";
+            const lintang = gAny["Lintang"] ?? gAny["lintang"] ?? "";
+            const bujur = gAny["Bujur"] ?? gAny["bujur"] ?? "";
+            const potensi = gAny["Potensi"] ?? gAny["potensi"] ?? "";
+            const magStr = gAny["Magnitude"] ?? gAny["magnitude"] ?? "";
             return (
               <div key={idx} className="border border-gray-100 rounded-lg p-4 hover:bg-gray-50 transition-colors">
                 <div className="flex items-start justify-between gap-4">
                   {/* Left: magnitude badge */}
                   <div className="flex items-start gap-3 flex-shrink-0">
                     <div className={`flex flex-col items-center justify-center w-14 h-14 rounded-lg ${magnitudeColor(mag)}`}>
-                      <span className="font-body-sans text-[20px] font-bold leading-none">{g.magnitude}</span>
+                      <span className="font-body-sans text-[20px] font-bold leading-none">{magStr}</span>
                       <span className="text-[9px] font-medium opacity-80 leading-tight">SR</span>
                     </div>
                   </div>
                   {/* Middle: location + details */}
                   <div className="flex-grow min-w-0">
-                    <p className="font-body-sans text-[14px] font-semibold text-text-dark mb-1 line-clamp-2">{g.wilayah}</p>
+                    <p className="font-body-sans text-[14px] font-semibold text-text-dark mb-1 line-clamp-2">{wilayah}</p>
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-on-surface-variant">
-                      <span>{g.tanggal} · {g.jam}</span>
-                      <span>Kedalaman: {g.kedalaman} ({depthLabel(depth)})</span>
-                      <span>Koordinat: {g.lintang}, {g.bujur}</span>
+                      <span>{tanggal} · {jam}</span>
+                      <span>Kedalaman: {kedalamanStr} ({depthLabel(depth)})</span>
+                      <span>Koordinat: {lintang}, {bujur}</span>
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       <span className="text-[11px] px-2 py-0.5 rounded-full font-medium bg-gray-100 text-gray-600">{magnitudeLabel(mag)}</span>
-                      <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium border ${tsunamiColor(g.potensi)}`}>
-                        {tsunamiBadge(g.potensi)}
+                      <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium border ${tsunamiColor(potensi)}`}>
+                        {tsunamiBadge(potensi)}
                       </span>
                     </div>
                   </div>
