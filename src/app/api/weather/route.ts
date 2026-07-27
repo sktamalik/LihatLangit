@@ -113,6 +113,28 @@ export async function GET(request: NextRequest) {
       ? await fetchForecast(adm4)
       : bmkgResult;
 
+  // Short-circuit on rate-limit: don't hammer BMKG with fallback probes, wait 1s then return error
+  if (!result.ok && (result.error.status === 429 || result.error.status === 403)) {
+    console.log(`[Weather] BMKG rate-limited (${result.error.status}), backing off before retry...`);
+    await new Promise((r) => setTimeout(r, 1000));
+    const retryResult = await fetchForecast(bmkgAdm4);
+    if (retryResult.ok) {
+      // Cache and return
+      const normalized = normalizeBmkgForecast(retryResult.data, region);
+      if (normalized && normalized.days.length > 0) {
+        setCache(cacheKey, normalized);
+        return NextResponse.json({
+          ...normalized, fromCache: false, isStale: false,
+        } satisfies WeatherForecast);
+      }
+    }
+    // Still rate-limited — return immediately, don't trigger 35-request fallback
+    return NextResponse.json(
+      { error: { code: "BMKG_UNAVAILABLE" as const, message: "Layanan BMKG sedang sibuk. Silakan coba lagi." } } satisfies ApiError,
+      { status: 502 }
+    );
+  }
+
   if (result.ok) {
     const normalized = normalizeBmkgForecast(result.data, region);
 
