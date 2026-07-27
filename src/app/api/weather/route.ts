@@ -17,28 +17,6 @@ import type {
   WeatherForecast,
 } from "@/types/weather";
 
-const RATE_LIMIT_MAX = 30;
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const requestLog = new Map<string, number[]>();
-
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const window = RATE_LIMIT_WINDOW_MS;
-
-  const timestamps = requestLog.get(ip) ?? [];
-  const recent = timestamps.filter((t) => now - t < window);
-
-  if (recent.length >= RATE_LIMIT_MAX) {
-    // Jangan push request yang ditolak ke array
-    requestLog.set(ip, recent);
-    return true;
-  }
-
-  recent.push(now);
-  requestLog.set(ip, recent);
-  return false;
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const adm4 = searchParams.get("adm4");
@@ -72,25 +50,6 @@ export async function GET(request: NextRequest) {
   // ── Check region in local dataset (soft check — BMKG may still have data) ──
   const region = await getRegionByAdm4(adm4);
   const bmkgAdm4 = toBmkgAdm4(adm4);
-
-  // ── Rate limit ──
-  const ip =
-    request.headers.get("x-forwarded-for") ??
-    request.headers.get("x-real-ip") ??
-    "unknown";
-
-  if (isRateLimited(ip)) {
-    return NextResponse.json(
-      {
-        error: {
-          code: "RATE_LIMITED",
-          message:
-            "Terlalu banyak permintaan. Silakan coba lagi beberapa saat.",
-        },
-      } satisfies ApiError,
-      { status: 429 }
-    );
-  }
 
   // ── Cache check ──
   const cacheKey = `weather:bmkg:adm4:${adm4}`;
