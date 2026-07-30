@@ -1,0 +1,762 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - region "Informasi LihatLangit" [ref=e4]:
+      - heading "LihatLangit — Cek Cuaca Indonesia Real-Time dari BMKG" [level=1] [ref=e5]
+      - paragraph [ref=e6]: LihatLangit adalah aplikasi web gratis untuk cek cuaca Indonesia secara real-time. Semua data prakiraan cuaca bersumber langsung dari BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) — sumber resmi cuaca Indonesia. Cari cuaca hingga level desa/kelurahan di seluruh Indonesia dari Sabang sampai Merauke.
+      - heading "Fitur Cek Cuaca Indonesia" [level=2] [ref=e7]
+      - list [ref=e8]:
+        - listitem [ref=e9]: Prakiraan cuaca 3 hari ke depan dengan interval 3 jam
+        - listitem [ref=e10]: Pencarian cuaca per kota, kecamatan, dan desa/kelurahan
+        - listitem [ref=e11]: Peta cuaca interaktif untuk 40+ kota besar Indonesia
+        - listitem [ref=e12]: Peringatan dini cuaca ekstrem dan nowcast BMKG real-time
+        - listitem [ref=e13]: Indeks UV, kelembapan udara, kecepatan angin, tekanan udara
+        - listitem [ref=e14]: "Kondisi laut: tinggi gelombang dan arah angin laut"
+        - listitem [ref=e15]: Informasi waktu terbit dan terbenam matahari serta fase bulan
+        - listitem [ref=e16]: Berita dan siaran pers terkini dari BMKG
+      - heading "Cuaca Kota Besar Indonesia" [level=2] [ref=e17]
+      - paragraph [ref=e18]: "Cek prakiraan cuaca untuk kota-kota besar Indonesia: cuaca Jakarta, cuaca Bandung, cuaca Surabaya, cuaca Yogyakarta, cuaca Medan, cuaca Makassar, cuaca Denpasar (Bali), cuaca Semarang, cuaca Palembang, dan cuaca Balikpapan — semua tersedia dengan data akurat dari BMKG."
+      - heading "Pertanyaan Umum tentang Cuaca Indonesia" [level=2] [ref=e19]
+      - heading "Bagaimana cara cek cuaca hari ini di Indonesia?" [level=3] [ref=e20]
+      - paragraph [ref=e21]: Buka LihatLangit dan ketik nama kota atau desa di kolom pencarian. Aplikasi akan menampilkan cuaca hari ini beserta prakiraan 3 hari ke depan dengan data langsung dari BMKG, termasuk suhu udara, kondisi langit, kelembapan, dan kecepatan angin.
+      - heading "Apakah prakiraan cuaca BMKG akurat?" [level=3] [ref=e22]
+      - paragraph [ref=e23]: BMKG menggunakan sistem pemodelan cuaca numerik dan jaringan stasiun pengamatan di seluruh Indonesia. Prakiraan BMKG adalah sumber data cuaca resmi dan paling akurat untuk kondisi iklim tropis Indonesia, diperbarui secara berkala setiap hari.
+      - heading "Apa itu nowcast BMKG?" [level=3] [ref=e24]
+      - paragraph [ref=e25]: Nowcast BMKG adalah peringatan dini cuaca ekstrem jangka pendek (0–2 jam ke depan) yang dikeluarkan oleh BMKG. LihatLangit menampilkan nowcast BMKG secara real-time agar pengguna dapat mengantisipasi hujan lebat, angin kencang, atau cuaca berbahaya di wilayah mereka.
+      - heading "Cuaca besok di kota saya bagaimana?" [level=3] [ref=e26]
+      - paragraph [ref=e27]: LihatLangit menampilkan prakiraan cuaca besok dan lusa dengan data per 3 jam dari BMKG. Cari nama kota atau wilayah kamu untuk melihat prediksi cuaca lengkap termasuk suhu, kemungkinan hujan, kecepatan angin, dan kondisi langit.
+      - heading "Tentang Sumber Data BMKG" [level=2] [ref=e28]
+      - paragraph [ref=e29]: BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) adalah lembaga pemerintah Indonesia yang bertugas mengamati dan mendistribusikan informasi cuaca resmi. LihatLangit mengakses data BMKG secara langsung melalui API publik BMKG di data.bmkg.go.id, memastikan informasi cuaca yang ditampilkan selalu akurat dan terkini.
+    - navigation [ref=e30]:
+      - generic [ref=e31]:
+        - link [ref=e33] [cursor=pointer]:
+          - /url: "#"
+          - img "LihatLangit — Cek Cuaca Indonesia Real-Time dari BMKG" [ref=e34]
+        - generic [ref=e35]:
+          - generic [ref=e36] [cursor=pointer]: Dashboard
+          - generic [ref=e37] [cursor=pointer]: Fitur
+          - generic [ref=e38] [cursor=pointer]: Peta Cuaca
+          - generic [ref=e39] [cursor=pointer]: Peringatan
+          - link "BMKG open_in_new" [ref=e40] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id
+            - text: BMKG
+            - generic [ref=e41]: open_in_new
+        - button "Kota Makassar" [ref=e721] [cursor=pointer]
+    - main [ref=e44]:
+      - generic [ref=e45]:
+        - link "Baru Data real-time dari BMKG arrow_forward" [ref=e46] [cursor=pointer]:
+          - /url: "#hero-search"
+          - generic [ref=e47]: Baru
+          - generic [ref=e48]:
+            - text: Data real-time dari BMKG
+            - generic [ref=e49]: arrow_forward
+        - heading "Cek Cuaca Indonesia Real-Time dari BMKG" [level=1] [ref=e50]
+        - paragraph [ref=e51]: LihatLangit, aplikasi cek cuaca Indonesia terkini. Dapatkan prakiraan cuaca akurat hingga level desa/kelurahan berdasarkan data resmi BMKG. Cek suhu, kelembapan, angin, dan peringatan dini cuaca ekstrem.
+        - generic [ref=e52]:
+          - button "Cek Cuaca Sekarang arrow_forward" [ref=e53] [cursor=pointer]:
+            - text: Cek Cuaca Sekarang
+            - generic [ref=e54]: arrow_forward
+          - generic [ref=e55]:
+            - button "my_location Cek Cuaca di Lokasi Saya" [ref=e56] [cursor=pointer]:
+              - generic [ref=e57]: my_location
+              - text: Cek Cuaca di Lokasi Saya
+            - generic [ref=e58] [cursor=pointer]:
+              - generic [ref=e59]: map
+              - text: Peta Cuaca Indonesia
+        - generic [ref=e61]:
+          - generic [ref=e62]: search
+          - generic [ref=e63]:
+            - combobox "Cari Desa atau Kecamatan..." [expanded] [active] [ref=e64]: Laladon
+            - button "Cari cuaca" [ref=e65]:
+              - generic [ref=e66]: search
+            - listbox [ref=e1301]:
+              - listitem [ref=e1302] [cursor=pointer]:
+                - paragraph [ref=e1303]: LALADON
+                - paragraph [ref=e1304]: CIOMAS, KABUPATEN BOGOR, JAWA BARAT
+      - generic [ref=e68]:
+        - navigation [ref=e74]:
+          - generic [ref=e75] [cursor=pointer]:
+            - generic [ref=e76]: dashboard
+            - text: Dashboard
+          - generic [ref=e77] [cursor=pointer]:
+            - generic [ref=e78]: pin_drop
+            - text: Prakiraan
+          - generic [ref=e79] [cursor=pointer]:
+            - generic [ref=e80]: map
+            - text: Peta Cuaca
+          - generic [ref=e81] [cursor=pointer]:
+            - generic [ref=e82]: warning
+            - text: Peringatan
+        - generic [ref=e83]:
+          - heading "Mariso" [level=2] [ref=e722]
+          - generic [ref=e723]:
+            - generic [ref=e724]:
+              - generic [ref=e725]: verified
+              - generic [ref=e726]:
+                - heading "Panambungan, Mariso" [level=3] [ref=e727]
+                - paragraph [ref=e728]: Cerah
+            - generic [ref=e729]: 28°C
+          - generic [ref=e730]:
+            - generic [ref=e731] [cursor=pointer]:
+              - generic [ref=e732]:
+                - generic [ref=e733]: clear_day
+                - generic [ref=e734]:
+                  - heading "Hari ini" [level=5] [ref=e735]
+                  - paragraph [ref=e736]: Cerah
+              - generic [ref=e737]: 28° – 28°
+            - generic [ref=e738] [cursor=pointer]:
+              - generic [ref=e739]:
+                - generic [ref=e740]: clear_day
+                - generic [ref=e741]:
+                  - heading "Besok" [level=5] [ref=e742]
+                  - paragraph [ref=e743]: Cerah
+              - generic [ref=e744]: 26° – 30°
+            - generic [ref=e745] [cursor=pointer]:
+              - generic [ref=e746]:
+                - generic [ref=e747]: clear_day
+                - generic [ref=e748]:
+                  - heading "Sabtu" [level=5] [ref=e749]
+                  - paragraph [ref=e750]: Cerah
+              - generic [ref=e751]: 25° – 29°
+      - generic [ref=e321]:
+        - generic [ref=e322]:
+          - generic [ref=e323]:
+            - heading "Peta Prakiraan Cuaca Indonesia" [level=3] [ref=e324]
+            - generic [ref=e325]: Kamis, 30 Juli 2026
+          - generic [ref=e326]: 29/38 wilayah
+        - generic [ref=e330]:
+          - generic:
+            - generic:
+              - button "--"
+              - button "25°C"
+              - button "26°C"
+              - button "26°C"
+              - button "28°C"
+              - button "26°C"
+              - button "26°C"
+              - button "27°C"
+              - button "25°C"
+              - button "24°C"
+              - button "26°C"
+              - button "25°C"
+              - button "21°C"
+              - button "26°C"
+              - button "21°C"
+              - button "26°C"
+              - button "24°C"
+              - button "23°C"
+              - button "23°C"
+              - button "27°C"
+              - button "24°C"
+              - button "25°C"
+              - button "24°C"
+              - button "--"
+              - button "28°C"
+              - button "23°C"
+              - button "25°C"
+              - button "23°C"
+              - button "26°C"
+              - button "--"
+              - button "--"
+              - button "26°C"
+              - button "25°C"
+              - button "--"
+              - button "--"
+              - button "--"
+              - button "--"
+              - button "--"
+          - generic [ref=e369]:
+            - generic [ref=e370]: 🗺️ Indikator Cuaca
+            - generic [ref=e371]:
+              - generic [ref=e372]: Cerah
+              - generic [ref=e375]: Cerah Berawan
+              - generic [ref=e378]: Berawan
+              - generic [ref=e381]: Berawan Tebal
+              - generic [ref=e384]: Hujan Ringan
+              - generic [ref=e387]: Hujan Sedang
+              - generic [ref=e390]: Hujan Lebat
+              - generic [ref=e393]: Hujan Petir
+            - generic [ref=e396]: Suhu (°C) di dalam label
+          - generic [ref=e1344]: 🟢 29/38 kota — Klik marker untuk detail
+          - generic [ref=e400]:
+            - button "Perbesar peta" [ref=e401] [cursor=pointer]: +
+            - button "Perkecil peta" [ref=e402] [cursor=pointer]: −
+        - button "Sembunyikan legenda cuaca" [ref=e404] [cursor=pointer]:
+          - generic [ref=e405]: 👁️
+          - generic [ref=e406]: Sembunyikan Legenda
+        - generic [ref=e407]:
+          - paragraph [ref=e408]: Data prakiraan cuaca dari BMKG — lingkaran berwarna menunjukkan kondisi cuaca terkini di setiap ibukota provinsi
+          - paragraph [ref=e409]:
+            - text: "Sumber:"
+            - link "data.bmkg.go.id" [ref=e410] [cursor=pointer]:
+              - /url: https://data.bmkg.go.id
+      - generic [ref=e752]:
+        - heading "Cek Cuaca & Prakiraan Real-Time dari BMKG." [level=3] [ref=e753]
+        - generic [ref=e754]:
+          - generic [ref=e755]:
+            - heading "Tren Cuaca 24 Jam" [level=3] [ref=e756]
+            - generic [ref=e757]:
+              - button "Suhu" [ref=e758] [cursor=pointer]
+              - button "Kelembapan" [ref=e760] [cursor=pointer]
+          - img "Grafik tren suhu dan kelembapan 24 jam" [ref=e763]:
+            - generic [ref=e767]: 28°
+            - generic [ref=e770]: 26°
+            - generic [ref=e773]: 27°
+            - generic [ref=e776]: 28°
+            - generic [ref=e779]: 28°
+            - generic [ref=e782]: 30°
+            - generic [ref=e785]: 30°
+            - generic [ref=e788]: 28°
+            - generic [ref=e791]: 27°
+            - generic [ref=e794]: 68%
+            - generic [ref=e797]: 70%
+            - generic [ref=e800]: 72%
+            - generic [ref=e803]: 64%
+            - generic [ref=e806]: 69%
+            - generic [ref=e809]: 65%
+            - generic [ref=e812]: 60%
+            - generic [ref=e815]: 60%
+            - generic [ref=e818]: 68%
+            - generic [ref=e821]: 23:00
+            - generic [ref=e822]: 02:00
+            - generic [ref=e823]: 05:00
+            - generic [ref=e824]: 08:00
+            - generic [ref=e825]: 11:00
+            - generic [ref=e826]: 14:00
+            - generic [ref=e827]: 17:00
+            - generic [ref=e828]: 20:00
+            - generic [ref=e829]: 23:00
+        - generic [ref=e835]:
+          - generic [ref=e836]:
+            - generic [ref=e837]:
+              - generic [ref=e838]: clear_day
+              - generic [ref=e840]:
+                - paragraph [ref=e841]: Cuaca Saat Ini
+                - paragraph [ref=e842]: Kota Makassar
+            - generic [ref=e843]: "23.00"
+          - generic [ref=e844]:
+            - generic [ref=e845]: clear_day
+            - generic [ref=e846]:
+              - heading "28°C" [level=2] [ref=e847]
+              - paragraph [ref=e848]: Cerah
+          - generic [ref=e850]:
+            - generic [ref=e851]:
+              - generic [ref=e852]: humidity_percentage
+              - generic [ref=e853]:
+                - paragraph [ref=e854]: Kelembapan
+                - paragraph [ref=e855]: 68%
+            - generic [ref=e856]:
+              - generic [ref=e857]: air
+              - generic [ref=e858]:
+                - paragraph [ref=e859]: Angin
+                - paragraph [ref=e860]: 4 km/h
+            - generic [ref=e861]:
+              - generic [ref=e862]: visibility
+              - generic [ref=e863]:
+                - paragraph [ref=e864]: Jarak Pandang
+                - paragraph [ref=e865]: < 9 km
+            - generic [ref=e866]:
+              - generic [ref=e867]: near_me
+              - generic [ref=e868]:
+                - paragraph [ref=e869]: Arah Angin
+                - paragraph [ref=e870]: S
+          - generic [ref=e871]:
+            - generic [ref=e872]:
+              - generic [ref=e873]: Kecepatan angin
+              - generic [ref=e874]: 4 km/h
+            - generic [ref=e875]:
+              - generic [ref=e876]: Tutupan awan
+              - generic [ref=e877]: 1%
+        - generic [ref=e879]:
+          - heading "Prakiraan 3 Hari" [level=3] [ref=e880]
+          - paragraph [ref=e881]: Ringkasan cuaca harian berdasarkan data per 3 jam dari BMKG. Suhu, kelembapan, angin, dan tutupan awan ditampilkan dalam rentang 24 jam. Data diperbarui mengikuti jadwal pembaruan resmi BMKG.
+          - generic [ref=e882]:
+            - generic [ref=e883] [cursor=pointer]:
+              - generic [ref=e884]:
+                - generic [ref=e885]: Hari ini
+                - generic [ref=e886]: clear_day
+                - generic [ref=e887]: Cerah
+              - generic [ref=e888]:
+                - generic [ref=e889]: 28° – 28°
+                - generic "Angin Tenang, arah S" [ref=e890]:
+                  - generic [ref=e891]: air
+                  - text: 4 km/h
+                  - generic [ref=e892]: S
+                - generic "Cerah" [ref=e893]:
+                  - generic [ref=e894]: cloud
+                  - text: 1%
+                - generic [ref=e895]:
+                  - generic [ref=e896]: water_drop
+                  - text: 68%
+                - generic "Jarak pandang" [ref=e897]:
+                  - generic [ref=e898]: visibility
+                  - text: < 9 km
+              - generic [ref=e900]:
+                - generic [ref=e901]: 28°
+                - generic [ref=e902]: /
+                - generic [ref=e903]: 28°
+            - generic [ref=e904] [cursor=pointer]:
+              - generic [ref=e905]:
+                - generic [ref=e906]: Besok
+                - generic [ref=e907]: clear_day
+                - generic [ref=e908]: Cerah
+              - generic [ref=e909]:
+                - generic [ref=e910]: 26° – 30°
+                - generic "Angin Sedang, arah NW" [ref=e911]:
+                  - generic [ref=e912]: air
+                  - text: 13 km/h
+                  - generic [ref=e913]: NW
+                - generic "Mendung" [ref=e914]:
+                  - generic [ref=e915]: cloud
+                  - text: 74%
+                - generic [ref=e916]:
+                  - generic [ref=e917]: water_drop
+                  - text: 66%
+                - generic "Jarak pandang" [ref=e918]:
+                  - generic [ref=e919]: visibility
+                  - text: < 8 km
+              - generic [ref=e921]:
+                - generic [ref=e922]: 30°
+                - generic [ref=e923]: /
+                - generic [ref=e924]: 26°
+            - generic [ref=e925] [cursor=pointer]:
+              - generic [ref=e926]:
+                - generic [ref=e927]: Sabtu
+                - generic [ref=e928]: clear_day
+                - generic [ref=e929]: Cerah
+              - generic [ref=e930]:
+                - generic [ref=e931]: 25° – 29°
+                - generic "Angin Sedang, arah NW" [ref=e932]:
+                  - generic [ref=e933]: air
+                  - text: 14 km/h
+                  - generic [ref=e934]: NW
+                - generic "Cerah" [ref=e935]:
+                  - generic [ref=e936]: cloud
+                  - text: 6%
+                - generic [ref=e937]:
+                  - generic [ref=e938]: water_drop
+                  - text: 67%
+                - generic "Jarak pandang" [ref=e939]:
+                  - generic [ref=e940]: visibility
+                  - text: < 9 km
+              - generic [ref=e942]:
+                - generic [ref=e943]: 29°
+                - generic [ref=e944]: /
+                - generic [ref=e945]: 25°
+          - generic [ref=e947]:
+            - generic [ref=e948]: info
+            - text: Data ditampilkan berdasarkan prakiraan BMKG per 3 jam.
+        - generic [ref=e949]:
+          - generic [ref=e950]:
+            - heading "co2 Metrik Lingkungan" [level=3] [ref=e951]:
+              - generic [ref=e952]: co2
+              - text: Metrik Lingkungan
+            - paragraph [ref=e953]: "*Estimasi berdasarkan kondisi cuaca, bukan pengukuran langsung"
+            - generic [ref=e954]:
+              - generic [ref=e955]:
+                - generic [ref=e956]: AQI (Estimasi)
+                - generic [ref=e957]: 23 (Baik)
+              - generic [ref=e958]:
+                - generic [ref=e959]: UV Index (Estimasi)
+                - generic [ref=e960]: 1 (Rendah)
+              - generic [ref=e961]:
+                - generic [ref=e962]: Fase Bulan
+                - generic [ref=e963]: Bulan Purnama
+          - generic [ref=e964]:
+            - heading "water Kondisi Laut" [level=3] [ref=e965]:
+              - generic [ref=e966]: water
+              - text: Kondisi Laut
+            - generic [ref=e967]:
+              - generic [ref=e968]: waves
+              - paragraph [ref=e969]: Gelombang
+              - paragraph [ref=e970]: Rendah
+              - generic [ref=e971]:
+                - generic [ref=e972]: 0.1 - 0.2m
+                - generic [ref=e973]: "Suhu: 29°C"
+          - generic [ref=e974]:
+            - heading "routine Aktivitas Harian" [level=3] [ref=e975]:
+              - generic [ref=e976]: routine
+              - text: Aktivitas Harian
+            - generic [ref=e977]:
+              - generic [ref=e978]:
+                - generic [ref=e979]: wb_twilight
+                - generic [ref=e980]:
+                  - paragraph [ref=e981]: Terbit
+                  - paragraph [ref=e982]: 06:15
+              - generic [ref=e983]:
+                - generic [ref=e984]: nights_stay
+                - generic [ref=e985]:
+                  - paragraph [ref=e986]: Terbenam
+                  - paragraph [ref=e987]: 18:01
+          - generic [ref=e988]:
+            - heading "security Rekomendasi" [level=3] [ref=e989]:
+              - generic [ref=e990]: security
+              - text: Rekomendasi
+            - generic [ref=e991]:
+              - generic [ref=e992]:
+                - generic [ref=e993]: monitor_heart
+                - generic [ref=e995]:
+                  - paragraph [ref=e996]: Kesehatan
+                  - paragraph [ref=e997]: Hidrasi cukup
+              - generic [ref=e998]:
+                - generic [ref=e999]: router
+                - generic [ref=e1001]:
+                  - paragraph [ref=e1002]: Rumah
+                  - paragraph [ref=e1003]: Aman menjemur
+              - generic [ref=e1004]:
+                - generic [ref=e1005]: sunny
+                - generic [ref=e1007]:
+                  - paragraph [ref=e1008]: Aktivitas
+                  - paragraph [ref=e1009]: Nikmati hari
+        - generic [ref=e1010]:
+          - generic [ref=e1011]:
+            - generic [ref=e1012]:
+              - heading "Prakiraan Hari Ini" [level=3] [ref=e1013]
+              - generic [ref=e1014]: 1 slot
+            - generic [ref=e1016]:
+              - generic [ref=e1017]:
+                - generic [ref=e1018]: 23:00
+                - generic [ref=e1019]: sunny
+                - generic [ref=e1020]: 28°
+              - generic [ref=e1021]:
+                - generic [ref=e1022]: Matahari
+                - generic [ref=e1023]:
+                  - generic [ref=e1024]:
+                    - generic [ref=e1025]: wb_twilight
+                    - generic [ref=e1026]: 06:15
+                  - generic [ref=e1027]:
+                    - generic [ref=e1028]: nights_stay
+                    - generic [ref=e1029]: 18:01
+              - generic [ref=e1030]:
+                - generic [ref=e1031]: Besok
+                - generic [ref=e1032]:
+                  - generic [ref=e1033]:
+                    - generic [ref=e1034]: sunny
+                    - generic [ref=e1035]: Cerah
+                  - generic [ref=e1036]:
+                    - generic [ref=e1037]: thermostat
+                    - generic [ref=e1038]: 26°–30°
+                  - generic [ref=e1039]:
+                    - generic [ref=e1040]:
+                      - generic [ref=e1041]: wb_twilight
+                      - text: 06:15
+                    - generic [ref=e1042]: •
+                    - generic [ref=e1043]:
+                      - generic [ref=e1044]: nights_stay
+                      - text: 18:01
+            - button "Detail 3 hari arrow_downward" [ref=e1045] [cursor=pointer]:
+              - text: Detail 3 hari
+              - generic [ref=e1046]: arrow_downward
+          - generic [ref=e1047]:
+            - generic [ref=e1048]:
+              - generic [ref=e1049]:
+                - heading "monitoring Status Data" [level=3] [ref=e1050]:
+                  - generic [ref=e1051]: monitoring
+                  - text: Status Data
+                - paragraph [ref=e1052]: Diperbarui 2 mnt lalu
+              - generic [ref=e1053]: Live
+            - generic [ref=e1056]:
+              - generic [ref=e1057]:
+                - generic [ref=e1058]: cloud_sync
+                - generic [ref=e1059]: Sumber
+                - generic [ref=e1060]: BMKG
+                - generic [ref=e1061]: Resmi
+              - generic [ref=e1062]:
+                - generic [ref=e1063]: schedule
+                - generic [ref=e1064]: Analisis
+                - generic [ref=e1065]: 30 Jul, 12:00 WITA
+                - generic [ref=e1066]: BMKG
+              - generic [ref=e1067]:
+                - generic [ref=e1068]: history
+                - generic [ref=e1069]: Diambil
+                - generic [ref=e1070]: 30 Jul, 22:52
+                - generic [ref=e1071]: Live
+        - generic [ref=e1073]:
+          - generic [ref=e1074]:
+            - generic [ref=e1075]:
+              - generic [ref=e1076]: landslide
+              - generic [ref=e1077]:
+                - heading "Info Gempa Bumi Terkini" [level=3] [ref=e1078]
+                - paragraph [ref=e1079]: "Sumber: BMKG — DataMKG/TEWS"
+            - button "refresh Refresh" [ref=e1080] [cursor=pointer]:
+              - generic [ref=e1081]: refresh
+              - text: Refresh
+          - generic [ref=e1082]:
+            - generic [ref=e1084]:
+              - generic [ref=e1086]:
+                - generic [ref=e1087]: "5.5"
+                - generic [ref=e1088]: SR
+              - generic [ref=e1089]:
+                - paragraph [ref=e1090]: 19 km BaratDaya KAB-KUPANG-NTT
+                - generic [ref=e1091]:
+                  - generic [ref=e1092]: 26 Jul 2026 · 17:57:43 WIB
+                  - generic [ref=e1093]: "Kedalaman: 26 km (Dangkal)"
+                  - generic [ref=e1094]: "Koordinat: 10.00 LS, 123.71 BT"
+                - generic [ref=e1095]:
+                  - generic [ref=e1096]: Sedang
+                  - generic [ref=e1097]: ⚠️ Berpotensi Tsunami
+            - generic [ref=e1099]:
+              - generic [ref=e1101]:
+                - generic [ref=e1102]: "5.5"
+                - generic [ref=e1103]: SR
+              - generic [ref=e1104]:
+                - paragraph [ref=e1105]: 61 km Tenggara SARMI-PAPUA
+                - generic [ref=e1106]:
+                  - generic [ref=e1107]: 24 Jul 2026 · 19:14:29 WIB
+                  - generic [ref=e1108]: "Kedalaman: 10 km (Dangkal)"
+                  - generic [ref=e1109]: "Koordinat: 2.37 LS, 139.01 BT"
+                - generic [ref=e1110]:
+                  - generic [ref=e1111]: Sedang
+                  - generic [ref=e1112]: ⚠️ Berpotensi Tsunami
+            - generic [ref=e1114]:
+              - generic [ref=e1116]:
+                - generic [ref=e1117]: "5.8"
+                - generic [ref=e1118]: SR
+              - generic [ref=e1119]:
+                - paragraph [ref=e1120]: 117 km BaratDaya TERNATE-MALUT
+                - generic [ref=e1121]:
+                  - generic [ref=e1122]: 24 Jul 2026 · 05:58:34 WIB
+                  - generic [ref=e1123]: "Kedalaman: 10 km (Dangkal)"
+                  - generic [ref=e1124]: "Koordinat: 0.72 LU, 126.31 BT"
+                - generic [ref=e1125]:
+                  - generic [ref=e1126]: Sedang
+                  - generic [ref=e1127]: ⚠️ Berpotensi Tsunami
+            - generic [ref=e1129]:
+              - generic [ref=e1131]:
+                - generic [ref=e1132]: "5.4"
+                - generic [ref=e1133]: SR
+              - generic [ref=e1134]:
+                - paragraph [ref=e1135]: 185 km BaratDaya ENGGANO-BENGKULU
+                - generic [ref=e1136]:
+                  - generic [ref=e1137]: 24 Jul 2026 · 05:50:25 WIB
+                  - generic [ref=e1138]: "Kedalaman: 10 km (Dangkal)"
+                  - generic [ref=e1139]: "Koordinat: 5.98 LS, 100.72 BT"
+                - generic [ref=e1140]:
+                  - generic [ref=e1141]: Sedang
+                  - generic [ref=e1142]: ⚠️ Berpotensi Tsunami
+            - generic [ref=e1144]:
+              - generic [ref=e1146]:
+                - generic [ref=e1147]: "5.1"
+                - generic [ref=e1148]: SR
+              - generic [ref=e1149]:
+                - paragraph [ref=e1150]: 65 km Tenggara SARMI-PAPUA
+                - generic [ref=e1151]:
+                  - generic [ref=e1152]: 24 Jul 2026 · 03:15:15 WIB
+                  - generic [ref=e1153]: "Kedalaman: 10 km (Dangkal)"
+                  - generic [ref=e1154]: "Koordinat: 2.40 LS, 139.02 BT"
+                - generic [ref=e1155]:
+                  - generic [ref=e1156]: Sedang
+                  - generic [ref=e1157]: ⚠️ Berpotensi Tsunami
+          - generic [ref=e1158]:
+            - paragraph [ref=e1159]: Menampilkan 5 dari 15 gempa terkini
+            - link "Lihat Detail BMKG open_in_new" [ref=e1160] [cursor=pointer]:
+              - /url: https://www.bmkg.go.id/gempabumi-terkini.html
+              - text: Lihat Detail BMKG
+              - generic [ref=e1161]: open_in_new
+        - generic [ref=e1163]:
+          - generic [ref=e1164]:
+            - heading "Peringatan Dini Cuaca BMKG" [level=3] [ref=e1165]
+            - generic [ref=e1168]:
+              - generic [ref=e1169]: (12 wilayah)
+              - combobox [ref=e1170]:
+                - option "Semua Provinsi" [selected]
+                - option "Aceh"
+                - option "Jawa Barat"
+                - option "Kalimantan Tengah"
+                - option "Kalimantan Utara"
+                - option "Lampung"
+                - option "Sulawesi Selatan"
+                - option "Sulawesi Tengah"
+                - option "Sumatera Selatan"
+                - option "Sumatera Utara"
+              - link "Sumber ↗" [ref=e1171] [cursor=pointer]:
+                - /url: https://www.bmkg.go.id/alerts/nowcast/id
+          - generic [ref=e1172]:
+            - button "warning Kalimantan Utara Hujan Lebat disertai Petir di Kalimantan Utara Thu, 30 Jul 2026 22:37:00 +0800 expand_more" [ref=e1174]:
+              - generic [ref=e1175]: warning
+              - generic [ref=e1176]:
+                - paragraph [ref=e1177]: Kalimantan Utara
+                - paragraph [ref=e1178]: Hujan Lebat disertai Petir di Kalimantan Utara
+                - paragraph [ref=e1179]: Thu, 30 Jul 2026 22:37:00 +0800
+              - generic [ref=e1180]: expand_more
+            - button "warning Kalimantan Tengah Hujan Lebat disertai Petir di Kalimantan Tengah Thu, 30 Jul 2026 21:02:00 +0700 expand_more" [ref=e1182]:
+              - generic [ref=e1183]: warning
+              - generic [ref=e1184]:
+                - paragraph [ref=e1185]: Kalimantan Tengah
+                - paragraph [ref=e1186]: Hujan Lebat disertai Petir di Kalimantan Tengah
+                - paragraph [ref=e1187]: Thu, 30 Jul 2026 21:02:00 +0700
+              - generic [ref=e1188]: expand_more
+            - button "+10 peringatan lainnya — Lihat semua" [ref=e1189]
+    - generic [ref=e647]:
+      - generic [ref=e1190]:
+        - generic [ref=e1191]:
+          - heading "Siaran Pers BMKG" [level=3] [ref=e1192]
+          - link "BMKG.go.id open_in_new" [ref=e1193] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/siaran-pers
+            - text: BMKG.go.id
+            - generic [ref=e1194]: open_in_new
+        - generic [ref=e1195]:
+          - link "Musim Kemarau di bawah Normal dan El Niño Kuat, BMKG Gencarkan Modifikasi Cuaca dan dukung Mitigasi Lintas Sektor 30 Jul 2026 Musim Kemarau di bawah Normal dan El Niño Kuat, BMKG Gencarkan Modifikasi Cuaca dan dukung Mitigasi Lintas Sektor Baca selengkapnya arrow_forward" [ref=e1196] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/siaran-pers/musim-kemarau-di-bawah-normal-dan-el-nino-kuat-bmkg-gencarkan-modifikasi-cuaca-dan-dukung-mitigasi-lintas-sektor
+            - img "Musim Kemarau di bawah Normal dan El Niño Kuat, BMKG Gencarkan Modifikasi Cuaca dan dukung Mitigasi Lintas Sektor" [ref=e1198]
+            - generic [ref=e1199]:
+              - generic [ref=e1200]: 30 Jul 2026
+              - heading "Musim Kemarau di bawah Normal dan El Niño Kuat, BMKG Gencarkan Modifikasi Cuaca dan dukung Mitigasi Lintas Sektor" [level=4] [ref=e1201]
+              - generic [ref=e1203]:
+                - text: Baca selengkapnya
+                - generic [ref=e1204]: arrow_forward
+          - link "Peringati HMKG ke-79, BMKG Perkuat Layanan untuk Mendukung Ketahanan Nasional 21 Jul 2026 Peringati HMKG ke-79, BMKG Perkuat Layanan untuk Mendukung Ketahanan Nasional Baca selengkapnya arrow_forward" [ref=e1205] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/siaran-pers/peringati-hmkg-ke-79-bmkg-perkuat-layanan-untuk-mendukung-ketahanan-nasional
+            - img "Peringati HMKG ke-79, BMKG Perkuat Layanan untuk Mendukung Ketahanan Nasional" [ref=e1207]
+            - generic [ref=e1208]:
+              - generic [ref=e1209]: 21 Jul 2026
+              - heading "Peringati HMKG ke-79, BMKG Perkuat Layanan untuk Mendukung Ketahanan Nasional" [level=4] [ref=e1210]
+              - generic [ref=e1212]:
+                - text: Baca selengkapnya
+                - generic [ref=e1213]: arrow_forward
+          - 'link "BMKG: Peringatan 20 Tahun Tsunami Pangandaran 2006 Refleksi Bangun Masyarakat Tangguh Tsunami 17 Jul 2026 BMKG: Peringatan 20 Tahun Tsunami Pangandaran 2006 Refleksi Bangun Masyarakat Tangguh Tsunami Baca selengkapnya arrow_forward" [ref=e1214] [cursor=pointer]':
+            - /url: https://www.bmkg.go.id/siaran-pers/bmkg-peringatan-20-tahun-tsunami-pangandaran-2006-refleksi-bangun-masyarakat-tangguh-tsunami
+            - 'img "BMKG: Peringatan 20 Tahun Tsunami Pangandaran 2006 Refleksi Bangun Masyarakat Tangguh Tsunami" [ref=e1216]'
+            - generic [ref=e1217]:
+              - generic [ref=e1218]: 17 Jul 2026
+              - 'heading "BMKG: Peringatan 20 Tahun Tsunami Pangandaran 2006 Refleksi Bangun Masyarakat Tangguh Tsunami" [level=4] [ref=e1219]'
+              - generic [ref=e1221]:
+                - text: Baca selengkapnya
+                - generic [ref=e1222]: arrow_forward
+          - link "BMKG Operasikan Radar Cuaca S-Band di Cilacap untuk Lindungi Nelayan dan Pesisir Selatan Jawa 8 Jul 2026 BMKG Operasikan Radar Cuaca S-Band di Cilacap untuk Lindungi Nelayan dan Pesisir Selatan Jawa Baca selengkapnya arrow_forward" [ref=e1223] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/siaran-pers/bmkg-operasikan-radar-cuaca-s-band-di-cilacap-untuk-lindungi-nelayan-dan-pesisir-selatan-jawa
+            - img "BMKG Operasikan Radar Cuaca S-Band di Cilacap untuk Lindungi Nelayan dan Pesisir Selatan Jawa" [ref=e1225]
+            - generic [ref=e1226]:
+              - generic [ref=e1227]: 8 Jul 2026
+              - heading "BMKG Operasikan Radar Cuaca S-Band di Cilacap untuk Lindungi Nelayan dan Pesisir Selatan Jawa" [level=4] [ref=e1228]
+              - generic [ref=e1230]:
+                - text: Baca selengkapnya
+                - generic [ref=e1231]: arrow_forward
+          - link "Perkuat Mitigasi Pesisir Barat Sumatra, BMKG Resmikan HF Radar Array 3 Jul 2026 Perkuat Mitigasi Pesisir Barat Sumatra, BMKG Resmikan HF Radar Array Baca selengkapnya arrow_forward" [ref=e1232] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/siaran-pers/perkuat-mitigasi-pesisir-barat-sumatra-bmkg-resmikan-hf-radar-array
+            - img "Perkuat Mitigasi Pesisir Barat Sumatra, BMKG Resmikan HF Radar Array" [ref=e1234]
+            - generic [ref=e1235]:
+              - generic [ref=e1236]: 3 Jul 2026
+              - heading "Perkuat Mitigasi Pesisir Barat Sumatra, BMKG Resmikan HF Radar Array" [level=4] [ref=e1237]
+              - generic [ref=e1239]:
+                - text: Baca selengkapnya
+                - generic [ref=e1240]: arrow_forward
+          - link "Sesar Sausu Picu Gempa Dangkal M6,7 di Palu, BMKG Imbau Warga Tetap Tenang 16 Jun 2026 Sesar Sausu Picu Gempa Dangkal M6,7 di Palu, BMKG Imbau Warga Tetap Tenang Baca selengkapnya arrow_forward" [ref=e1241] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/siaran-pers/sesar-sausu-picu-gempa-dangkal-m67-di-palu-bmkg-imbau-warga-tetap-tenang
+            - img "Sesar Sausu Picu Gempa Dangkal M6,7 di Palu, BMKG Imbau Warga Tetap Tenang" [ref=e1243]
+            - generic [ref=e1244]:
+              - generic [ref=e1245]: 16 Jun 2026
+              - heading "Sesar Sausu Picu Gempa Dangkal M6,7 di Palu, BMKG Imbau Warga Tetap Tenang" [level=4] [ref=e1246]
+              - generic [ref=e1248]:
+                - text: Baca selengkapnya
+                - generic [ref=e1249]: arrow_forward
+        - link "Lihat semua siaran pers open_in_new" [ref=e1251] [cursor=pointer]:
+          - /url: https://www.bmkg.go.id/siaran-pers
+          - text: Lihat semua siaran pers
+          - generic [ref=e1252]: open_in_new
+      - generic [ref=e657]:
+        - generic [ref=e658]:
+          - heading "Informasi BMKG" [level=3] [ref=e659]
+          - generic [ref=e660]:
+            - button "Pengumuman" [ref=e661] [cursor=pointer]
+            - button "Artikel" [ref=e662] [cursor=pointer]
+        - generic [ref=e1253]:
+          - link "Hasil Survei Persepsi Pengguna Web dan Aplikasi Info BMKG Tahun 2026 13 Jul 2026 chevron_right" [ref=e1254] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/pengumuman/hasil-survei-persepsi-pengguna-web-dan-aplikasi-info-bmkg-tahun-2026
+            - generic [ref=e1255]:
+              - heading "Hasil Survei Persepsi Pengguna Web dan Aplikasi Info BMKG Tahun 2026" [level=4] [ref=e1256]
+              - generic [ref=e1257]: 13 Jul 2026
+            - generic [ref=e1258]: chevron_right
+          - link "Pengumuman 3 (Tiga) Besar Hasil Seleksi Terbuka Jabatan Tinggi Pratama BMKG 9 May 2026 chevron_right" [ref=e1260] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/pengumuman/pengumuman-3-tiga-besar-hasil-seleksi-terbuka-jabatan-tinggi-pratama-bmkg
+            - generic [ref=e1261]:
+              - heading "Pengumuman 3 (Tiga) Besar Hasil Seleksi Terbuka Jabatan Tinggi Pratama BMKG" [level=4] [ref=e1262]
+              - generic [ref=e1263]: 9 May 2026
+            - generic [ref=e1264]: chevron_right
+          - link "Pengumuman Hasil Seleksi Policy Brief dalam Seleksi Terbuka Jabatan Pimpinan Tinggi Pratama di Lingkungan Badan Meteorologi, Klimatologi, dan Geofisika 15 Apr 2026 chevron_right" [ref=e1266] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/pengumuman/pengumuman-hasil-seleksi-policy-brief-dalam-seleksi-terbuka-jabatan-pimpinan-tinggi-pratama-di-lingkungan-badan-meteorologi-klimatologi-dan-geofisika
+            - generic [ref=e1267]:
+              - heading "Pengumuman Hasil Seleksi Policy Brief dalam Seleksi Terbuka Jabatan Pimpinan Tinggi Pratama di Lingkungan Badan Meteorologi, Klimatologi, dan Geofisika" [level=4] [ref=e1268]
+              - generic [ref=e1269]: 15 Apr 2026
+            - generic [ref=e1270]: chevron_right
+          - link "Undangan Market Sounding Kategori Jasa Pemeliharaan Sistem Pengelolaan Data dan Komputasi 27 Mar 2026 chevron_right" [ref=e1272] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/pengumuman/undangan-market-sounding-kategori-jasa-pemeliharaan-sstem-pengelolaan-data-dan-komputasi
+            - generic [ref=e1273]:
+              - heading "Undangan Market Sounding Kategori Jasa Pemeliharaan Sistem Pengelolaan Data dan Komputasi" [level=4] [ref=e1274]
+              - generic [ref=e1275]: 27 Mar 2026
+            - generic [ref=e1276]: chevron_right
+          - link "Pengumuman Hasil Seleksi Administrasi Jabatan Pimpinan Tinggi Pratama di Lingkungan Badan Meteorologi, Klimatologi, dan Geofisika 26 Mar 2026 chevron_right" [ref=e1278] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/pengumuman/pengumuman-hasil-seleksi-administrasi-jabatan-pimpinan-tinggi-pratama-di-lingkungan-badan-meteorologi-klimatologi-dan-geofisika-2
+            - generic [ref=e1279]:
+              - heading "Pengumuman Hasil Seleksi Administrasi Jabatan Pimpinan Tinggi Pratama di Lingkungan Badan Meteorologi, Klimatologi, dan Geofisika" [level=4] [ref=e1280]
+              - generic [ref=e1281]: 26 Mar 2026
+            - generic [ref=e1282]: chevron_right
+          - link "Pengumuman Kategori Produk Katalog Elektronik Sektoral BMKG Pada Inaproc Katalog Elektronik 11 Mar 2026 chevron_right" [ref=e1284] [cursor=pointer]:
+            - /url: https://www.bmkg.go.id/pengumuman/pengumuman-kategori-produk-katalog-elektronik-sektoral-bmkg-pada-inaproc-katalog-elektronik
+            - generic [ref=e1285]:
+              - heading "Pengumuman Kategori Produk Katalog Elektronik Sektoral BMKG Pada Inaproc Katalog Elektronik" [level=4] [ref=e1286]
+              - generic [ref=e1287]: 11 Mar 2026
+            - generic [ref=e1288]: chevron_right
+        - link "Lihat semua pengumuman open_in_new" [ref=e1291] [cursor=pointer]:
+          - /url: https://www.bmkg.go.id/pengumuman
+          - text: Lihat semua pengumuman
+          - generic [ref=e1292]: open_in_new
+    - generic [ref=e671]:
+      - generic [ref=e672]:
+        - heading "Cek Cuaca Akurat dari Sumber Terpercaya — BMKG." [level=3] [ref=e673]
+        - generic [ref=e674]:
+          - generic [ref=e675]:
+            - generic [ref=e676]: database
+            - heading "Data Resmi BMKG" [level=4] [ref=e678]
+            - paragraph [ref=e679]: Seluruh data prakiraan cuaca dan info cuaca Indonesia berasal langsung dari Badan Meteorologi, Klimatologi, dan Geofisika — sumber cuaca resmi Indonesia.
+          - generic [ref=e680]:
+            - generic [ref=e681]: travel_explore
+            - heading "Cakupan Nasional" [level=4] [ref=e683]
+            - paragraph [ref=e684]: Cek cuaca hingga level desa/kelurahan di seluruh Indonesia. Dari Sabang sampai Merauke — prakiraan cuaca akurat di mana pun Anda berada.
+          - generic [ref=e685]:
+            - generic [ref=e686]: schedule
+            - heading "Update Real-Time" [level=4] [ref=e688]
+            - paragraph [ref=e689]: Data prakiraan cuaca BMKG terkini yang diperbarui secara berkala. Cek suhu, kelembapan, dan peringatan dini cuaca ekstrem kapan saja.
+      - generic [ref=e1294]:
+        - generic [ref=e1295]:
+          - generic [ref=e1296]: info
+          - generic [ref=e1297]: Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)
+        - generic [ref=e1298]:
+          - generic [ref=e1299]: "Diperbarui BMKG: 30 Jul, 12:00 WITA"
+          - generic [ref=e1300]: "Diambil: 30 Juli 2026, 22:52"
+      - contentinfo [ref=e691]:
+        - generic [ref=e692]:
+          - generic [ref=e693]:
+            - generic [ref=e694]:
+              - generic [ref=e695]:
+                - link [ref=e696] [cursor=pointer]:
+                  - /url: "#"
+                  - img "LihatLangit — Prakiraan Cuaca Indonesia" [ref=e697]
+                - link "open_in_new data.bmkg.go.id" [ref=e698] [cursor=pointer]:
+                  - /url: https://data.bmkg.go.id
+                  - generic [ref=e699]: open_in_new
+                  - text: data.bmkg.go.id
+              - generic [ref=e700]:
+                - paragraph [ref=e701]: “Memprediksi cuaca bukan sekadar ilmu, tetapi juga seni memahami alam.”
+                - paragraph [ref=e702]: Cek cuaca Indonesia terkini — prakiraan cuaca BMKG, suhu udara, kelembapan, peringatan dini cuaca ekstrem, dan peta cuaca interaktif seluruh Indonesia.
+            - generic [ref=e703]:
+              - generic [ref=e704]: Navigasi
+              - generic [ref=e705] [cursor=pointer]: Dashboard
+              - generic [ref=e706] [cursor=pointer]: Prakiraan
+              - generic [ref=e707] [cursor=pointer]: Peta
+              - generic [ref=e708] [cursor=pointer]: Peringatan
+            - generic [ref=e709]:
+              - generic [ref=e710]: Sumber
+              - link "BMKG Data" [ref=e711] [cursor=pointer]:
+                - /url: https://data.bmkg.go.id
+              - link "BMKG Site" [ref=e712] [cursor=pointer]:
+                - /url: https://www.bmkg.go.id
+            - generic [ref=e713]:
+              - generic [ref=e714]: Komunitas
+              - link "GitHub" [ref=e715] [cursor=pointer]:
+                - /url: "#"
+              - link "Twitter" [ref=e716] [cursor=pointer]:
+                - /url: "#"
+          - generic [ref=e717]:
+            - paragraph [ref=e718]: © 2026 LihatLangit. Dibuat oleh sktafolio.
+            - paragraph [ref=e719]: Data bersumber dari BMKG Indonesia.
+  - alert [ref=e720]
