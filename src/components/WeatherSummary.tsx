@@ -1,5 +1,6 @@
 "use client";
 import type { WeatherForecast } from "@/types/weather";
+import WindDirection from "@/components/WindDirection";
 
 function getWeatherTheme(desc: string) {
   const d = desc.toLowerCase();
@@ -55,19 +56,12 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
         <div className="w-full h-px bg-white/50 my-4" />
 
         {/* Metrics grid - flex-grow to fill available space */}
-        <div className="grid grid-cols-2 gap-4 w-full flex-grow">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 w-full flex-grow">
           <div className="flex items-center gap-3 bg-white/40 rounded-xl px-3 py-2.5">
             <span className="material-symbols-outlined text-[20px] text-blue-500">humidity_percentage</span>
             <div>
               <p className="font-body-sans text-[10px] text-text-muted font-medium">Kelembapan</p>
               <p className="font-body-sans text-[14px] font-bold text-text-dark">{c?.humidityPct !== null ? `${c!.humidityPct}%` : "--"}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3 bg-white/40 rounded-xl px-3 py-2.5">
-            <span className="material-symbols-outlined text-[20px] text-teal-500">air</span>
-            <div>
-              <p className="font-body-sans text-[10px] text-text-muted font-medium">Angin</p>
-              <p className="font-body-sans text-[14px] font-bold text-text-dark">{c?.windSpeedKmh !== null ? `${c!.windSpeedKmh} km/h` : "--"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-white/40 rounded-xl px-3 py-2.5">
@@ -77,21 +71,17 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
               <p className="font-body-sans text-[14px] font-bold text-text-dark">{c?.visibilityText ?? "--"}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-white/40 rounded-xl px-3 py-2.5">
-            <span className="material-symbols-outlined text-[20px] text-emerald-500">near_me</span>
-            <div>
-              <p className="font-body-sans text-[10px] text-text-muted font-medium">Arah Angin</p>
-              <p className="font-body-sans text-[14px] font-bold text-text-dark">{c?.windDirection ?? "--"}</p>
+          <div className="flex items-center gap-2 bg-white/40 rounded-xl px-2.5 py-2">
+            <WindDirection windDirection={c?.windDirection ?? null} windSpeedKmh={c?.windSpeedKmh ?? null} size="sm" />
+            <div className="min-w-0">
+              <p className="font-body-sans text-[10px] text-text-muted font-medium">Angin</p>
+              <p className="font-body-sans text-[12px] font-bold text-text-dark">{c?.windSpeedKmh != null ? `${Math.round(c.windSpeedKmh)} km/h` : "--"}</p>
             </div>
           </div>
         </div>
 
         {/* Additional info section */}
         <div className="mt-4 pt-4 border-t border-white/30">
-          <div className="flex items-center justify-between text-[12px]">
-            <span className="text-text-muted font-body-sans">Kecepatan angin</span>
-            <span className="font-body-sans font-bold text-text-dark">{c?.windSpeedKmh !== null ? `${c!.windSpeedKmh} km/h` : "--"}</span>
-          </div>
           <div className="flex items-center justify-between text-[12px] mt-2">
             <span className="text-text-muted font-body-sans">Tutupan awan</span>
             <span className="font-body-sans font-bold text-text-dark">{c?.cloudCoverPct !== null ? `${c!.cloudCoverPct}%` : "--"}</span>
