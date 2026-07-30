@@ -19,6 +19,7 @@ import WeatherLoadingState from "@/components/WeatherLoadingState";
 import WeatherErrorState from "@/components/WeatherErrorState";
 import WarningBanner from "@/components/WarningBanner";
 import EarthquakeWarning from "@/components/EarthquakeWarning";
+import ScrollReveal from "@/components/ScrollReveal";
 import SearchNotif from "@/components/SearchNotif";
 import type { SearchNotifState } from "@/components/SearchNotif";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -308,28 +309,36 @@ export default function DashboardClient() {
             <h3 className="font-display-pixel text-[14px] xs:text-[16px] md:text-[22px] text-text-dark text-center uppercase leading-[20px] xs:leading-[24px] md:leading-[30px] tracking-[0.05em] max-w-3xl mx-auto">
               Cek Cuaca & Prakiraan <span className="text-primary-container">Real-Time dari BMKG.</span>
             </h3>
-            <TrendChart forecast={state.forecast} />
+            <ScrollReveal><TrendChart forecast={state.forecast} /></ScrollReveal>
             {/* Row: Card Celsius (40%) — peta cuaca lokal dihapus, sudah ada peta Indonesia di atas */}
-            <div className="grid grid-cols-1 md:grid-cols-10 gap-8 w-full items-stretch">
-              <div className="md:col-span-10 h-full"><WeatherSummary forecast={state.forecast} /></div>
-            </div>
+            <ScrollReveal delay={100}>
+              <div className="grid grid-cols-1 md:grid-cols-10 gap-8 w-full items-stretch">
+                <div className="md:col-span-10 h-full"><WeatherSummary forecast={state.forecast} /></div>
+              </div>
+            </ScrollReveal>
             {/* Row: Prakiraan 3 Hari — full width */}
-            <div className="w-full"><WeekForecast forecast={state.forecast} /></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-              <EnviroMetrics forecast={state.forecast} />
-              <SeaConditions forecast={state.forecast} />
-              <SunMoon forecast={state.forecast} />
-              <SmartTips forecast={state.forecast} />
-            </div>
+            <ScrollReveal delay={200}><div className="w-full"><WeekForecast forecast={state.forecast} /></div></ScrollReveal>
+            <ScrollReveal delay={300}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+                <EnviroMetrics forecast={state.forecast} />
+                <SeaConditions forecast={state.forecast} />
+                <SunMoon forecast={state.forecast} />
+                <SmartTips forecast={state.forecast} />
+              </div>
+            </ScrollReveal>
             {/* Row: Prakiraan Hari Ini + Status Data — 2 columns side by side */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-              <HourlyForecast forecast={state.forecast} />
-              <CommunityReports forecast={state.forecast} />
-            </div>
+            <ScrollReveal delay={400}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                <HourlyForecast forecast={state.forecast} />
+                <CommunityReports forecast={state.forecast} />
+              </div>
+            </ScrollReveal>
             {/* Info Gempa Bumi — full width, section terpisah */}
-            <div className="w-full"><EarthquakeWarning /></div>
+            <ScrollReveal delay={500}><div className="w-full"><EarthquakeWarning /></div></ScrollReveal>
             {/* Peringatan Dini — full width */}
-            <div id="peringatan-dini" className="w-full"><WarningBanner /></div>
+            <ScrollReveal delay={600}>
+              <div id="peringatan-dini" className="w-full"><WarningBanner /></div>
+            </ScrollReveal>
           </div>
         )}
 
