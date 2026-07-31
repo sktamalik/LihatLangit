@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://lihatlangit.vercel.app");
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lihatlangit.vercel.app";
 const OG_IMAGE = `${SITE_URL}/Share.jpg?v=3`;
 const TITLE = "LihatLangit — Cek Cuaca Indonesia Real-Time dari BMKG";
 const DESCRIPTION = "Cek cuaca Indonesia terkini dengan LihatLangit. Prakiraan cuaca akurat berdasarkan data resmi BMKG untuk seluruh wilayah Indonesia. Cari cuaca hingga level desa/kelurahan, lihat prakiraan 3 hari, peringatan dini, dan peta interaktif.";
