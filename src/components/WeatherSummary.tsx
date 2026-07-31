@@ -2,6 +2,21 @@
 import type { WeatherForecast } from "@/types/weather";
 import WindDirection from "@/components/WindDirection";
 
+function calcFeelsLike(tempC: number, rh: number): number {
+  // Heat Index (Rothfusz regression) for temp ≥ 27°C
+  // Below 27°C, feels-like ≈ actual temp (dew-point-based feels fine)
+  if (tempC < 27 || rh < 40) return tempC;
+  // Not safe above 56°C index — clamp input, shouldn't hit on Earth
+  if (tempC > 50) return tempC;
+  // Convert to Fahrenheit, Rothfusz regression
+  const T = tempC * 9 / 5 + 32;
+  const HI = -42.379 + 2.04901523 * T + 10.14333127 * rh
+    - 0.22475541 * T * rh - 0.00683783 * T * T - 0.05481717 * rh * rh
+    + 0.00122874 * T * T * rh + 0.00085282 * T * rh * rh
+    - 0.00000199 * T * T * rh * rh;
+  return Math.round(((HI - 32) * 5 / 9) * 10) / 10;
+}
+
 function getWeatherTheme(desc: string) {
   const d = desc.toLowerCase();
   if (d.includes("hujan")) return { gradient: "from-sky-100 via-blue-50 to-indigo-100", icon: "rainy", color: "text-blue-500", accent: "bg-blue-500/10" };
@@ -46,6 +61,14 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
               {c?.temperatureC != null ? `${Math.round(c.temperatureC)}` : "--"}
               <span className="text-[22px] font-semibold text-text-muted ml-0.5">°C</span>
             </h2>
+            {c?.temperatureC != null && c?.humidityPct != null && (
+              <p className="font-body-sans text-[13px] text-text-muted mt-1">
+                Terasa{" "}
+                <span className="font-semibold text-text-dark">
+                  {Math.round(calcFeelsLike(c.temperatureC, c.humidityPct))}°C
+                </span>
+              </p>
+            )}
             <p className={`font-body-sans text-[14px] ${theme.color} font-bold uppercase tracking-wide`}>
               {c?.weatherDescription ?? "—"}
             </p>
