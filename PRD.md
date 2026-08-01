@@ -6,7 +6,7 @@ Nama produk: LihatLangit
 Target implementasi: website dashboard untuk memantau prakiraan cuaca wilayah Indonesia berdasarkan data publik BMKG.
 Dokumen terkait: `DESIGN.md`, `Guideline.md`, `Tasks.md`, dan `CLAUDE.md`.
 
-> **Status:** MVP selesai dan live di production (lihatlangit.vercel.app). Fitur pasca-MVP yang sudah dibangun: Info Gempa Bumi, Arah Angin Visual, Dark Mode, Transisi & Micro-interactions, fallback chain luas, GitHub Actions CI. Lihat bagian "Fitur Pasca-MVP yang Sudah Dibangun" dan "Operasional & CI/CD".
+> **Status:** MVP selesai dan live di production (lihatlangit.vercel.app). Fitur pasca-MVP yang sudah dibangun: Info Gempa Bumi, Arah Angin Visual, Transisi & Micro-interactions, fallback chain luas, GitHub Actions CI. Lihat bagian "Fitur Pasca-MVP yang Sudah Dibangun" dan "Operasional & CI/CD".
 
 ## 1. Ringkasan Produk
 
@@ -160,7 +160,6 @@ Kebutuhan:
 |---|---|---|
 | Info Gempa Bumi Terkini | `src/components/EarthquakeWarning.tsx`, `src/app/api/gempa/route.ts` | Data gempa real-time dari BMKG TEWS (gempaterkini.json), cache 5 menit, refresh otomatis, badge magnitude berwarna + potensi tsunami, field access case-insensitive |
 | Arah Angin Visual | `src/components/WindDirection.tsx` | Kompas SVG panah berputar sesuai arah angin, skala Beaufort berwarna, terintegrasi di WeatherSummary |
-| Dark Mode | `src/lib/ThemeProvider.tsx`, `src/components/DarkModeToggle.tsx` | Class-based, localStorage + prefers-color-scheme, anti-flash script, CSS variable overrides di globals.css |
 | Transisi & Micro-interactions | `src/components/ScrollReveal.tsx` | IntersectionObserver fade-in-up bertahap pada komponen dashboard, keyframes animasi di globals.css |
 | Fallback chain luas | `src/lib/regionSearch.ts` | Coverage-guided (bmkg-coverage.json), prioritas kota `XX.71+`, probe `adm3.1001-1010`; sebagian besar pencarian berhasil walau desa tidak tercover BMKG (mis. Flores Timur → Kota Kupang, Laladon → Cibinong) |
 

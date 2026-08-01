@@ -36,7 +36,6 @@ When exact adm4 fails, system tries (`findBmkgFallback(adm4, 35)`):
 - `src/components/EarthquakeWarning.tsx` + `src/app/api/gempa/route.ts` — live BMKG TEWS earthquakes (5-min cache), case-insensitive field access (`Magnitude`/`Kedalaman`/`Wilayah`/`Potensi`)
 - `src/components/WindDirection.tsx` — compass arrow for wind direction + Beaufort scale, integrated into WeatherSummary
 - `src/components/ScrollReveal.tsx` — IntersectionObserver fade-in-up on scroll, staggered delays in dashboard
-- **Dark Mode** — `src/lib/ThemeProvider.tsx` (class-based, localStorage + prefers-color-scheme), `DarkModeToggle.tsx`, anti-flash script in layout, `@custom-variant dark` + `.dark` CSS variable overrides in globals.css
 
 ## Optimizations Done
 - favicon.ico created; `layout.tsx` icons config updated
