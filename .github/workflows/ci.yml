@@ -26,7 +26,10 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint 2>&1 | tee lint-output.txt
+      - name: Upload lint output on failure
+        if: failure()
+        run: cat lint-output.txt
 
       - name: Build (Next.js)
         run: npm run build
