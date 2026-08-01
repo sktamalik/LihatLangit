@@ -26,7 +26,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        run: npx eslint --format github
+        run: npm run lint
 
       - name: Build (Next.js)
         run: npm run build
