@@ -1,9 +1,8 @@
 name: CI
 
-# Trigger: setiap push ke branch mana pun + PR
 on:
-  push:
-  pull_request:
+  push: {}
+  pull_request: {}
 
 jobs:
   ci:
@@ -26,10 +25,7 @@ jobs:
         run: npx tsc --noEmit
 
       - name: Lint
-        run: npm run lint 2>&1 | tee lint-output.txt
-      - name: Upload lint output on failure
-        if: failure()
-        run: cat lint-output.txt
+        run: npm run lint
 
       - name: Build (Next.js)
         run: npm run build
