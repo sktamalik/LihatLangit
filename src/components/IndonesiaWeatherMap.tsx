@@ -60,7 +60,9 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   }, []);
 
   useEffect(() => {
-    fetchAllWeather();
+    // fetch di dalam effect — pattern normal untuk data loading; state di-set dari async fetch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchAllWeather();
   }, [fetchAllWeather]);
 
   // ── Init map once ──

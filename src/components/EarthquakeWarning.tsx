@@ -70,8 +70,10 @@ export default function EarthquakeWarning() {
   }, []);
 
   useEffect(() => {
-    fetchGempa();
-    const interval = setInterval(fetchGempa, 5 * 60 * 1000); // refresh setiap 5 menit
+    // fetch di dalam effect — pattern normal untuk data loading; state di-set dari async fetch
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchGempa();
+    const interval = setInterval(() => void fetchGempa(), 5 * 60 * 1000); // refresh setiap 5 menit
     return () => clearInterval(interval);
   }, [fetchGempa]);
 
