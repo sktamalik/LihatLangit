@@ -1,9 +1,12 @@
 # PRD - LihatLangit: Dashboard Prakiraan Cuaca Indonesia Berbasis BMKG
 
 Tanggal verifikasi sumber: 2026-07-03
+Tanggal pembaruan terakhir: 2026-08-01
 Nama produk: LihatLangit
 Target implementasi: website dashboard untuk memantau prakiraan cuaca wilayah Indonesia berdasarkan data publik BMKG.
-Dokumen terkait: `DESIGN.md`, `Guideline.md`, dan `Tasks.md`.
+Dokumen terkait: `DESIGN.md`, `Guideline.md`, `Tasks.md`, dan `CLAUDE.md`.
+
+> **Status:** MVP selesai dan live di production (lihatlangit.vercel.app). Fitur pasca-MVP yang sudah dibangun: Info Gempa Bumi, Arah Angin Visual, Dark Mode, Transisi & Micro-interactions, fallback chain luas, GitHub Actions CI. Lihat bagian "Fitur Pasca-MVP yang Sudah Dibangun" dan "Operasional & CI/CD".
 
 ## 1. Ringkasan Produk
 
@@ -141,15 +144,25 @@ Kebutuhan:
 
 ### 6.2 Fitur Setelah MVP
 
-1. Lokasi favorit di localStorage.
-2. Share link wilayah.
-3. Peta Indonesia atau peta wilayah terpilih.
-4. Perbandingan beberapa wilayah.
-5. Integrasi peringatan dini cuaca nowcast BMKG.
-6. Mode bahasa Indonesia/English.
-7. Progressive Web App.
-8. Notifikasi browser untuk peringatan dini setelah parser CAP stabil.
-9. Dataset `adm4` lengkap dan proses import tervalidasi.
+1. Lokasi favorit di localStorage. *(belum)*
+2. Share link wilayah. *(belum)*
+3. Peta Indonesia atau peta wilayah terpilih. *(✅ sudah — IndonesiaWeatherMap, Leaflet, lazy-loaded)*
+4. Perbandingan beberapa wilayah. *(belum)*
+5. Integrasi peringatan dini cuaca nowcast BMKG. *(✅ sudah — WarningBanner untuk nowcast/peringatan cuaca ekstrem)*
+6. Mode bahasa Indonesia/English. *(belum)*
+7. Progressive Web App. *(belum)*
+8. Notifikasi browser untuk peringatan dini setelah parser CAP stabil. *(belum)*
+9. Dataset `adm4` lengkap dan proses import tervalidasi. *(✅ sudah — 80,534 region di regions-adm4.json)*
+
+### 6.3 Fitur Pasca-MVP yang Sudah Dibangun
+
+| Fitur | File | Keterangan |
+|---|---|---|
+| Info Gempa Bumi Terkini | `src/components/EarthquakeWarning.tsx`, `src/app/api/gempa/route.ts` | Data gempa real-time dari BMKG TEWS (gempaterkini.json), cache 5 menit, refresh otomatis, badge magnitude berwarna + potensi tsunami, field access case-insensitive |
+| Arah Angin Visual | `src/components/WindDirection.tsx` | Kompas SVG panah berputar sesuai arah angin, skala Beaufort berwarna, terintegrasi di WeatherSummary |
+| Dark Mode | `src/lib/ThemeProvider.tsx`, `src/components/DarkModeToggle.tsx` | Class-based, localStorage + prefers-color-scheme, anti-flash script, CSS variable overrides di globals.css |
+| Transisi & Micro-interactions | `src/components/ScrollReveal.tsx` | IntersectionObserver fade-in-up bertahap pada komponen dashboard, keyframes animasi di globals.css |
+| Fallback chain luas | `src/lib/regionSearch.ts` | Coverage-guided (bmkg-coverage.json), prioritas kota `XX.71+`, probe `adm3.1001-1010`; sebagian besar pencarian berhasil walau desa tidak tercover BMKG (mis. Flores Timur → Kota Kupang, Laladon → Cibinong) |
 
 ## 7. User Flow
 
@@ -409,18 +422,20 @@ Komponen utama:
 
 MVP dianggap selesai bila:
 
-1. Pengguna dapat mencari dan memilih minimal 10 wilayah sample dengan kode `adm4`.
-2. Tombol "Gunakan lokasi" tersedia dan menangani sukses, ditolak, dan tidak ada match dengan baik.
-3. Sistem mengambil data dari endpoint resmi BMKG melalui API internal.
-4. Dashboard menampilkan ringkasan cuaca terdekat dari data BMKG.
-5. Dashboard menampilkan prakiraan 3 hari dalam slot 3 jam.
-6. Metadata `analysis_date`, `fetchedAt`, `fromCache`, `isStale`, dan sumber BMKG tampil.
-7. Error state untuk invalid `adm4`, wilayah tidak ditemukan, BMKG gagal, timeout, dan data kosong tersedia.
-8. Cache mencegah request berulang ke BMKG untuk wilayah yang sama dalam TTL.
-9. Unit test mencakup validasi `adm4`, search region, normalisasi BMKG, dan cache fresh/stale.
-10. UI mengikuti `DESIGN.md` pada warna, tipografi, glass cards, layout desktop/mobile, empty state, dan source attribution.
-11. Tidak ada data cuaca dummy di UI utama setelah integrasi BMKG selesai.
-12. Dokumen `PRD.md`, `Guideline.md`, `Tasks.md`, dan `DESIGN.md` tetap sinkron.
+1. Pengguna dapat mencari dan memilih minimal 10 wilayah sample dengan kode `adm4`. ✅
+2. Tombol "Gunakan lokasi" tersedia dan menangani sukses, ditolak, dan tidak ada match dengan baik. ✅
+3. Sistem mengambil data dari endpoint resmi BMKG melalui API internal. ✅
+4. Dashboard menampilkan ringkasan cuaca terdekat dari data BMKG. ✅
+5. Dashboard menampilkan prakiraan 3 hari dalam slot 3 jam. ✅
+6. Metadata `analysis_date`, `fetchedAt`, `fromCache`, `isStale`, dan sumber BMKG tampil. ✅
+7. Error state untuk invalid `adm4`, wilayah tidak ditemukan, BMKG gagal, timeout, dan data kosong tersedia. ✅
+8. Cache mencegah request berulang ke BMKG untuk wilayah yang sama dalam TTL. ✅
+9. Unit test mencakup validasi `adm4`, search region, normalisasi BMKG, dan cache fresh/stale. ⏳
+10. UI mengikuti `DESIGN.md` pada warna, tipografi, glass cards, layout desktop/mobile, empty state, dan source attribution. ✅
+11. Tidak ada data cuaca dummy di UI utama setelah integrasi BMKG selesai. ✅
+12. Dokumen `PRD.md`, `Guideline.md`, `Tasks.md`, dan `DESIGN.md` tetap sinkron. ✅
+
+**Catatan:** MVP dinyatakan selesai dan live di production. Satu-satunya kriteria yang belum tuntas adalah unit test otomatis (#9) — Vitest sudah dikonfigurasi, test belum lengkap.
 
 ## 14. Risiko dan Mitigasi
 
@@ -439,3 +454,35 @@ MVP dianggap selesai bila:
 Bangun LihatLangit, website dashboard prakiraan cuaca Indonesia menggunakan data resmi BMKG. Layar pertama harus berupa dashboard app-like sesuai `DESIGN.md`: Airy Modernism, glassmorphism terkontrol, palet sky-blue, Geist/Inter, search wilayah dengan tombol "Gunakan lokasi", ringkasan cuaca terdekat, timeline 3 hari per 3 jam, dan atribusi BMKG yang terlihat.
 
 Gunakan endpoint `https://api.bmkg.go.id/publik/prakiraan-cuaca?adm4={kode_wilayah_tingkat_iv}` melalui API internal server-side, bukan langsung dari browser. Implementasikan dataset pencarian `adm4`, validasi parameter, cache server-side, stale fallback, normalisasi respons BMKG, error state lengkap, status data, dan test utama. Jangan membuat prediksi sendiri, jangan menghilangkan atribusi BMKG, dan jangan mulai fitur opsional sebelum acceptance criteria MVP terpenuhi.
+
+## 16. Operasional & CI/CD
+
+### 16.1 Arsitektur Deployment
+
+```text
+git push ke GitHub
+   ├──→ GitHub Actions (CI): typecheck → lint → build (Node 22)
+   └──→ Vercel (CI+CD): build → deploy ke lihatlangit.vercel.app
+```
+
+- GitHub Actions dan Vercel berjalan **paralel dan independen** — Vercel deploy tanpa menunggu status CI.
+- CI bertindak sebagai quality gate yang terlihat (tab Actions), bukan gate yang memblokir deploy.
+
+### 16.2 Poin Penting CI (dari pengalaman)
+
+1. **`npm ci` gagal di CI** karena optional-dep drift (`@emnapi/*` versi beda Windows vs Linux) — gunakan `npm install --force` di workflow, bukan `npm ci`.
+2. **`eslint --format github` tidak tersedia** di eslint 9.39 — pakai `npm run lint` (formatter stylish).
+3. **`scripts/**` di-ignore dari eslint** (script Node, bukan kode aplikasi).
+4. **`react-hooks/set-state-in-effect`** di-disable via komentar untuk pola async fetch (EarthquakeWarning, IndonesiaWeatherMap).
+
+### 16.3 Kebijakan BMKG API (anti-block)
+
+- BMKG rate-limit agresif (~50 request) → **429**, dan dapat **block IP → 403** (hilang dalam 1–7 hari).
+- `fetchForecast()` retry ×2 dengan backoff (500ms/1500ms) + rotasi User-Agent.
+- `route.ts` short-circuit pada 429/403 — jangan lanjut ke fallback chain (mencegah hammer berlebih).
+- Scan coverage wajib CONCURRENCY=1, DELAY=1200ms (lihat `scripts/scan-bmkg-coverage.js`).
+- Rate limiter internal di Edge Middleware (30 req/60s/IP), bukan serverless (Map tidak persist di serverless).
+
+### 16.4 Fitur Pasca-MVP Tersedia
+
+Lihat tabel pada §6.3. Status live di production.
