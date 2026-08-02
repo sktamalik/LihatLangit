@@ -4,7 +4,7 @@ import "./globals.css";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lihatlangit.vercel.app";
 const OG_IMAGE = `${SITE_URL}/Share.jpg?v=3`;
-const TITLE = "LihatLangit — Cek Cuaca Indonesia Real-Time dari BMKG";
+const TITLE = "LihatLangit | Cek Cuaca Indonesia";
 const DESCRIPTION = "Cek cuaca Indonesia terkini dengan LihatLangit. Prakiraan cuaca akurat berdasarkan data resmi BMKG untuk seluruh wilayah Indonesia. Cari cuaca hingga level desa/kelurahan, lihat prakiraan 3 hari, peringatan dini, dan peta interaktif.";
 const KEYWORDS = [
   "cuaca", "cek cuaca", "lihat langit", "prakiraan cuaca", "info cuaca",
