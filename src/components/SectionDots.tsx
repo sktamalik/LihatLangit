@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * SectionDots — numbered navigation dots fixed on the right viewport edge.
- * Dot 1 = section 1, dot 2 = section 2, etc. Active section is highlighted;
- * clicking a dot smooth-scrolls to that section.
+ * SectionDots — navigation dots fixed on the right viewport edge, one per section.
+ * Active section (scroll-spy) is a solid orange dot; inactive are hollow gray.
+ * Clicking a dot smooth-scrolls to that section.
  */
 
 interface SectionDef {
@@ -30,9 +30,9 @@ export default function SectionDots({ active, onNavigate }: SectionDotsProps) {
   return (
     <nav
       aria-label="Navigasi bagian"
-      className="fixed right-3 md:right-4 top-1/2 -translate-y-1/2 z-[60] hidden md:flex flex-col items-center gap-2.5"
+      className="fixed right-3 md:right-4 top-1/2 -translate-y-1/2 z-[60] hidden md:flex flex-col items-center gap-3"
     >
-      {SECTIONS.map((s, i) => {
+      {SECTIONS.map((s) => {
         const isActive = active === s.id;
         return (
           <button
@@ -41,14 +41,12 @@ export default function SectionDots({ active, onNavigate }: SectionDotsProps) {
             aria-label={s.label}
             aria-current={isActive ? "true" : undefined}
             title={s.label}
-            className={`w-7 h-7 rounded-full text-[11px] font-bold font-body-sans flex items-center justify-center transition-all duration-200 cursor-pointer select-none border ${
+            className={`rounded-full transition-all duration-200 cursor-pointer ${
               isActive
-                ? "bg-primary-container text-white border-primary-container shadow-[0_2px_10px_rgba(255,90,34,0.4)] scale-110"
-                : "bg-white text-text-muted border-outline-variant/50 hover:bg-primary-container/10 hover:text-primary-container hover:scale-105"
+                ? "w-3 h-3 bg-primary-container shadow-[0_0_8px_rgba(255,90,34,0.6)]"
+                : "w-2 h-2 border border-text-muted/60 hover:border-primary-container hover:bg-primary-container/20"
             }`}
-          >
-            {i + 1}
-          </button>
+          />
         );
       })}
     </nav>
