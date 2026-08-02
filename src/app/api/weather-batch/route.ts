@@ -6,6 +6,12 @@
  *
  * Returns a map of adm4 → { region, temperatureC, weatherDescription, ... }.
  * Failed lookups are omitted from the result (never returns partial errors).
+ *
+ * Speed design (map must load within Vercel's 10s function limit):
+ *  - Shorter timeouts + fewer retries than the single-weather route
+ *  - Fallback probing runs in parallel batches of 5 (not serial)
+ *  - Shared rate-limit flag: one 429/403 aborts the whole batch so we
+ *    don't hammer BMKG — partial results are returned instead
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -17,6 +23,12 @@ import { getRegionByAdm4, toBmkgAdm4, findBmkgFallback } from "@/lib/regionSearc
 import type { WeatherForecast } from "@/types/weather";
 
 const MAX_CODES = 40;
+const CONCURRENCY = 5;
+const PRIMARY_TIMEOUT = 4000;
+const PRIMARY_RETRIES = 1; // 2 attempts max per code
+const FALLBACK_TIMEOUT = 3000;
+const FALLBACK_RETRIES = 0; // don't retry probes — keep total time bounded
+const BATCH_SIZE = 5;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -39,9 +51,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // ── Fetch with concurrency limit + fallback ──
+  // ── Fetch with concurrency limit + parallel fallback ──
   const results: Record<string, WeatherForecast> = {};
-  const CONCURRENCY = 5;
+  let rateLimited = false; // shared — one 429/403 stops all remaining probes
 
   async function fetchOne(adm4: string): Promise<void> {
     const cacheKey = `weather:bmkg:adm4:${adm4}`;
@@ -54,18 +66,38 @@ export async function GET(request: NextRequest) {
     }
     // 2. Try BMKG-compatible code first, then original
     const bmkgAdm4 = toBmkgAdm4(adm4);
-    let result = await fetchForecast(bmkgAdm4, 8000);
+    let result = await fetchForecast(bmkgAdm4, PRIMARY_TIMEOUT, PRIMARY_RETRIES);
     if (!result.ok && bmkgAdm4 !== adm4) {
-      result = await fetchForecast(adm4, 8000);
+      result = await fetchForecast(adm4, PRIMARY_TIMEOUT, PRIMARY_RETRIES);
     }
 
-    // 3. If both failed, try expanded fallback (same as regular weather route)
+    // Rate-limited — flag shared, stop everything, keep stale if available
+    if (!result.ok && (result.error.status === 429 || result.error.status === 403)) {
+      rateLimited = true;
+      if (cached.status === "stale") results[adm4] = cached.payload;
+      return;
+    }
+
+    // 3. If both failed, try expanded fallback in parallel batches (same as weather route)
     if (!result.ok) {
       const fallbackCandidates = await findBmkgFallback(adm4, 15);
-      for (const candidate of fallbackCandidates) {
-        if (candidate === bmkgAdm4 || candidate === adm4) continue;
-        const fb = await fetchForecast(candidate, 5000);
-        if (fb.ok) { result = fb; break; }
+      const toTry = fallbackCandidates.filter((c) => c !== bmkgAdm4 && c !== adm4);
+      outer: for (let i = 0; i < toTry.length; i += BATCH_SIZE) {
+        if (rateLimited) break;
+        const batch = toTry.slice(i, i + BATCH_SIZE);
+        const outcomes = await Promise.all(
+          batch.map(async (candidate) => ({
+            candidate,
+            res: await fetchForecast(candidate, FALLBACK_TIMEOUT, FALLBACK_RETRIES),
+          }))
+        );
+        for (const { res } of outcomes) {
+          if (res.ok) { result = res; break outer; }
+        }
+        if (outcomes.some(({ res }) => !res.ok && (res.error.status === 429 || res.error.status === 403))) {
+          rateLimited = true;
+          break;
+        }
       }
     }
 
@@ -94,7 +126,7 @@ export async function GET(request: NextRequest) {
   // Worker pool with concurrency limit
   const queue = [...codes];
   async function worker(): Promise<void> {
-    while (queue.length > 0) {
+    while (queue.length > 0 && !rateLimited) {
       const code = queue.shift()!;
       await fetchOne(code);
     }

@@ -45,7 +45,8 @@ function buildError(
  */
 export async function fetchForecast(
   adm4: string,
-  timeoutMs: number = DEFAULT_TIMEOUT_MS
+  timeoutMs: number = DEFAULT_TIMEOUT_MS,
+  maxRetries: number = MAX_RETRIES
 ): Promise<BmkgClientResult> {
   if (!isValidAdm4(adm4)) {
     return {
@@ -56,7 +57,7 @@ export async function fetchForecast(
 
   const url = `${BMKG_BASE_URL}?adm4=${encodeURIComponent(adm4)}`;
 
-  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     const ua = USER_AGENTS[attempt % USER_AGENTS.length];
@@ -73,7 +74,7 @@ export async function fetchForecast(
       if (!response.ok) {
         const status = response.status;
         // 429 or 403 — rate limited / blocked; retry with backoff if attempts remain
-        if ((status === 429 || status === 403) && attempt < MAX_RETRIES) {
+        if ((status === 429 || status === 403) && attempt < maxRetries) {
           clearTimeout(timer);
           controller.abort();
           const delay = RETRY_DELAY_MS[attempt] ?? 1500;
@@ -104,7 +105,7 @@ export async function fetchForecast(
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === "AbortError") {
         // AbortError from actual timeout, or from manual abort after rate-limit
-        if (attempt < MAX_RETRIES) {
+        if (attempt < maxRetries) {
           continue;
         }
         return {
@@ -114,7 +115,7 @@ export async function fetchForecast(
       }
 
       const msg = err instanceof Error ? err.message : String(err);
-      if (attempt < MAX_RETRIES) {
+      if (attempt < maxRetries) {
         continue;
       }
       return {
