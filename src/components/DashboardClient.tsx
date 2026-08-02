@@ -22,6 +22,7 @@ import EarthquakeWarning from "@/components/EarthquakeWarning";
 import ScrollReveal from "@/components/ScrollReveal";
 import SearchNotif from "@/components/SearchNotif";
 import type { SearchNotifState } from "@/components/SearchNotif";
+import ScrollProgress from "@/components/ScrollProgress";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import type { ErrorCode, Region } from "@/types/weather";
@@ -101,6 +102,7 @@ export default function DashboardClient() {
 
   return (
     <>
+      <ScrollProgress />
       <SearchNotif notif={searchNotif} onDismiss={() => setSearchNotif(null)} />
 
       {/* NAVBAR — only element with elevated z-index */}
