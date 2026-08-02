@@ -40,6 +40,7 @@ Verified coverage codes are ALWAYS probed before blind patterns — they returne
 - `src/components/EarthquakeWarning.tsx` + `src/app/api/gempa/route.ts` — live BMKG TEWS earthquakes (5-min cache), case-insensitive field access (`Magnitude`/`Kedalaman`/`Wilayah`/`Potensi`)
 - `src/components/WindDirection.tsx` — compass arrow for wind direction + Beaufort scale, integrated into WeatherSummary
 - `src/components/ScrollReveal.tsx` — IntersectionObserver fade-in-up on scroll, staggered delays in dashboard
+- `src/components/SectionDots.tsx` — scroll-spy dots fixed on the right viewport edge, one per section (Beranda/Dashboard/Peta Cuaca/Prakiraan/Berita BMKG); active section = solid orange dot (`bg-primary-container`, 12px), inactive = hollow gray (8px); click smooth-scrolls; `hidden md:flex` (desktop only)
 
 ## Optimizations Done
 - favicon.ico created; `layout.tsx` icons config updated
