@@ -13,14 +13,17 @@ Stack: Next.js 16, TypeScript, Tailwind CSS v4, Leaflet maps, Vercel deployment,
 - IP block 403 typically clears in 1–7 days; avoid mass scans (use `scripts/scan-bmkg-coverage.js` with CONCURRENCY=1, DELAY=1200ms)
 
 ## Fallback Chain (regionSearch.ts)
-When exact adm4 fails, system tries (`findBmkgFallback(adm4, 35)`):
-- **Level C**: coverage-guided — known-working codes from `bmkg-coverage.json` first
+When exact adm4 fails (404 or 200-with-empty-data), system tries (`findBmkgFallback(adm4, 35)`):
+- **Level C**: coverage-guided — known-working codes from `bmkg-coverage.json` for same adm3 + same adm2 (city)
+- **Level P**: ALL known-working coverage codes in the same province
+- **Level O**: known-working coverage codes from other provinces, nearest province first (province-code ≈ island grouping; dataset has NO coordinates, so real distance is impossible)
 - **Level 0**: direct variants + `adm3.1001-1010` probes
 - **Level 1**: same district — inject `adm3.1001` first, other villages (cap 5)
 - **Level 2**: other districts in same city (cap 6), injects `adm3.1001`
-- **Level 3**: other cities in province — **prioritize kota `XX.71+`** over rural kabupaten, injects `adm2.XX.01.1001`/`2001` + coverage data (cap 20)
-- **Level 4**: nearest villages from other provinces by coords (cap 10, boosted for provinces with coverage)
-- **Level 5**: first village from each other province (cap 15), city pattern `XX.71.01.1001` + coverage
+- **Level 3**: other cities in province — **prioritize kota `XX.71+`** over rural kabupaten, injects `adm2.XX.01.1001`/`2001` (cap 20)
+- **Level 5**: last resort — first village from each other province (cap 15), city pattern `XX.71.01.1001`
+
+Verified coverage codes are ALWAYS probed before blind patterns — they returned 200 during the scan, so they hit immediately and spare BMKG requests. Fallback probe chain aborts early on 429/403 to avoid IP blocks. `route.ts` also falls through to the chain when BMKG returns 200 with empty `data[]` (previously returned EMPTY_FORECAST without fallback).
 
 ## Key Files
 - `src/app/api/weather/route.ts` — main weather API; fallback in parallel batches of 5 (3s timeout), `findBmkgFallback(adm4, 35)`, 429/403 short-circuit

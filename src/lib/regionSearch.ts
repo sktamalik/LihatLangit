@@ -321,13 +321,21 @@ export function generateBmkgVariants(adm4: string): string[] {
  * Find BMKG-compatible adm4 codes from expanding scope.
  *
  * Strategy by level (each capped to ensure diversity across levels):
- *   C (coverage):  Known-working codes from bmkg-coverage.json — tried first
+ *   C (coverage, closest): Known-working codes from bmkg-coverage.json for the
+ *                          same adm3 and same adm2 (city) — highest confidence
+ *   P (coverage, province): All known-working codes in the same adm1 (province)
+ *   O (coverage, others):  Known-working codes from other provinces, nearest
+ *                          province first (province-code proximity ≈ island
+ *                          grouping; dataset has NO coordinates so real
+ *                          distance is impossible) — cap 15
  *   0 (exact):     Direct variants + adm3.1001-1010 probes (cap 13)
  *   1 (district):  adm3.1001 first, then other villages in same adm3 — cap 8
  *   2 (city):      Other districts in the same adm2 (kab/kota) — cap 10
- *   3 (province):  Other cities in the same adm1 (provinsi) — cap 10
- *   4 (nearest):   Nearest villages from other provinces by coord — cap 5
- *   5 (any):       First village from each other province — cap 10
+ *   3 (province):  Other cities in the same adm1 (provinsi) — cap 20
+ *
+ * Verified coverage codes are ALWAYS tried before blind pattern probes:
+ * they returned 200 during the scan, so they succeed immediately and spare
+ * BMKG requests. Blind probes only run when a province has no coverage.
  *
  * 1XXX-format codes (kelurahan) are prioritized since BMKG
  * is more likely to have data for them.
@@ -384,6 +392,37 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
+  // Level P: All known-working coverage codes in the same province
+  const provPrefix = `${adm1}.`;
+  for (const [covAdm3, covAdm4] of Object.entries(coverage)) {
+    if (candidates.length >= maxCandidates) break;
+    if (covAdm4 && covAdm3.startsWith(provPrefix) && covAdm3 !== adm3 && !covAdm3.startsWith(adm2Prefix)) {
+      addCandidate(covAdm4);
+    }
+  }
+
+  if (candidates.length >= maxCandidates) return candidates;
+
+  // Level O: Known-working coverage codes from other provinces — nearest province first.
+  // Dataset has NO coordinates, so province-code proximity (≈ island grouping) proxies distance:
+  // codes 11-21 = Sumatra, 31-36 = Java, 51-53 = Bali/Nusa Tenggara, 61-65 = Kalimantan,
+  // 71-76 = Sulawesi, 81-82 = Maluku, 91-94 = Papua.
+  const provNum = parseInt(adm1, 10);
+  const otherProvCoverage: Array<{ adm3: string; code: string; dist: number }> = [];
+  for (const [covAdm3, covAdm4] of Object.entries(coverage)) {
+    if (!covAdm4 || covAdm3.startsWith(provPrefix)) continue;
+    const otherProv = parseInt(covAdm3.slice(0, 2), 10);
+    otherProvCoverage.push({ adm3: covAdm3, code: covAdm4, dist: Math.abs(provNum - otherProv) });
+  }
+  otherProvCoverage.sort((a, b) => a.dist - b.dist);
+  let levelOAdded = 0;
+  for (const { code } of otherProvCoverage) {
+    if (levelOAdded >= 15 || candidates.length >= maxCandidates) break;
+    if (addCandidate(code)) levelOAdded++;
+  }
+
+  if (candidates.length >= maxCandidates) return candidates;
+
   // Level 0: Direct variants + adm3.1001-1010 probes (cap 13)
   addVariants(adm4, 3);
   // Probe 1001-1010 for the same kecamatan — scan script confirms these have highest hit rate
@@ -436,8 +475,7 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 3: Other cities in the same province — prioritize cities (XX.71+) then coverage data (cap 20)
-  const provPrefix = `${adm1}.`;
+  // Level 3: Other cities in the same province — prioritize cities (XX.71+) (cap 20)
   const otherCities = new Set<string>();
   for (const entry of index) {
     if (entry.region.adm4.startsWith(provPrefix)) {
@@ -461,15 +499,6 @@ export async function findBmkgFallback(
   });
   const prioritizedAdm2 = [...cities, ...kabupaten];
 
-  // Inject coverage data for same province (known working codes)
-  const covEntries = Object.entries(coverage);
-  for (const [covAdm3, covAdm4] of covEntries) {
-    if (candidates.length >= maxCandidates) break;
-    if (covAdm4 && covAdm3.startsWith(provPrefix)) {
-      addCandidate(covAdm4);
-    }
-  }
-
   // Then iterate prioritized adm2 list
   let level3Added = 0;
   for (let ci = 0; ci < prioritizedAdm2.length && level3Added < 20; ci++) {
@@ -488,52 +517,9 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 4: Nearest villages from other provinces by coordinates (cap 10)
-  // Prefer provinces that actually have BMKG data (from coverage file)
-  const coordsEntry = index.find(
-    (e) =>
-      e.region.adm4 === adm4 &&
-      e.region.latitude != null &&
-      e.region.longitude != null
-  );
-  if (coordsEntry) {
-    const { latitude, longitude } = coordsEntry.region;
-    const covProvs = new Set<string>();
-    for (const [covAdm3, covAdm4] of covEntries) {
-      if (covAdm4) covProvs.add(covAdm3.slice(0, 2));
-    }
-    const nearest: Array<{ entry: IndexEntry; dist: number }> = [];
-    for (const entry of index) {
-      const entryProv = entry.region.adm4.slice(0, 2);
-      if (entryProv === adm1) continue; // skip same province
-      if (entry.region.latitude == null || entry.region.longitude == null) continue;
-      const d = haversineKm(
-        latitude!,
-        longitude!,
-        entry.region.latitude!,
-        entry.region.longitude!
-      );
-      // Boost score for provinces known to have BMKG data
-      const score = covProvs.has(entryProv) ? d * 0.5 : d;
-      nearest.push({ entry, dist: score });
-    }
-    nearest.sort((a, b) => a.dist - b.dist);
-    // Deduplicate by province for diversity
-    const usedProvs = new Set<string>();
-    let level4Added = 0;
-    for (let ni = 0; ni < nearest.length && level4Added < 10; ni++) {
-      const entryProv = nearest[ni].entry.region.adm4.slice(0, 2);
-      if (usedProvs.has(entryProv)) continue;
-      usedProvs.add(entryProv);
-      const before = candidates.length;
-      addVariants(nearest[ni].entry.region.adm4, 1);
-      addCandidate(nearest[ni].entry.region.adm4); // force original code too
-      if (candidates.length > before) level4Added++;
-    }
-  }
-
-  // Level 5: Best village from each other province (cap 15)
-  // Prefer coverage data, then cities (XX.71+), then fallback to 01.01.1001
+  // Level 5: Last resort — first village from each other province (cap 15).
+  // Coverage codes for other provinces were already tried in Level O; this adds
+  // blind city patterns for provinces that have no coverage entry at all.
   const otherProvs = new Set<string>();
   let level5Added = 0;
   for (const entry of index) {
@@ -543,10 +529,6 @@ export async function findBmkgFallback(
     if (otherProvs.has(entryProv)) continue;
     otherProvs.add(entryProv);
     const before = candidates.length;
-
-    // Try coverage data first (highest confidence)
-    const covForProv = Object.entries(coverage).find(([k, v]) => k.startsWith(entryProv) && v);
-    if (covForProv?.[1]) addCandidate(covForProv[1]);
 
     // Try city pattern: XX.71.01.1001 or XX.73.01.1001
     addCandidate(`${entryProv}.71.01.1001`);

@@ -109,28 +109,18 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Days empty check
-    if (normalized.days.length === 0) {
-      return NextResponse.json(
-        {
-          error: {
-            code: "EMPTY_FORECAST",
-            message:
-              "Data prakiraan belum tersedia untuk wilayah ini. Coba lagi nanti.",
-          },
-        } satisfies ApiError,
-        { status: 404 }
-      );
+    // Days empty check — BMKG returns 200 with empty data[] for some codes.
+    // Do NOT error out here: fall through to the nearest-available fallback chain.
+    if (normalized.days.length > 0) {
+      // Cache the fresh data
+      setCache(cacheKey, normalized);
+
+      return NextResponse.json({
+        ...normalized,
+        fromCache: false,
+        isStale: false,
+      } satisfies WeatherForecast);
     }
-
-    // Cache the fresh data
-    setCache(cacheKey, normalized);
-
-    return NextResponse.json({
-      ...normalized,
-      fromCache: false,
-      isStale: false,
-    } satisfies WeatherForecast);
   }
 
   // ── BMKG failed — try expanded fallback ──
@@ -160,14 +150,33 @@ export async function GET(request: NextRequest) {
         break outer;
       }
     }
+    // Rate-limited during fallback — stop probing, don't hammer BMKG
+    if (results.some(({ res }) => !res.ok && (res.error.status === 429 || res.error.status === 403))) {
+      console.log(`[Weather] BMKG rate-limited during fallback, aborting probe chain`);
+      break;
+    }
   }
 
   if (fallbackResult?.ok && fallbackCode) {
     const normalized = normalizeBmkgForecast(fallbackResult.data, region);
 
     if (normalized && normalized.days.length > 0) {
-      // Look up the actual village name for the fallback code
-      const fallbackRegion = normalized.region;
+      // Actual data source — BMKG lokasi of the working fallback code
+      const sourceVillage = normalized.region.village;
+
+      // Header must show the SEARCHED region, not the fallback source.
+      // The fallbackFrom notice tells the user where the data really comes from.
+      if (region) {
+        normalized.region = {
+          ...normalized.region, // keep BMKG coords (map zooms to data location)
+          adm4: region.adm4,
+          province: region.province,
+          city: region.city,
+          district: region.district,
+          village: region.village,
+          timezone: region.timezone,
+        };
+      }
 
       setCache(cacheKey, normalized);
 
@@ -175,7 +184,7 @@ export async function GET(request: NextRequest) {
         ...normalized,
         fromCache: false,
         isStale: false,
-        fallbackFrom: fallbackRegion.village,
+        fallbackFrom: sourceVillage,
         fallbackAdm4: fallbackCode,
       } satisfies WeatherForecast);
     }
@@ -201,7 +210,7 @@ export async function GET(request: NextRequest) {
     INVALID_ADM4: "INVALID_ADM4",
   };
 
-  const errorCode = errorMap[result.error.code] ?? "BMKG_UNAVAILABLE";
+  const errorCode = errorMap[!result.ok ? result.error.code : "HTTP_ERROR"] ?? "BMKG_UNAVAILABLE";
 
   const messageMap: Record<string, string> = {
     BMKG_TIMEOUT:
