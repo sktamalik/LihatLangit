@@ -58,13 +58,18 @@ export async function GET(request: NextRequest) {
   async function fetchOne(adm4: string): Promise<void> {
     const cacheKey = `weather:bmkg:adm4:${adm4}`;
 
-    // 1. Cache check
+    // 1. Cache check (always — stale/cached data survives rate limits)
     const cached = getCache<WeatherForecast>(cacheKey);
     if (cached.status === "fresh") {
       results[adm4] = cached.payload;
       return;
     }
-    // 2. Try BMKG-compatible code first, then original
+    // 2. Skip BMKG network calls once rate-limited (flag shared across workers)
+    if (rateLimited) {
+      if (cached.status === "stale") results[adm4] = cached.payload;
+      return;
+    }
+    // 3. Try BMKG-compatible code first, then original
     const bmkgAdm4 = toBmkgAdm4(adm4);
     let result = await fetchForecast(bmkgAdm4, PRIMARY_TIMEOUT, PRIMARY_RETRIES);
     if (!result.ok && bmkgAdm4 !== adm4) {
@@ -126,9 +131,9 @@ export async function GET(request: NextRequest) {
   // Worker pool with concurrency limit
   const queue = [...codes];
   async function worker(): Promise<void> {
-    while (queue.length > 0 && !rateLimited) {
+    while (queue.length > 0) {
       const code = queue.shift()!;
-      await fetchOne(code);
+      await fetchOne(code); // rate-limit handled inside — cached cities still resolve
     }
   }
   await Promise.allSettled(Array.from({ length: CONCURRENCY }, () => worker()));
