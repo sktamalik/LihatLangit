@@ -37,8 +37,14 @@ export default function DashboardClient() {
   const prevAdm4Ref = useRef<string | null>(null);
 
   // ── Intersection observer: track which section is visible ──
+  // Only track top-level sections (hero, app-preview, peta-cuaca, features, berita-bmkg).
+  // Do NOT observe nested divs like #hero-search or #peringatan-dini — they'd hijack
+  // the active section (hero-search lives inside hero, peringatan-dini inside features).
   useEffect(() => {
-    const sections = document.querySelectorAll("section[id], div[id]");
+    const sectionIds = ["hero", "app-preview", "peta-cuaca", "features", "berita-bmkg"];
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -49,9 +55,7 @@ export default function DashboardClient() {
       },
       { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
     );
-    sections.forEach((el) => {
-      if (el.id) observer.observe(el);
-    });
+    sections.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [state.status]);
 
