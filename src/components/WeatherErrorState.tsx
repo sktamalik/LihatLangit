@@ -6,7 +6,7 @@ export default function WeatherErrorState({code,message,onRetry}:{code:ErrorCode
     <span className="material-symbols-outlined text-[48px] text-primary mb-4">{ei[code]??"warning"}</span>
     <h3 className="font-body-sans text-[20px] font-semibold text-text-primary mb-2">
       {code==="BMKG_TIMEOUT"&&"Koneksi Terputus"}
-      {code==="BMKG_UNAVAILABLE"&&"Data Tidak Tersedia"}
+      {code==="BMKG_UNAVAILABLE"&&"Data Belum Tersedia"}
       {code==="EMPTY_FORECAST"&&"Data Kosong"}
       {(!["BMKG_TIMEOUT","BMKG_UNAVAILABLE","EMPTY_FORECAST"].includes(code))&&"Terjadi Kesalahan"}
     </h3>
@@ -18,8 +18,8 @@ export default function WeatherErrorState({code,message,onRetry}:{code:ErrorCode
         </>
       ) : code==="BMKG_UNAVAILABLE" ? (
         <>
-          Data BMKG untuk wilayah ini sedang tidak tersedia. Mungkin kode wilayah ini tidak tercakup dalam layanan prakiraan BMKG.
-          {" "}Coba cari <strong>kota</strong> atau <strong>kecamatan</strong> terdekat.
+          {message || "Data BMKG untuk wilayah ini sedang tidak tersedia."}{" "}
+          Coba lagi dalam beberapa saat, atau cari <strong>kota</strong>/<strong>kecamatan</strong> terdekat.
         </>
       ) : message}
     </p>
