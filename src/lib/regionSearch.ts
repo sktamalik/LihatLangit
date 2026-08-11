@@ -23,8 +23,17 @@ const COVERAGE_CANDIDATES = [
   path.join(process.cwd(), "src", "data", "bmkg-coverage.json"),
 ];
 
+const NEAREST_CANDIDATES = [
+  path.join(process.cwd(), "public", "data", "bmkg-nearest.json"),
+  path.join(process.cwd(), "src", "data", "bmkg-nearest.json"),
+];
+
 // Lazy-loaded coverage map: adm3 → known working adm4 code (or null = no data)
 let coverageCache: Record<string, string | null> | null = null;
+
+// Lazy-loaded nearest map: adm3 → [[workingCode, tier], ...] closest first
+// (precomputed offline by scripts/build-nearest-fallback.js)
+let nearestCache: Record<string, Array<[string, number]>> | null = null;
 
 async function getCoverage(): Promise<Record<string, string | null>> {
   if (coverageCache !== null) return coverageCache;
@@ -40,8 +49,25 @@ async function getCoverage(): Promise<Record<string, string | null>> {
     }
   }
   coverageCache = {};
-  return coverageCache;
-}
+    return coverageCache;
+  }
+
+  async function getNearestMap(): Promise<Record<string, Array<[string, number]>>> {
+    if (nearestCache !== null) return nearestCache;
+    for (const p of NEAREST_CANDIDATES) {
+      if (fs.existsSync(p)) {
+        try {
+          const raw = await fs.promises.readFile(p, "utf-8");
+          nearestCache = JSON.parse(raw);
+          return nearestCache!;
+        } catch {
+          // corrupt file — treat as empty
+        }
+      }
+    }
+    nearestCache = {};
+    return nearestCache;
+  }
 
 function resolveDataPath(): string {
   for (const p of DATA_CANDIDATES) {
@@ -266,6 +292,24 @@ export async function getVillagesByAdm3(adm3: string): Promise<Region[]> {
   return index
     .filter((e) => e.region.adm4.startsWith(prefix))
     .map((e) => e.region);
+}
+
+/**
+ * Best known-working BMKG codes for an adm3 (kecamatan), nearest first.
+ *
+ * Precomputed offline by scripts/build-nearest-fallback.js from
+ * bmkg-coverage.json — tier 0 = same district, 1 = same city, 2 = same
+ * province, 3 = nearest province (centroid distance). Every adm3 in the
+ * dataset has at least one candidate, so a search can ALWAYS find data
+ * from some nearby region instead of showing "Data Tidak Tersedia".
+ */
+export async function findNearestWithData(
+  adm3: string,
+  limit: number = 3
+): Promise<Array<{ code: string; tier: number }>> {
+  const map = await getNearestMap();
+  const list = map[adm3] ?? [];
+  return list.slice(0, limit).map(([code, tier]) => ({ code, tier }));
 }
 
 /**

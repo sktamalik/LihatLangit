@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchRegions, findNearestRegion, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, generateBmkgVariants, getVillagesByAdm3, findBmkgFallback } from "./regionSearch";
+import { searchRegions, findNearestRegion, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, generateBmkgVariants, getVillagesByAdm3, findBmkgFallback, findNearestWithData } from "./regionSearch";
 
 describe("searchRegions", () => {
   it("returns results for 'Kemayoran'", async () => {
@@ -171,5 +171,31 @@ describe("findBmkgFallback", () => {
   it("keeps the searched adm3's converted variant (tried by primary fetch anyway)", async () => {
     const candidates = await findBmkgFallback("73.71.01.0005", 35);
     expect(candidates).toContain("73.71.01.1005");
+  });
+});
+
+describe("findNearestWithData", () => {
+  it("returns the same-district code (tier 0) for a covered adm3", async () => {
+    // 32.01.01 (Bogor) has known coverage → its own code, tier 0
+    const candidates = await findNearestWithData("32.01.01", 3);
+    expect(candidates.length).toBeGreaterThan(0);
+    expect(candidates[0]).toEqual({ code: "32.01.01.1001", tier: 0 });
+  });
+
+  it("returns known-working codes even for adm3 with zero coverage (Aceh)", async () => {
+    // 11.01.01 (Simeulue, Aceh) — province 11 has NO coverage → nearest province (Sumut)
+    const candidates = await findNearestWithData("11.01.01", 3);
+    expect(candidates.length).toBeGreaterThan(0);
+    expect(candidates.every((c) => c.code.startsWith("12."))).toBe(true); // Sumatera Utara
+    expect(candidates.every((c) => c.tier === 3)).toBe(true);
+  });
+
+  it("respects the limit", async () => {
+    const candidates = await findNearestWithData("11.01.01", 1);
+    expect(candidates.length).toBe(1);
+  });
+
+  it("returns empty for unknown adm3", async () => {
+    expect(await findNearestWithData("99.99.99")).toEqual([]);
   });
 });
