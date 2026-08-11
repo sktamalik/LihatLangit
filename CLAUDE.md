@@ -14,9 +14,10 @@ Stack: Next.js 16, TypeScript, Tailwind CSS v4, Leaflet maps, Vercel deployment,
 
 ## Fallback Chain (regionSearch.ts)
 When exact adm4 fails (404 or 200-with-empty-data), system tries (`findBmkgFallback(adm4, 35)`):
+- **Level N (nearest-with-data)**: NEW — precomputed `bmkg-nearest.json` maps EVERY adm3 to 1-3 known-working codes, closest first (tier 0 = same adm3, 1 = same city, 2 = same province, 3 = nearest province by centroid haversine). Probed FIRST (1-3 requests) — almost always succeeds without burning the 35-probe chain. Fallback chain only runs if this misses (or on rate-limit → abort).
 - **Level C**: coverage-guided — known-working codes from `bmkg-coverage.json` for same adm3 + same adm2 (city)
 - **Level P**: ALL known-working coverage codes in the same province
-- **Level O**: known-working coverage codes from other provinces, nearest province first (province-code ≈ island grouping; dataset has NO coordinates, so real distance is impossible)
+- **Level O**: known-working coverage codes from other provinces, nearest province first (centroid distance; dataset has NO coordinates of its own) 
 - **Level 0**: direct variants + `adm3.1001-1010` probes
 - **Level 1**: same district — inject `adm3.1001` first, other villages (cap 5)
 - **Level 2**: other districts in same city (cap 6), injects `adm3.1001`
@@ -25,15 +26,18 @@ When exact adm4 fails (404 or 200-with-empty-data), system tries (`findBmkgFallb
 
 Verified coverage codes are ALWAYS probed before blind patterns — they returned 200 during the scan, so they hit immediately and spare BMKG requests. Fallback probe chain aborts early on 429/403 to avoid IP blocks. `route.ts` also falls through to the chain when BMKG returns 200 with empty `data[]` (previously returned EMPTY_FORECAST without fallback).
 
+**"Data Tidak Tersedia" is now nearly impossible**: `bmkg-nearest.json` guarantees every one of the 4,571 kecamatan has ≥1 known-working candidate (572 codes from coverage; nearest province fallback otherwise). E.g. LATIUNG (Aceh) → P.O. Hurlang (Sumut), Fakfak (Papua Barat) → Wawali (Sulut). Rebuild the map after re-scanning coverage: `npm run build:nearest`.
+
 ## Key Files
-- `src/app/api/weather/route.ts` — main weather API; fallback in parallel batches of 5 (3s timeout), `findBmkgFallback(adm4, 35)`, 429/403 short-circuit; 200-with-empty-`data[]` falls through to fallback chain (not EMPTY_FORECAST); header shows SEARCHED region, `fallbackFrom` = actual data source
+- `src/app/api/weather/route.ts` — main weather API; probes precomputed nearest-with-data codes FIRST (1-3 req, 3s timeout), then fallback in parallel batches of 5 (3s timeout), `findBmkgFallback(adm4, 35)`, 429/403 short-circuit aborts all further probing; 200-with-empty-`data[]` falls through to fallback chain (not EMPTY_FORECAST); header shows SEARCHED region, `fallbackFrom` = actual data source
 - `src/app/api/weather-batch/route.ts` — national map endpoint (max 40 codes): concurrency 5, primary 4s timeout × 2 attempts, fallback probes parallel in batches of 5 (3s, no retries), **shared rate-limit flag** (one 429/403 aborts BMKG probes but cached/stale cities still resolve), returns partial results on failure
-- `src/lib/regionSearch.ts` — fallback chain logic, coverage-guided, city-priority Level 3
+- `src/lib/regionSearch.ts` — fallback chain logic, coverage-guided, city-priority Level 3; `findNearestWithData(adm3)` loads precomputed `bmkg-nearest.json`
 - `src/lib/bmkgClient.ts` — BMKG fetch with retry + User-Agent rotation; `fetchForecast(adm4, timeoutMs, maxRetries)`
 - `src/middleware.ts` — Edge rate limiter (30 req/60s/IP) — moved from serverless (in-memory Map useless there)
 - `src/components/DashboardClient.tsx` — main dashboard, IndonesiaWeatherMap lazy-loaded
 - `public/data/regions-adm4.json` — 80,534 Indonesian regions dataset
 - `public/data/bmkg-coverage.json` — scanned adm3 → known-working code map (partial, ~1.2K/4.5K)
+- `public/data/bmkg-nearest.json` — precomputed adm3 → closest known-working codes (tier 0-3), ALL 4,571 adm3 covered; build with `npm run build:nearest` (`scripts/build-nearest-fallback.js`)
 - `scripts/scan-bmkg-coverage.js` — scan script (CONCURRENCY=1, DELAY=1200ms; resume-able)
 
 ## Features Added
