@@ -7,15 +7,75 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { isValidAdm4 } from "@/lib/adm4";
-import { getRegionByAdm4, toBmkgAdm4, findBmkgFallback } from "@/lib/regionSearch";
+import {
+  getRegionByAdm4,
+  toBmkgAdm4,
+  findBmkgFallback,
+  findNearestWithData,
+  getAdm3Prefix,
+} from "@/lib/regionSearch";
 import { fetchForecast } from "@/lib/bmkgClient";
 import type { BmkgClientResult } from "@/lib/bmkgClient";
 import { normalizeBmkgForecast } from "@/lib/weatherNormalize";
 import { getCache, setCache } from "@/lib/cache";
 import type {
   ApiError,
+  Region,
   WeatherForecast,
 } from "@/types/weather";
+
+/**
+ * Normalize a BMKG result into a WeatherForecast response, caching it.
+ * When fallbackCode is given, the header keeps the SEARCHED region while
+ * fallbackFrom/fallbackAdm4 point to the actual data source.
+ * Returns null when the payload has no usable forecast days.
+ */
+function buildSuccessResponse(
+  result: BmkgClientResult,
+  cacheKey: string,
+  region: Region | undefined,
+  fallbackCode?: string
+): NextResponse | null {
+  if (!result.ok) return null;
+  const normalized = normalizeBmkgForecast(result.data, region);
+
+  if (!normalized || normalized.days.length === 0) return null;
+
+  if (fallbackCode) {
+    // Actual data source — BMKG lokasi of the working fallback code
+    const sourceVillage = normalized.region.village;
+
+    // Header must show the SEARCHED region, not the fallback source.
+    // The fallbackFrom notice tells the user where the data really comes from.
+    if (region) {
+      normalized.region = {
+        ...normalized.region, // keep BMKG coords (map zooms to data location)
+        adm4: region.adm4,
+        province: region.province,
+        city: region.city,
+        district: region.district,
+        village: region.village,
+        timezone: region.timezone,
+      };
+    }
+
+    setCache(cacheKey, normalized);
+    return NextResponse.json({
+      ...normalized,
+      fromCache: false,
+      isStale: false,
+      fallbackFrom: sourceVillage,
+      fallbackAdm4: fallbackCode,
+    } satisfies WeatherForecast);
+  }
+
+  setCache(cacheKey, normalized);
+  return NextResponse.json({
+    ...normalized,
+    fromCache: false,
+    isStale: false,
+  } satisfies WeatherForecast);
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -95,37 +155,53 @@ export async function GET(request: NextRequest) {
   }
 
   if (result.ok) {
-    const normalized = normalizeBmkgForecast(result.data, region);
+    const resp = buildSuccessResponse(result, cacheKey, region);
+    if (resp) return resp;
+    // 200 with empty data[] — fall through to fallback chain
+  }
 
-    if (!normalized) {
-      return NextResponse.json(
-        {
-          error: {
-            code: "BMKG_INVALID_RESPONSE",
-            message: "Data BMKG tidak dapat diproses. Coba beberapa saat lagi.",
-          },
-        } satisfies ApiError,
-        { status: 502 }
-      );
-    }
+  // ── BMKG failed — try precomputed nearest region that HAS BMKG data ──
+  // Every adm3 maps offline to known-working codes (closest first), so this
+  // succeeds with 1-3 requests instead of the 35-probe chain below — sparing
+  // BMKG's aggressive rate limit. Exact matches were already tried above.
+  console.log(`[Weather] Exact adm4 ${adm4} failed, probing nearest-with-data codes...`);
+  const nearestCandidates = await findNearestWithData(getAdm3Prefix(adm4), 3);
+  const nearestToTry = nearestCandidates
+    .map((c) => c.code)
+    .filter((c) => c !== bmkgAdm4 && c !== adm4);
+  let rateLimited = false;
 
-    // Days empty check — BMKG returns 200 with empty data[] for some codes.
-    // Do NOT error out here: fall through to the nearest-available fallback chain.
-    if (normalized.days.length > 0) {
-      // Cache the fresh data
-      setCache(cacheKey, normalized);
+  if (nearestToTry.length > 0) {
+    const FALLBACK_TIMEOUT = 3000;
+    const nearestResults = await Promise.all(
+      nearestToTry.map(async (candidate) => ({
+        candidate,
+        res: await fetchForecast(candidate, FALLBACK_TIMEOUT),
+      }))
+    );
 
-      return NextResponse.json({
-        ...normalized,
-        fromCache: false,
-        isStale: false,
-      } satisfies WeatherForecast);
+    if (
+      nearestResults.some(
+        ({ res }) => !res.ok && (res.error.status === 429 || res.error.status === 403)
+      )
+    ) {
+      console.log(`[Weather] BMKG rate-limited during nearest probe, aborting`);
+      rateLimited = true;
+    } else {
+      const hit = nearestResults.find(({ res }) => res.ok);
+      if (hit) {
+        const resp = buildSuccessResponse(hit.res, cacheKey, region, hit.candidate);
+        if (resp) {
+          console.log(`[Weather] Nearest-with-data SUCCESS: adm4=${hit.candidate}`);
+          return resp;
+        }
+      }
     }
   }
 
-  // ── BMKG failed — try expanded fallback ──
+  // ── BMKG failed — try expanded fallback (only if not rate-limited) ──
   console.log(`[Weather] Exact adm4 ${adm4} failed, trying expanded fallback...`);
-  const fallbackCandidates = await findBmkgFallback(adm4, 35);
+  const fallbackCandidates = !rateLimited ? await findBmkgFallback(adm4, 35) : [];
   let fallbackResult: BmkgClientResult | null = null;
   let fallbackCode: string | null = null;
   const FALLBACK_TIMEOUT = 3000;
@@ -158,36 +234,8 @@ export async function GET(request: NextRequest) {
   }
 
   if (fallbackResult?.ok && fallbackCode) {
-    const normalized = normalizeBmkgForecast(fallbackResult.data, region);
-
-    if (normalized && normalized.days.length > 0) {
-      // Actual data source — BMKG lokasi of the working fallback code
-      const sourceVillage = normalized.region.village;
-
-      // Header must show the SEARCHED region, not the fallback source.
-      // The fallbackFrom notice tells the user where the data really comes from.
-      if (region) {
-        normalized.region = {
-          ...normalized.region, // keep BMKG coords (map zooms to data location)
-          adm4: region.adm4,
-          province: region.province,
-          city: region.city,
-          district: region.district,
-          village: region.village,
-          timezone: region.timezone,
-        };
-      }
-
-      setCache(cacheKey, normalized);
-
-      return NextResponse.json({
-        ...normalized,
-        fromCache: false,
-        isStale: false,
-        fallbackFrom: sourceVillage,
-        fallbackAdm4: fallbackCode,
-      } satisfies WeatherForecast);
-    }
+    const resp = buildSuccessResponse(fallbackResult, cacheKey, region, fallbackCode);
+    if (resp) return resp;
   }
 
   // ── BMKG failed — try stale cache ──
