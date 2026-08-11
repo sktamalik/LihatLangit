@@ -47,7 +47,13 @@ Mencakup seluruh provinsi dan kota besar Indonesia — dari Sabang sampai Merauk
 Semua data prakiraan cuaca bersumber dari API resmi BMKG: https://data.bmkg.go.id
 
 ## Link Penting
-- [Beranda](https://lihatlangit.vercel.app)
+- [Beranda](https://lihatlangitt.my.id)
+- [Cuaca Kota Besar Indonesia](https://lihatlangitt.my.id/cuaca)
+- [Cuaca Jakarta](https://lihatlangitt.my.id/cuaca/jakarta)
+- [Cuaca Bandung](https://lihatlangitt.my.id/cuaca/bandung)
+- [Cuaca Surabaya](https://lihatlangitt.my.id/cuaca/surabaya)
+- [Cuaca Medan](https://lihatlangitt.my.id/cuaca/medan)
+- [Cuaca Makassar](https://lihatlangitt.my.id/cuaca/makassar)
 - [Data BMKG](https://data.bmkg.go.id)
 - [GitHub Repository](https://github.com/sktamalik/LihatLangit)
 

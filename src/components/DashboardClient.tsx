@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useWeather } from "@/lib/useWeather";
 import RegionSearch from "@/components/RegionSearch";
 import WeatherSummary from "@/components/WeatherSummary";
@@ -123,7 +124,8 @@ export default function DashboardClient() {
             {navLink("features", "Fitur")}
             {navLink("peta-cuaca", "Peta Cuaca")}
             {navLink("peringatan-dini", "Peringatan")}
-            <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[12px] lg:text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[14px] lg:text-[16px]">open_in_new</span></a>
+                        <Link href="/cuaca" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans text-[12px] lg:text-[14px] no-underline">Cuaca Kota</Link>
+                        <a href="https://www.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-on-surface-variant hover:text-primary-container transition-colors duration-200 font-body-sans flex items-center gap-1 text-[12px] lg:text-[14px] no-underline">BMKG <span className="material-symbols-outlined text-[14px] lg:text-[16px]">open_in_new</span></a>
           </div>
           {/* Right side: desktop location button + mobile hamburger */}
           <div className="flex items-center gap-2">
