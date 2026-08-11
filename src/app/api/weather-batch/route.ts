@@ -19,7 +19,7 @@ import { isValidAdm4 } from "@/lib/adm4";
 import { fetchForecast } from "@/lib/bmkgClient";
 import { getCache, setCache } from "@/lib/cache";
 import { normalizeBmkgForecast } from "@/lib/weatherNormalize";
-import { getRegionByAdm4, toBmkgAdm4, findBmkgFallback } from "@/lib/regionSearch";
+import { getRegionByAdm4, toBmkgAdm4, findBmkgFallback, findNearestWithData, getAdm3Prefix } from "@/lib/regionSearch";
 import type { WeatherForecast } from "@/types/weather";
 
 const MAX_CODES = 40;
@@ -83,25 +83,50 @@ export async function GET(request: NextRequest) {
       return;
     }
 
-    // 3. If both failed, try expanded fallback in parallel batches (same as weather route)
+    // 3. If both failed, try fallback — nearest-with-data first, then expanded chain
     if (!result.ok) {
-      const fallbackCandidates = await findBmkgFallback(adm4, 15);
-      const toTry = fallbackCandidates.filter((c) => c !== bmkgAdm4 && c !== adm4);
-      outer: for (let i = 0; i < toTry.length; i += BATCH_SIZE) {
-        if (rateLimited) break;
-        const batch = toTry.slice(i, i + BATCH_SIZE);
-        const outcomes = await Promise.all(
-          batch.map(async (candidate) => ({
-            candidate,
-            res: await fetchForecast(candidate, FALLBACK_TIMEOUT, FALLBACK_RETRIES),
-          }))
-        );
-        for (const { res } of outcomes) {
-          if (res.ok) { result = res; break outer; }
+      // 3a. Precomputed nearest region WITH data (known-working codes, closest first)
+      if (!rateLimited) {
+        const nearestCandidates = await findNearestWithData(getAdm3Prefix(adm4), 3);
+        const nearestToTry = nearestCandidates
+          .map((c) => c.code)
+          .filter((c) => c !== bmkgAdm4 && c !== adm4);
+        if (nearestToTry.length > 0) {
+          const outcomes = await Promise.all(
+            nearestToTry.map(async (candidate) => ({
+              candidate,
+              res: await fetchForecast(candidate, FALLBACK_TIMEOUT, FALLBACK_RETRIES),
+            }))
+          );
+          const hit = outcomes.find(({ res }) => res.ok);
+          if (hit) {
+            result = hit.res;
+          } else if (outcomes.some(({ res }) => !res.ok && (res.error.status === 429 || res.error.status === 403))) {
+            rateLimited = true;
+          }
         }
-        if (outcomes.some(({ res }) => !res.ok && (res.error.status === 429 || res.error.status === 403))) {
-          rateLimited = true;
-          break;
+      }
+
+      // 3b. Expanded fallback chain in parallel batches (rate-limit aborts it)
+      if (!result.ok && !rateLimited) {
+        const fallbackCandidates = await findBmkgFallback(adm4, 15);
+        const toTry = fallbackCandidates.filter((c) => c !== bmkgAdm4 && c !== adm4);
+        outer: for (let i = 0; i < toTry.length; i += BATCH_SIZE) {
+          if (rateLimited) break;
+          const batch = toTry.slice(i, i + BATCH_SIZE);
+          const outcomes = await Promise.all(
+            batch.map(async (candidate) => ({
+              candidate,
+              res: await fetchForecast(candidate, FALLBACK_TIMEOUT, FALLBACK_RETRIES),
+            }))
+          );
+          for (const { res } of outcomes) {
+            if (res.ok) { result = res; break outer; }
+          }
+          if (outcomes.some(({ res }) => !res.ok && (res.error.status === 429 || res.error.status === 403))) {
+            rateLimited = true;
+            break;
+          }
         }
       }
     }
@@ -121,6 +146,19 @@ export async function GET(request: NextRequest) {
         results[adm4] = cached.payload;
       }
       return;
+    }
+
+    // Header keeps the SEARCHED region even when data came from a fallback source
+    if (region) {
+      normalized.region = {
+        ...normalized.region, // keep BMKG coords (map zooms to data location)
+        adm4: region.adm4,
+        province: region.province,
+        city: region.city,
+        district: region.district,
+        village: region.village,
+        timezone: region.timezone,
+      };
     }
 
     // Save to cache
