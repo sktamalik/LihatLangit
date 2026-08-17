@@ -23,23 +23,23 @@
 
 ## ✨ Fitur
 
-| Fitur | Deskripsi |
-|---|---|
-| **🔍 Pencarian Wilayah** | Cari provinsi, kota, kecamatan, hingga desa/kelurahan dari database lokal |
-| **📍 Geolokasi** | Deteksi otomatis wilayah terdekat via browser geolocation |
-| **🌡️ Ringkasan Cuaca** | Suhu, kondisi langit, kelembapan, kecepatan angin, tutupan awan, jarak pandang |
-| **📅 Prakiraan 3 Hari** | Setiap slot 3 jam dengan tab Hari Ini, Besok, dan Lusa |
-| **📈 Grafik Tren** | Visualisasi suhu, kelembapan, dan tekanan udara dalam grafik interaktif |
-| **🗺️ Peta Interaktif** | Peta cuaca seluruh Indonesia dengan marker suhu dan kondisi cuaca tiap kota |
-| **⚠️ Peringatan Dini** | Nowcast BMKG — peringatan cuaca ekstrem real-time langsung dari BMKG |
-| **🌊 Kondisi Laut** | Tinggi gelombang, kecepatan angin laut, dan arah angin |
-| **☀️🌙 Info Matahari & Bulan** | Waktu terbit, terbenam, fase bulan, dan durasi siang |
-| **🌿 Metrik Lingkungan** | Indeks UV, jarak pandang, tutupan awan, tekanan udara |
-| **💡 Tips Pintar** | Rekomendasi aktivitas berdasarkan kondisi cuaca terkini |
-| **📰 Berita BMKG** | Siaran pers dan informasi terkini dari BMKG |
-| **👥 Laporan Komunitas** | Fitur laporan cuaca dari pengguna |
-| **📱 Responsif** | Tampilan optimal di desktop, tablet, dan mobile |
-| **🎨 Sky Theme UI** | Glassmorphism, palet sky-blue, animasi awan & burung, pixel-art sun |
+| Fitur                          | Deskripsi                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------ |
+| **🔍 Pencarian Wilayah**       | Cari provinsi, kota, kecamatan, hingga desa/kelurahan dari database lokal      |
+| **📍 Geolokasi**               | Deteksi otomatis wilayah terdekat via browser geolocation                      |
+| **🌡️ Ringkasan Cuaca**         | Suhu, kondisi langit, kelembapan, kecepatan angin, tutupan awan, jarak pandang |
+| **📅 Prakiraan 3 Hari**        | Setiap slot 3 jam dengan tab Hari Ini, Besok, dan Lusa                         |
+| **📈 Grafik Tren**             | Visualisasi suhu, kelembapan, dan tekanan udara dalam grafik interaktif        |
+| **🗺️ Peta Interaktif**         | Peta cuaca seluruh Indonesia dengan marker suhu dan kondisi cuaca tiap kota    |
+| **⚠️ Peringatan Dini**         | Nowcast BMKG — peringatan cuaca ekstrem real-time langsung dari BMKG           |
+| **🌊 Kondisi Laut**            | Tinggi gelombang, kecepatan angin laut, dan arah angin                         |
+| **☀️🌙 Info Matahari & Bulan** | Waktu terbit, terbenam, fase bulan, dan durasi siang                           |
+| **🌿 Metrik Lingkungan**       | Indeks UV, jarak pandang, tutupan awan, tekanan udara                          |
+| **💡 Tips Pintar**             | Rekomendasi aktivitas berdasarkan kondisi cuaca terkini                        |
+| **📰 Berita BMKG**             | Siaran pers dan informasi terkini dari BMKG                                    |
+| **👥 Laporan Komunitas**       | Fitur laporan cuaca dari pengguna                                              |
+| **📱 Responsif**               | Tampilan optimal di desktop, tablet, dan mobile                                |
+| **🎨 Sky Theme UI**            | Glassmorphism, palet sky-blue, animasi awan & burung, pixel-art sun            |
 
 <br>
 
@@ -53,17 +53,17 @@
   <img src="https://img.shields.io/badge/Leaflet-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet">
 </p>
 
-| Teknologi | Kegunaan |
-|---|---|
-| **[Next.js 16](https://nextjs.org/)** (App Router) | Framework React full-stack — SSR, API routes, routing |
-| **[React 19](https://react.dev/)** | Library UI dengan hooks dan concurrent features |
-| **[TypeScript](https://www.typescriptlang.org/)** | Type-safe JavaScript |
-| **[Tailwind CSS v4](https://tailwindcss.com/)** | Utility-first CSS modern dengan CSS-first config |
-| **[Leaflet](https://leafletjs.com/)** | Peta interaktif Indonesia dengan marker cuaca |
-| **[Vitest](https://vitest.dev/)** | Unit testing — cepat dan native ESM |
-| **[ESLint](https://eslint.org/)** | Linting dengan konfigurasi Next.js |
-| **[fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser)** | Parsing XML data BMKG & CAP alerts |
-| **[Zod](https://zod.dev/)** | Validasi skema data runtime |
+| Teknologi                                                                     | Kegunaan                                              |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------- |
+| **[Next.js 16](https://nextjs.org/)** (App Router)                            | Framework React full-stack — SSR, API routes, routing |
+| **[React 19](https://react.dev/)**                                            | Library UI dengan hooks dan concurrent features       |
+| **[TypeScript](https://www.typescriptlang.org/)**                             | Type-safe JavaScript                                  |
+| **[Tailwind CSS v4](https://tailwindcss.com/)**                               | Utility-first CSS modern dengan CSS-first config      |
+| **[Leaflet](https://leafletjs.com/)**                                         | Peta interaktif Indonesia dengan marker cuaca         |
+| **[Vitest](https://vitest.dev/)**                                             | Unit testing — cepat dan native ESM                   |
+| **[ESLint](https://eslint.org/)**                                             | Linting dengan konfigurasi Next.js                    |
+| **[fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser)** | Parsing XML data BMKG & CAP alerts                    |
+| **[Zod](https://zod.dev/)**                                                   | Validasi skema data runtime                           |
 
 <br>
 
@@ -202,6 +202,7 @@ Penjelasan lebih detail ada di [docs/architecture.md](docs/architecture.md).
 Mengambil prakiraan cuaca untuk kode wilayah `adm4` dari BMKG.
 
 **Response sukses:**
+
 ```json
 {
   "source": "BMKG",
@@ -224,10 +225,10 @@ Mengambil prakiraan cuaca untuk kode wilayah `adm4` dari BMKG.
 
 ### `GET /api/regions`
 
-| Parameter | Deskripsi |
-|---|---|
-| `?q={query}` | Cari wilayah (provinsi/kota/kecamatan/desa) |
-| `?lat={lat}&lon={lon}` | Cari wilayah terdekat dari koordinat GPS |
+| Parameter              | Deskripsi                                   |
+| ---------------------- | ------------------------------------------- |
+| `?q={query}`           | Cari wilayah (provinsi/kota/kecamatan/desa) |
+| `?lat={lat}&lon={lon}` | Cari wilayah terdekat dari koordinat GPS    |
 
 ### `GET /api/weather-batch?cities={kode1},{kode2},...`
 
@@ -237,8 +238,8 @@ Data cuaca multiple kota sekaligus — digunakan untuk peta interaktif.
 
 Peringatan dini cuaca BMKG (nowcast) — feed RSS di-parsing dari XML.
 
-| Parameter | Deskripsi |
-|---|---|
+| Parameter        | Deskripsi                                                     |
+| ---------------- | ------------------------------------------------------------- |
 | `?detail={link}` | Detail peringatan dalam format CAP (Common Alerting Protocol) |
 
 ### `GET /api/press-releases`
@@ -285,6 +286,7 @@ npm run test:watch
 ```
 
 Cakupan test:
+
 - ✅ Validasi regex kode `adm4` (format BMKG)
 - ✅ Pencarian wilayah dari dataset lokal
 - ✅ Nearest region dari koordinat geografis
@@ -298,15 +300,15 @@ Cakupan test:
 
 ### Tema Visual
 
-| Elemen | Value |
-|---|---|
-| **Primary** | `#FF5A22` (oranye BMKG) |
-| **Accent** | `#3B82F6` (biru) |
-| **Background** | `#E2F0F9` (sky blue) |
-| **Footer** | `#5A3714` (earth brown) |
-| **Heading Font** | *Press Start 2P* (pixel) |
-| **Body Font** | *Inter* |
-| **Display Font** | *Space Mono* |
+| Elemen           | Value                    |
+| ---------------- | ------------------------ |
+| **Primary**      | `#FF5A22` (oranye BMKG)  |
+| **Accent**       | `#3B82F6` (biru)         |
+| **Background**   | `#E2F0F9` (sky blue)     |
+| **Footer**       | `#5A3714` (earth brown)  |
+| **Heading Font** | _Press Start 2P_ (pixel) |
+| **Body Font**    | _Inter_                  |
+| **Display Font** | _Space Mono_             |
 
 ### Animasi Latar
 
@@ -351,13 +353,13 @@ Semua data cuaca bersumber dari **Badan Meteorologi, Klimatologi, dan Geofisika 
 
 ## 🧠 Known Limitations
 
-| Keterbatasan | Rencana ke Depan |
-|---|---|
-| **Cache in-memory** — hilang saat server restart | Integrasi Redis / Upstash |
-| **Belum PWA** — tidak ada dukungan offline | Service Worker + cache-first |
-| **Belum notifikasi** — tidak ada push alert | Web Push API / OneSignal |
-| **BMKG rate limit** — perlindungan terbatas | Queue + distributed cache |
-| **Dataset statis** — perlu update manual | Pipeline update otomatis dari BMKG |
+| Keterbatasan                                     | Rencana ke Depan                   |
+| ------------------------------------------------ | ---------------------------------- |
+| **Cache in-memory** — hilang saat server restart | Integrasi Redis / Upstash          |
+| **Belum PWA** — tidak ada dukungan offline       | Service Worker + cache-first       |
+| **Belum notifikasi** — tidak ada push alert      | Web Push API / OneSignal           |
+| **BMKG rate limit** — perlindungan terbatas      | Queue + distributed cache          |
+| **Dataset statis** — perlu update manual         | Pipeline update otomatis dari BMKG |
 
 <br>
 
@@ -382,14 +384,14 @@ Kontribusi selalu diterima! Berikut cara berkontribusi:
 
 ## 📄 Lisensi
 
-Hak cipta © 2026 [Sktamalik_](https://github.com/sktamalik)
+Hak cipta © 2026 [Sktamalik\_](https://github.com/sktamalik)
 
 Data cuaca: © **BMKG** — digunakan sesuai ketentuan resmi BMKG.
 
 ---
 
 <p align="center">
-  Dibuat dengan ☕ dan ❤️ untuk Indonesia
+  Dibuat dengan ☕ untuk Indonesia
   <br>
   <a href="https://github.com/sktamalik">@sktamalik</a>
 </p>
