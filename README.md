@@ -17,6 +17,7 @@
   <a href="#fitur"><strong>Jelajahi Fitur</strong></a> ·
   <a href="#cara-menjalankan"><strong>Coba Sekarang</strong></a> ·
   <a href="#struktur-proyek"><strong>Struktur</strong></a> ·
+  <a href="#arsitektur"><strong>Arsitektur</strong></a> ·
   <a href="#api-endpoint"><strong>API</strong></a>
 </p>
 
@@ -175,6 +176,22 @@ src/
     ├── regions-adm4.json          # Dataset wilayah Indonesia (lengkap)
     └── indonesia-cities.ts        # Data kota untuk peta interaktif
 ```
+
+<br>
+
+## 🏗️ Arsitektur
+
+Alur data: **Browser → Edge Middleware (rate limit) → API Routes → Library → BMKG API**, dengan data lokal (`regions-adm4.json`, `bmkg-coverage.json`, `bmkg-nearest.json`) sebagai penopang fallback saat BMKG tidak punya data atau sedang rate-limit.
+
+**Flowchart:**
+
+![Arsitektur LihatLangit — Flowchart](docs/flowchart.png)
+
+**Diagram Excalidraw:**
+
+![Arsitektur LihatLangit — Excalidraw](docs/flowchart.excalidraw.png)
+
+Penjelasan lebih detail ada di [docs/architecture.md](docs/architecture.md).
 
 <br>
 
