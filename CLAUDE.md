@@ -18,7 +18,7 @@ When exact adm4 fails (404 or 200-with-empty-data), system tries (`findBmkgFallb
 - **Level C**: coverage-guided — known-working codes from `bmkg-coverage.json` for same adm3 + same adm2 (city)
 - **Level P**: ALL known-working coverage codes in the same province
 - **Level O**: known-working coverage codes from other provinces, nearest province first (centroid distance; dataset has NO coordinates of its own) 
-- **Level 0**: direct variants + `adm3.1001-1010` probes
+- **Level 0**: direct variants + `adm3.1001-1015` AND `adm3.2001-2010` probes (sebagian desa hanya ada di format 2XXX)
 - **Level 1**: same district — inject `adm3.1001` first, other villages (cap 5)
 - **Level 2**: other districts in same city (cap 6), injects `adm3.1001`
 - **Level 3**: other cities in province — **prioritize kota `XX.71+`** over rural kabupaten, injects `adm2.XX.01.1001`/`2001` (cap 20)
@@ -29,12 +29,13 @@ Verified coverage codes are ALWAYS probed before blind patterns — they returne
 **"Data Tidak Tersedia" is now nearly impossible**: `bmkg-nearest.json` guarantees every one of the 4,571 kecamatan has ≥1 known-working candidate (572 codes from coverage; nearest province fallback otherwise). E.g. LATIUNG (Aceh) → P.O. Hurlang (Sumut), Fakfak (Papua Barat) → Wawali (Sulut). Rebuild the map after re-scanning coverage: `npm run build:nearest`.
 
 ## Key Files
-- `src/app/api/weather/route.ts` — main weather API; probes precomputed nearest-with-data codes FIRST (1-3 req, 3s timeout), then fallback in parallel batches of 5 (3s timeout), `findBmkgFallback(adm4, 35)`, 429/403 short-circuit aborts all further probing; 200-with-empty-`data[]` falls through to fallback chain (not EMPTY_FORECAST); header shows SEARCHED region, `fallbackFrom` = actual data source
+- `src/app/api/weather/route.ts` — main weather API; probes precomputed nearest-with-data codes FIRST (1-3 req, 3s timeout), then fallback in parallel batches of 5 (3s timeout), `findBmkgFallback(adm4, 35)`, 429/403 short-circuit aborts all further probing; **rate-limit path serves stale cache or cached nearest-with-data data (zero BMKG requests) before returning 502**; exact fetch 5s timeout × 1 retry + hard wall-clock budget 8.5s (TOTAL_BUDGET_MS) keeps route inside Vercel 10s limit; 200-with-empty-`data[]` falls through to fallback chain (not EMPTY_FORECAST); header shows SEARCHED region, `fallbackFrom` = actual data source
 - `src/app/api/weather-batch/route.ts` — national map endpoint (max 40 codes): concurrency 5, primary 4s timeout × 2 attempts, fallback probes parallel in batches of 5 (3s, no retries), **shared rate-limit flag** (one 429/403 aborts BMKG probes but cached/stale cities still resolve), returns partial results on failure
 - `src/lib/regionSearch.ts` — fallback chain logic, coverage-guided, city-priority Level 3; `findNearestWithData(adm3)` loads precomputed `bmkg-nearest.json`
 - `src/lib/bmkgClient.ts` — BMKG fetch with retry + User-Agent rotation; `fetchForecast(adm4, timeoutMs, maxRetries)`
 - `src/middleware.ts` — Edge rate limiter (30 req/60s/IP) — moved from serverless (in-memory Map useless there)
-- `src/components/DashboardClient.tsx` — main dashboard, IndonesiaWeatherMap lazy-loaded
+- `src/components/DashboardClient.tsx` — main dashboard, IndonesiaWeatherMap lazy-loaded (`next/dynamic` + `ssr:false`)
+- `src/components/IndonesiaWeatherMap.tsx` — national map; **weather-batch fetch DI-GATE ke viewport** (IntersectionObserver, rootMargin 400px, sekali per mount) — dulu fetch 38 kota tiap page load, itu penyebab rate-limit BMKG di semua user
 - `public/data/regions-adm4.json` — 80,534 Indonesian regions dataset
 - `public/data/bmkg-coverage.json` — scanned adm3 → known-working code map (partial, ~1.2K/4.5K)
 - `public/data/bmkg-nearest.json` — precomputed adm3 → closest known-working codes (tier 0-3), ALL 4,571 adm3 covered; build with `npm run build:nearest` (`scripts/build-nearest-fallback.js`)
@@ -56,7 +57,7 @@ Verified coverage codes are ALWAYS probed before blind patterns — they returne
 - regionSearch.ts level 2 bug fixed: `slice(0,8)` → `getAdm3Prefix()`
 - **Duplicate timezone logic removed** — weatherNormalize.ts now imports `formatLocalNow`/`getLocalTodayStr`/`getLocalTomorrowStr` from `time.ts`
 - **Canonical URL fix** — `layout.tsx` SITE_URL no longer uses `VERCEL_URL` (preview URL leak); defaults to `https://lihatlangit.vercel.app`
-- **National map speedup** — `weather-batch` was serial-probing 15 fallback codes per city (worst ~75s, blew Vercel 10s limit); now parallel batches of 5 with 3s timeout, 4s primary × 2 attempts, shared rate-limit abort → 38 cities load in ~1.5s warm / ~3.5s cold
+- **National map speedup** — `weather-batch` was serial-probing 15 fallback codes per city (worst ~75s, blew Vercel 10s limit); now parallel batches of 5 with 3s timeout, 4s primary × 2 attempts, shared rate-limit abort + per-code wall-clock budget 9s → 38 cities load in ~1.5s warm / ~3.5s cold
 - **Fallback cache-safety** — rate-limit in batch no longer skips cached/stale cities; cache check always runs, only BMKG network calls are skipped
 - **`fallbackFrom` notice** — dashboard header shows the SEARCHED region; a small "Data dari wilayah terdekat: X" line appears when fallback data is used
 
