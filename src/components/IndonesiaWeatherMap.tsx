@@ -59,10 +59,33 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
     }
   }, []);
 
+  // ── Fetch weather batch hanya saat section peta mendekati viewport ──
+  // Sebelumnya fetch 38 kota ke BMKG terjadi di SETIAP page load — itu penyebab
+  // utama rate-limit BMKG (429/403) yang bikin "Layanan BMKG sedang sibuk".
+  // Sekarang fetch ditunda sampai user scroll mendekati peta, sekali per mount.
+  const weatherFetchedRef = useRef(false);
   useEffect(() => {
-    // fetch di dalam effect — pattern normal untuk data loading; state di-set dari async fetch
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void fetchAllWeather();
+    if (weatherFetchedRef.current) return;
+    const el = document.getElementById("peta-cuaca");
+    if (!el) {
+      // Section tidak ditemukan — fallback ke fetch langsung
+      weatherFetchedRef.current = true;
+      void fetchAllWeather();
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting) && !weatherFetchedRef.current) {
+          weatherFetchedRef.current = true;
+          void fetchAllWeather();
+          observer.disconnect();
+        }
+      },
+      // 400px early — fetch sudah jalan sebelum peta benar-benar kelihatan
+      { rootMargin: "400px 0px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [fetchAllWeather]);
 
   // ── Init map once ──

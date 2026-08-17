@@ -11,7 +11,6 @@ import EnviroMetrics from "@/components/EnviroMetrics";
 import SeaConditions from "@/components/SeaConditions";
 import SunMoon from "@/components/SunMoon";
 import SmartTips from "@/components/SmartTips";
-import IndonesiaWeatherMap from "@/components/IndonesiaWeatherMap";
 import BmkgPressRelease from "@/components/BmkgPressRelease";
 import BmkgInfoTabs from "@/components/BmkgInfoTabs";
 import CommunityReports from "@/components/CommunityReports";
@@ -26,6 +25,14 @@ import type { SearchNotifState } from "@/components/SearchNotif";
 import SectionDots from "@/components/SectionDots";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
+
+// Lazy-load peta: JS + fetch weather-batch (38 kota) hanya dimuat saat dibutuhkan.
+// ssr:false karena Leaflet butuh window — sekaligus mencegah hammer BMKG di load awal.
+const IndonesiaWeatherMap = dynamic(
+  () => import("@/components/IndonesiaWeatherMap"),
+  { ssr: false }
+);
 import type { ErrorCode, Region } from "@/types/weather";
 
 export default function DashboardClient() {
