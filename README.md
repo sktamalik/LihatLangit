@@ -16,7 +16,6 @@
 <p align="center">
   <a href="#fitur"><strong>Jelajahi Fitur</strong></a> ·
   <a href="#cara-menjalankan"><strong>Coba Sekarang</strong></a> ·
-  <a href="#struktur-proyek"><strong>Struktur</strong></a> ·
   <a href="#arsitektur"><strong>Arsitektur</strong></a> ·
   <a href="#api-endpoint"><strong>API</strong></a>
 </p>
@@ -113,72 +112,6 @@ npm run test:watch  # watch mode
 
 <br>
 
-## 📂 Struktur Proyek
-
-```
-src/
-├── app/
-│   ├── layout.tsx                 # Root layout — global styles, fonts, sky animations
-│   ├── page.tsx                   # Dashboard utama — hero, navbar, semua section
-│   ├── globals.css                # Tailwind v4 + custom theme CSS & animations
-│   ├── loading.tsx                # Loading state (spinner)
-│   ├── error.tsx                  # Global error boundary
-│   ├── not-found.tsx              # 404 halaman
-│   └── api/
-│       ├── weather/route.ts       # GET /api/weather?adm4={kode}
-│       ├── weather-batch/route.ts # GET /api/weather-batch — data batch untuk peta
-│       ├── regions/route.ts       # GET /api/regions?q=... & ?lat=...&lon=...
-│       ├── warnings/route.ts      # GET /api/warnings — peringatan dini BMKG
-│       ├── press-releases/route.ts# GET /api/press-releases — siaran pers BMKG
-│       └── bmkg-content/route.ts  # GET /api/bmkg-content — konten BMKG
-│
-├── components/
-│   ├── RegionSearch.tsx           # Search bar + geolocation trigger
-│   ├── WeatherSummary.tsx         # Ringkasan cuaca terkini
-│   ├── HourlyForecast.tsx         # Prakiraan per 3 jam
-│   ├── WeekForecast.tsx           # Prakiraan 7 hari
-│   ├── TrendChart.tsx             # Grafik tren suhu & kelembapan
-│   ├── IndonesiaWeatherMap.tsx    # Peta interaktif seluruh Indonesia
-│   ├── EnviroMetrics.tsx          # Indeks UV, jarak pandang, tekanan, awan
-│   ├── SeaConditions.tsx          # Tinggi gelombang, angin laut
-│   ├── SunMoon.tsx                # Info matahari & bulan
-│   ├── SmartTips.tsx              # Tips aktivitas berdasarkan cuaca
-│   ├── WarningBanner.tsx          # Peringatan dini BMKG
-│   ├── BmkgPressRelease.tsx       # Siaran pers BMKG
-│   ├── BmkgInfoTabs.tsx           # Tab info BMKG
-│   ├── BmkgNewsCard.tsx           # Card berita BMKG
-│   ├── CommunityReports.tsx       # Laporan komunitas
-│   ├── EducationNews.tsx          # Edukasi kebencanaan
-│   ├── SourceAttribution.tsx      # Atribusi data BMKG
-│   ├── WeatherLoadingState.tsx    # Skeleton loading
-│   ├── WeatherErrorState.tsx      # Error state dengan retry
-│   ├── EmptyState.tsx             # State awal — ajakan cari wilayah
-│   └── Toast.tsx                  # Notifikasi toast
-│
-├── lib/
-│   ├── adm4.ts                    # Validasi regex kode adm4 BMKG
-│   ├── adm4.test.ts               # Unit test validasi adm4
-│   ├── bmkgClient.ts              # HTTP client ke API BMKG
-│   ├── weatherNormalize.ts        # Normalisasi data BMKG → tipe internal
-│   ├── weatherNormalize.test.ts   # Unit test normalisasi
-│   ├── cache.ts                   # In-memory cache dengan TTL & stale
-│   ├── cache.test.ts              # Unit test cache behavior
-│   ├── regionSearch.ts            # Search & nearest region dari dataset
-│   ├── regionSearch.test.ts       # Unit test search region
-│   ├── envCalculations.ts         # Kalkulasi UV, jarak pandang, dll
-│   ├── time.ts                    # Format & utilitas waktu
-│   └── useWeather.ts              # Custom hook state management dashboard
-│
-├── types/
-│   └── weather.ts                 # Tipe data internal TypeScript
-│
-└── data/
-    ├── regions-adm4.json          # Dataset wilayah Indonesia (lengkap)
-    └── indonesia-cities.ts        # Data kota untuk peta interaktif
-```
-
-<br>
-
 ## 🏗️ Arsitektur
 
 Alur data: **Browser → Edge Middleware (rate limit) → API Routes → Library → BMKG API**, dengan data lokal (`regions-adm4.json`, `bmkg-coverage.json`, `bmkg-nearest.json`) sebagai penopang fallback saat BMKG tidak punya data atau sedang rate-limit.
@@ -271,30 +204,7 @@ Peringatan cuaca ekstrem **real-time langsung dari BMKG**:
 - Data RSS nowcast BMKG di-refresh setiap 5 menit
 - Filter per provinsi
 - Ekspansi detail per peringatan (waktu kejadian, tingkat urgensi, area terdampak)
-- Tampilkan/sembunyikan semua peringatan
-
-<br>
-
-## 🧪 Testing
-
-```bash
-# Jalankan semua test
-npm run test
-
-# Watch mode
-npm run test:watch
-```
-
-Cakupan test:
-
-- ✅ Validasi regex kode `adm4` (format BMKG)
-- ✅ Pencarian wilayah dari dataset lokal
-- ✅ Nearest region dari koordinat geografis
-- ✅ Normalisasi fixture response BMKG (sukses, kosong, parsial)
-- ✅ Pemilihan nearest forecast point
-- ✅ Cache fresh/stale behavior
-
-<br>
+- Tampilkan/sembunyikan semua peringatan<br>
 
 ## 🎨 Desain
 
@@ -321,7 +231,7 @@ Cakupan test:
 
 ## 📊 Dataset Wilayah
 
-Saat ini mencakup **seluruh provinsi dan kota besar Indonesia**. Dataset disimpan dalam format JSON di `src/data/regions-adm4.json` dengan struktur:
+Saat ini mencakup **80.534 desa/kelurahan di seluruh Indonesia**. Dataset disimpan dalam format JSON di `public/data/regions-adm4.json` dengan struktur:
 
 ```json
 {
