@@ -467,10 +467,15 @@ export async function findBmkgFallback(
 
   if (candidates.length >= maxCandidates) return candidates;
 
-  // Level 0: Direct variants + adm3.1001-1010 probes (cap 13)
+  // Level 0: Direct variants + adm3.1001-1015 AND 2001-2010 probes.
+  // Scan script confirms 1001-1015 have the highest hit rate; some regions
+  // only exist in 2XXX format (e.g. certain desa), so probe those too.
   addVariants(adm4, 3);
-  // Probe 1001-1010 for the same kecamatan — scan script confirms these have highest hit rate
-  for (let n = 1001; n <= 1010; n++) {
+  for (let n = 1001; n <= 1015; n++) {
+    if (candidates.length >= maxCandidates) break;
+    addCandidate(`${adm3}.${n}`);
+  }
+  for (let n = 2001; n <= 2010; n++) {
     if (candidates.length >= maxCandidates) break;
     addCandidate(`${adm3}.${n}`);
   }
