@@ -29,6 +29,8 @@ const PRIMARY_RETRIES = 1; // 2 attempts max per code
 const FALLBACK_TIMEOUT = 3000;
 const FALLBACK_RETRIES = 0; // don't retry probes — keep total time bounded
 const BATCH_SIZE = 5;
+// Wall-clock budget per code — keeps worst case inside Vercel's 10s limit
+const CODE_BUDGET_MS = 9000;
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -56,6 +58,8 @@ export async function GET(request: NextRequest) {
   let rateLimited = false; // shared — one 429/403 stops all remaining probes
 
   async function fetchOne(adm4: string): Promise<void> {
+    const startedAt = Date.now();
+    const budgetLeft = () => CODE_BUDGET_MS - (Date.now() - startedAt);
     const cacheKey = `weather:bmkg:adm4:${adm4}`;
 
     // 1. Cache check (always — stale/cached data survives rate limits)
@@ -112,12 +116,12 @@ export async function GET(request: NextRequest) {
         const fallbackCandidates = await findBmkgFallback(adm4, 15);
         const toTry = fallbackCandidates.filter((c) => c !== bmkgAdm4 && c !== adm4);
         outer: for (let i = 0; i < toTry.length; i += BATCH_SIZE) {
-          if (rateLimited) break;
+          if (rateLimited || budgetLeft() <= 0) break;
           const batch = toTry.slice(i, i + BATCH_SIZE);
           const outcomes = await Promise.all(
             batch.map(async (candidate) => ({
               candidate,
-              res: await fetchForecast(candidate, FALLBACK_TIMEOUT, FALLBACK_RETRIES),
+              res: await fetchForecast(candidate, Math.min(FALLBACK_TIMEOUT, Math.max(1000, budgetLeft())), FALLBACK_RETRIES),
             }))
           );
           for (const { res } of outcomes) {

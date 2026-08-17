@@ -24,12 +24,62 @@ import type {
   WeatherForecast,
 } from "@/types/weather";
 
+// Timeouts tuned to stay inside Vercel's 10s serverless budget.
+// Exact fetch: 2 attempts × 5s max; fallback probes: 3s each, parallel batches.
+const EXACT_TIMEOUT_MS = 5000;
+const FALLBACK_TIMEOUT_MS = 3000;
+const BATCH_SIZE = 5;
+// Hard wall-clock budget for the whole request — after this we stop probing BMKG
+// and serve stale/cached data or fail fast instead of being killed by Vercel.
+const TOTAL_BUDGET_MS = 8500;
+
 /**
  * Normalize a BMKG result into a WeatherForecast response, caching it.
  * When fallbackCode is given, the header keeps the SEARCHED region while
  * fallbackFrom/fallbackAdm4 point to the actual data source.
  * Returns null when the payload has no usable forecast days.
  */
+/**
+ * Serve cached data when BMKG is rate-limited/blocked — zero BMKG requests.
+ * Tries the searched region's stale cache first, then any cached data for the
+ * nearest-with-data codes (same codes the live probe would try).
+ * Returns null when nothing is cached.
+ */
+async function serveCachedFallback(
+  cacheKey: string,
+  adm4: string
+): Promise<NextResponse | null> {
+  // 1. Stale cache of the searched region itself
+  const cached = getCache<WeatherForecast>(cacheKey);
+  if (cached.status === "stale") {
+    return NextResponse.json({
+      ...cached.payload,
+      fromCache: true,
+      isStale: true,
+    } satisfies WeatherForecast);
+  }
+
+  // 2. Cached data for nearest known-working codes (same tier as live probe)
+  const nearest = await findNearestWithData(getAdm3Prefix(adm4), 3);
+  for (const { code } of nearest) {
+    if (code === toBmkgAdm4(adm4) || code === adm4) continue;
+    const c = getCache<WeatherForecast>(`weather:bmkg:adm4:${code}`);
+    if (c.status === "fresh" || c.status === "stale") {
+      const source = await getRegionByAdm4(code);
+      return NextResponse.json({
+        ...c.payload,
+        fromCache: true,
+        isStale: c.status === "stale",
+        // Header tetap wilayah yang dicari; notice menunjuk sumber data sebenarnya
+        fallbackFrom: source?.village ?? c.payload.region.village,
+        fallbackAdm4: code,
+      } satisfies WeatherForecast);
+    }
+  }
+
+  return null;
+}
+
 function buildSuccessResponse(
   result: BmkgClientResult,
   cacheKey: string,
@@ -78,6 +128,7 @@ function buildSuccessResponse(
 }
 
 export async function GET(request: NextRequest) {
+  const requestStartedAt = Date.now();
   const { searchParams } = new URL(request.url);
   const adm4 = searchParams.get("adm4");
 
@@ -124,19 +175,21 @@ export async function GET(request: NextRequest) {
   }
 
   // ── Fetch from BMKG ──
-  // Try BMKG-compatible code first (converted to 1XXX format), then original
-  const bmkgResult = await fetchForecast(bmkgAdm4);
-  const result = bmkgResult.ok
-    ? bmkgResult
-    : bmkgAdm4 !== adm4
-      ? await fetchForecast(adm4)
+  // Try BMKG-compatible code first (converted to 1XXX format), then original.
+  // Explicit short timeout + single retry keeps us inside Vercel's 10s budget.
+  const bmkgResult = await fetchForecast(bmkgAdm4, EXACT_TIMEOUT_MS, 1);
+  const result =
+    !bmkgResult.ok && bmkgAdm4 !== adm4 && Date.now() - requestStartedAt < TOTAL_BUDGET_MS
+      ? await fetchForecast(adm4, EXACT_TIMEOUT_MS, 1)
       : bmkgResult;
 
-  // Short-circuit on rate-limit: don't hammer BMKG with fallback probes, wait 1s then return error
+  // Short-circuit on rate-limit: don't hammer BMKG with fallback probes.
+  // 429 = windowed rate limit (backoff + retry can land in a fresh window);
+  // 403 = IP block (won't clear soon, but one cheap retry costs nothing).
   if (!result.ok && (result.error.status === 429 || result.error.status === 403)) {
     console.log(`[Weather] BMKG rate-limited (${result.error.status}), backing off before retry...`);
-    await new Promise((r) => setTimeout(r, 1000));
-    const retryResult = await fetchForecast(bmkgAdm4);
+    await new Promise((r) => setTimeout(r, 1500));
+    const retryResult = await fetchForecast(bmkgAdm4, EXACT_TIMEOUT_MS, 1);
     if (retryResult.ok) {
       // Cache and return
       const normalized = normalizeBmkgForecast(retryResult.data, region);
@@ -147,7 +200,15 @@ export async function GET(request: NextRequest) {
         } satisfies WeatherForecast);
       }
     }
-    // Still rate-limited — return immediately, don't trigger 35-request fallback
+    // Still rate-limited — serve cached data (zero BMKG requests) before erroring.
+    // The precomputed nearest-with-data map + disk cache often have data for
+    // this or a nearby region, so users keep seeing weather instead of "sibuk".
+    const cachedResp = await serveCachedFallback(cacheKey, adm4);
+    if (cachedResp) {
+      console.log(`[Weather] Rate-limited, serving cached fallback for ${adm4}`);
+      return cachedResp;
+    }
+    // Nothing cached — return immediately, don't trigger 35-request fallback
     return NextResponse.json(
       { error: { code: "BMKG_UNAVAILABLE" as const, message: "Layanan BMKG sedang sibuk. Silakan coba lagi." } } satisfies ApiError,
       { status: 502 }
@@ -171,12 +232,11 @@ export async function GET(request: NextRequest) {
     .filter((c) => c !== bmkgAdm4 && c !== adm4);
   let rateLimited = false;
 
-  if (nearestToTry.length > 0) {
-    const FALLBACK_TIMEOUT = 3000;
+  if (nearestToTry.length > 0 && Date.now() - requestStartedAt < TOTAL_BUDGET_MS) {
     const nearestResults = await Promise.all(
       nearestToTry.map(async (candidate) => ({
         candidate,
-        res: await fetchForecast(candidate, FALLBACK_TIMEOUT),
+        res: await fetchForecast(candidate, FALLBACK_TIMEOUT_MS, 0),
       }))
     );
 
@@ -204,17 +264,20 @@ export async function GET(request: NextRequest) {
   const fallbackCandidates = !rateLimited ? await findBmkgFallback(adm4, 35) : [];
   let fallbackResult: BmkgClientResult | null = null;
   let fallbackCode: string | null = null;
-  const FALLBACK_TIMEOUT = 3000;
-  const BATCH_SIZE = 5;
 
   // Probe in parallel batches — 5 concurrent requests per batch, stop on first success.
-  // Worst case: 7 batches × 3s = ~21s instead of 35 × 4s = ~140s serial.
+  // Wall-clock budget (TOTAL_BUDGET_MS) hard-caps total time so Vercel's 10s
+  // limit is never hit even in the worst case of 7 batches × 3s.
   const toTry = fallbackCandidates.filter(c => c !== bmkgAdm4 && c !== adm4);
   outer: for (let i = 0; i < toTry.length; i += BATCH_SIZE) {
+    if (Date.now() - requestStartedAt >= TOTAL_BUDGET_MS) {
+      console.log(`[Weather] Fallback probe budget exhausted, stopping`);
+      break;
+    }
     const batch = toTry.slice(i, i + BATCH_SIZE);
     const results = await Promise.all(
       batch.map(async (candidate) => {
-        const res = await fetchForecast(candidate, FALLBACK_TIMEOUT);
+        const res = await fetchForecast(candidate, FALLBACK_TIMEOUT_MS, 0);
         return { candidate, res };
       })
     );
