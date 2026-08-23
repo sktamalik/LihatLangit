@@ -210,5 +210,17 @@ export async function GET(request: NextRequest) {
     };
   }
 
-  return NextResponse.json(summary);
+  // CDN cache: complete results are shared by ALL visitors for 10 min
+  // (BMKG updates every 3h, so this is safely fresh) — warm loads become
+  // instant edge hits instead of new BMKG-probing function invocations.
+  // Partial results (rate-limited mid-batch) get a short 30s TTL so a
+  // retry fills in the missing cities soon.
+  const complete = Object.keys(summary).length >= codes.length;
+  const cacheControl = complete
+    ? "public, s-maxage=600, stale-while-revalidate=1800"
+    : "public, s-maxage=30, stale-while-revalidate=120";
+
+  return NextResponse.json(summary, {
+    headers: { "Cache-Control": cacheControl },
+  });
 }

@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { searchRegions, findNearestRegion, reverseGeocode } from "@/lib/regionSearch";
+import { searchRegions, reverseGeocode } from "@/lib/regionSearch";
 import type { Region, ApiError } from "@/types/weather";
 
 export async function GET(request: NextRequest) {
@@ -33,10 +33,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(error, { status: 400 });
     }
 
-    const nearest = await findNearestRegion(latNum, lonNum);
-    if (nearest) return NextResponse.json(nearest);
-
-    // Fallback: reverse geocode via Nominatim + match local dataset
+    // Reverse geocode via Nominatim + match local dataset
+    // (dataset has NO coordinates — nearest-by-coords is impossible)
     const geocoded = await reverseGeocode(latNum, lonNum);
     if (geocoded) return NextResponse.json(geocoded);
 

@@ -25,8 +25,9 @@ import type {
 } from "@/types/weather";
 
 // Timeouts tuned to stay inside Vercel's 10s serverless budget.
-// Exact fetch: 2 attempts × 5s max; fallback probes: 3s each, parallel batches.
-const EXACT_TIMEOUT_MS = 5000;
+// Exact fetch: up to 3 attempts × 4s max (incl. rate-limit retry);
+// fallback probes: 3s each, parallel batches. Hard budget below caps total.
+const EXACT_TIMEOUT_MS = 4000;
 const FALLBACK_TIMEOUT_MS = 3000;
 const BATCH_SIZE = 5;
 // Hard wall-clock budget for the whole request — after this we stop probing BMKG
@@ -91,6 +92,10 @@ function buildSuccessResponse(
 
   if (!normalized || normalized.days.length === 0) return null;
 
+  // CDN cache — BMKG updates every ~3h so a 5-min edge cache is safely fresh.
+  // Repeat searches for the same region become instant CDN hits.
+  const headers = { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" };
+
   if (fallbackCode) {
     // Actual data source — BMKG lokasi of the working fallback code
     const sourceVillage = normalized.region.village;
@@ -116,7 +121,7 @@ function buildSuccessResponse(
       isStale: false,
       fallbackFrom: sourceVillage,
       fallbackAdm4: fallbackCode,
-    } satisfies WeatherForecast);
+    } satisfies WeatherForecast, { headers });
   }
 
   setCache(cacheKey, normalized);
@@ -124,7 +129,7 @@ function buildSuccessResponse(
     ...normalized,
     fromCache: false,
     isStale: false,
-  } satisfies WeatherForecast);
+  } satisfies WeatherForecast, { headers });
 }
 
 export async function GET(request: NextRequest) {
@@ -171,15 +176,18 @@ export async function GET(request: NextRequest) {
       ...cached.payload,
       fromCache: true,
       isStale: false,
-    } satisfies WeatherForecast);
+    } satisfies WeatherForecast, {
+      headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+    });
   }
 
   // ── Fetch from BMKG ──
   // Try BMKG-compatible code first (converted to 1XXX format), then original.
   // Explicit short timeout + single retry keeps us inside Vercel's 10s budget.
   const bmkgResult = await fetchForecast(bmkgAdm4, EXACT_TIMEOUT_MS, 1);
+  // Second attempt only when enough budget remains for it AND the fallback chain
   const result =
-    !bmkgResult.ok && bmkgAdm4 !== adm4 && Date.now() - requestStartedAt < TOTAL_BUDGET_MS
+    !bmkgResult.ok && bmkgAdm4 !== adm4 && Date.now() - requestStartedAt < TOTAL_BUDGET_MS - EXACT_TIMEOUT_MS
       ? await fetchForecast(adm4, EXACT_TIMEOUT_MS, 1)
       : bmkgResult;
 
@@ -187,6 +195,16 @@ export async function GET(request: NextRequest) {
   // 429 = windowed rate limit (backoff + retry can land in a fresh window);
   // 403 = IP block (won't clear soon, but one cheap retry costs nothing).
   if (!result.ok && (result.error.status === 429 || result.error.status === 403)) {
+    // Skip the backoff retry when the wall-clock budget is already spent —
+    // a 1.5s sleep + another 4s fetch can blow past Vercel's 10s limit.
+    if (Date.now() - requestStartedAt >= TOTAL_BUDGET_MS - 6000) {
+      const cachedResp = await serveCachedFallback(cacheKey, adm4);
+      if (cachedResp) return cachedResp;
+      return NextResponse.json(
+        { error: { code: "BMKG_UNAVAILABLE" as const, message: "Layanan BMKG sedang sibuk. Silakan coba lagi." } } satisfies ApiError,
+        { status: 502 }
+      );
+    }
     console.log(`[Weather] BMKG rate-limited (${result.error.status}), backing off before retry...`);
     await new Promise((r) => setTimeout(r, 1500));
     const retryResult = await fetchForecast(bmkgAdm4, EXACT_TIMEOUT_MS, 1);

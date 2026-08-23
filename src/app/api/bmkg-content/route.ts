@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const html = await fetchBmkgPage(type);
-    const articles = parseBmkgContent(html, type);
+    const articles = parseBmkgContent(html);
 
     if (articles.length > 0) {
       cacheMap.set(type, { data: articles, fetchedAt: Date.now() });
@@ -86,7 +86,7 @@ async function fetchBmkgPage(type: ContentType): Promise<string> {
   return res.text();
 }
 
-function parseBmkgContent(html: string, type: ContentType): BmkgContent[] {
+function parseBmkgContent(html: string): BmkgContent[] {
   const articles: BmkgContent[] = [];
 
   // Match article blocks
