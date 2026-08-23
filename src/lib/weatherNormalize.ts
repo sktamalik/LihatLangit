@@ -226,6 +226,3 @@ export function getNearestForecastPoint(
   // All points are in the past — return the last available
   return points[points.length - 1];
 }
-
-/** Re-export so callers don't break — preferred import path is @/lib/time */
-export { formatLocalNow } from "@/lib/time";

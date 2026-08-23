@@ -205,44 +205,6 @@ export async function searchRegions(query: string): Promise<Region[]> {
   return scored.slice(0, MAX_RESULTS).map((r) => r.region);
 }
 
-/** Haversine distance in kilometers */
-function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-/**
- * Find the nearest region to given coordinates.
- * Returns null if no region has coordinates.
- */
-export async function findNearestRegion(lat: number, lon: number): Promise<Region | null> {
-  const index = await getIndex();
-  const withCoords = index.filter((e) => e.region.latitude != null && e.region.longitude != null);
-
-  if (withCoords.length === 0) return null;
-
-  let nearest = withCoords[0].region;
-  let minDist = haversineKm(lat, lon, nearest.latitude!, nearest.longitude!);
-
-  for (let i = 1; i < withCoords.length; i++) {
-    const r = withCoords[i].region;
-    const d = haversineKm(lat, lon, r.latitude!, r.longitude!);
-    if (d < minDist) {
-      minDist = d;
-      nearest = r;
-    }
-  }
-
-  return nearest;
-}
-
 /** Get a region by its adm4 code */
 export async function getRegionByAdm4(adm4: string): Promise<Region | undefined> {
   const index = await getIndex();

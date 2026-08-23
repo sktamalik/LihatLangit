@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { INDONESIA_CITIES } from "@/data/indonesia-cities";
-import { slugifyCity, getSiteUrl, cityTitle, cityDescription, cityUrl } from "@/lib/citySeo";
+import { slugifyCity, getSiteUrl, cityTitle, cityUrl } from "@/lib/citySeo";
 
 export const metadata: Metadata = {
   title: "Cuaca Kota Besar Indonesia — Prakiraan BMKG Hari Ini",

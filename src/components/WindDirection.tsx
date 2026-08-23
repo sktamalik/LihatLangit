@@ -74,7 +74,6 @@ export default function WindDirection({ windDirection, windSpeedKmh, size = "md"
   }, [windDirection]);
 
   const dim = size === "sm" ? 48 : size === "lg" ? 96 : 64;
-  const strokeW = size === "sm" ? 2 : 3;
   const fontSize = size === "sm" ? 9 : size === "lg" ? 13 : 11;
 
   return (

@@ -62,31 +62,43 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   // ── Fetch weather batch hanya saat section peta mendekati viewport ──
   // Sebelumnya fetch 38 kota ke BMKG terjadi di SETIAP page load — itu penyebab
   // utama rate-limit BMKG (429/403) yang bikin "Layanan BMKG sedang sibuk".
-  // Sekarang fetch ditunda sampai user scroll mendekati peta, sekali per mount.
+  // Dua jalur prefetch, mana yang lebih dulu:
+  //   1. requestIdleCallback — browser idle ~2-4s setelah load; respons cached
+  //      di CDN (s-maxage=600) sehingga murah dan tidak menambah beban BMKG.
+  //   2. IntersectionObserver rootMargin 600px — user scroll cepat ke peta.
   const weatherFetchedRef = useRef(false);
+  const startFetch = useCallback(() => {
+    if (weatherFetchedRef.current) return;
+    weatherFetchedRef.current = true;
+    void fetchAllWeather();
+  }, [fetchAllWeather]);
+
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === "function") {
+      const idle = window.requestIdleCallback(startFetch, { timeout: 5000 });
+      return () => window.cancelIdleCallback(idle);
+    }
+    const t = setTimeout(startFetch, 3000);
+    return () => clearTimeout(t);
+  }, [startFetch]);
+
   useEffect(() => {
     if (weatherFetchedRef.current) return;
     const el = document.getElementById("peta-cuaca");
-    if (!el) {
-      // Section tidak ditemukan — fallback ke fetch langsung
-      weatherFetchedRef.current = true;
-      void fetchAllWeather();
-      return;
-    }
+    if (!el) return; // jalur idle-callback tetap jalan sebagai fallback
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting) && !weatherFetchedRef.current) {
-          weatherFetchedRef.current = true;
-          void fetchAllWeather();
+        if (entries.some((e) => e.isIntersecting)) {
+          startFetch();
           observer.disconnect();
         }
       },
-      // 400px early — fetch sudah jalan sebelum peta benar-benar kelihatan
-      { rootMargin: "400px 0px" }
+      // 600px early — fetch sudah jalan sebelum peta benar-benar kelihatan
+      { rootMargin: "600px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [fetchAllWeather]);
+  }, [startFetch]);
 
   // ── Init map once ──
   useEffect(() => {

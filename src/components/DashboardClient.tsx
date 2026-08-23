@@ -299,7 +299,7 @@ export default function DashboardClient() {
                       return (
                         <div key={day.date} className="rounded-lg p-3.5 flex justify-between items-center hover:bg-surface-container-low transition-colors cursor-pointer">
                           <div className="flex items-center gap-4">
-                            <span className="material-symbols-outlined text-primary-container text-[24px]">{day.points[0]?.weatherDescription.toLowerCase().includes("hujan") ? "rainy" : day.points[0]?.weatherDescription.toLowerCase().includes("awan") ? "cloud" : "clear_day"}</span>
+                            <span className="material-symbols-outlined text-primary-container text-[24px]">{day.points[0]?.weatherDescription?.toLowerCase().includes("hujan") ? "rainy" : day.points[0]?.weatherDescription?.toLowerCase().includes("awan") ? "cloud" : "clear_day"}</span>
                             <div><h5 className="font-body-sans text-[14px] font-medium text-text-dark">{day.label}</h5><p className="font-body-sans text-[12px] text-on-surface-variant">{day.points[0]?.weatherDescription ?? "—"}</p></div>
                           </div>
                           <span className="font-body-sans text-[14px] font-semibold text-text-dark">{tMin !== 999 ? `${Math.round(tMin)}°` : "--"} – {tMax !== -999 ? `${Math.round(tMax)}°` : "--"}</span>

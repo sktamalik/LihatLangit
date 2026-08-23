@@ -128,6 +128,5 @@ export async function fetchForecast(
   }
 
   // Should not reach here, but satisfies return
-  // Should not reach here, but satisfies return
   return { ok: false, error: buildError("HTTP_ERROR", "Request failed after max retries") };
 }

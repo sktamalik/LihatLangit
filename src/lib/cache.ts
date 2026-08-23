@@ -173,8 +173,3 @@ export function clearCache(): void {
     }
   }
 }
-
-/** Get cache size for diagnostics */
-export function cacheSize(): number {
-  return store.size;
-}

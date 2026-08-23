@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchRegions, findNearestRegion, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, generateBmkgVariants, getVillagesByAdm3, findBmkgFallback, findNearestWithData } from "./regionSearch";
+import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, generateBmkgVariants, getVillagesByAdm3, findBmkgFallback, findNearestWithData } from "./regionSearch";
 
 describe("searchRegions", () => {
   it("returns results for 'Kemayoran'", async () => {
@@ -60,14 +60,6 @@ describe("searchRegions", () => {
     const mariso = results.find((r) => r.district === "MARISO");
     expect(mariso).toBeDefined();
     expect(mariso!.city).toContain("MAKASSAR");
-  });
-});
-
-describe("findNearestRegion", () => {
-  it("returns null because dataset lacks coordinates", async () => {
-    // Dataset from build script sets latitude/longitude to null
-    const result = await findNearestRegion(-6.162, 106.856);
-    expect(result).toBeNull();
   });
 });
 
