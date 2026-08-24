@@ -163,7 +163,7 @@ Mengambil prakiraan cuaca untuk kode wilayah `adm4` dari BMKG.
 | `?q={query}`           | Cari wilayah (provinsi/kota/kecamatan/desa) |
 | `?lat={lat}&lon={lon}` | Cari wilayah terdekat dari koordinat GPS    |
 
-### `GET /api/weather-batch?cities={kode1},{kode2},...`
+### `GET /api/weather-batch?adm4={kode1},{kode2},...`
 
 Data cuaca multiple kota sekaligus — digunakan untuk peta interaktif.
 
@@ -174,10 +174,6 @@ Peringatan dini cuaca BMKG (nowcast) — feed RSS di-parsing dari XML.
 | Parameter        | Deskripsi                                                     |
 | ---------------- | ------------------------------------------------------------- |
 | `?detail={link}` | Detail peringatan dalam format CAP (Common Alerting Protocol) |
-
-### `GET /api/press-releases`
-
-Siaran pers terbaru dari BMKG.
 
 ### `GET /api/bmkg-content`
 
