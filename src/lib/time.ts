@@ -118,59 +118,58 @@ export function formatAnalysisDate(isoString: string, timezone?: string): string
 }
 
 
-/**
- * Helper: compute UTC offset minutes from an IANA timezone string.
- * Indonesia only uses WIB (+7), WITA (+8), WIT (+9).
- */
-function getUtcOffsetMinutes(timezone?: string): number {
-  if (!timezone) return 7 * 60;
-  const tzMap: Record<string, number> = {
-    "Asia/Jakarta": 7 * 60,
-    "Asia/Makassar": 8 * 60,
-    "Asia/Jayapura": 9 * 60,
+function getZonedDateTimeParts(
+  date: Date,
+  timezone?: string
+): Record<"year" | "month" | "day" | "hour" | "minute", string> {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone ?? "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).formatToParts(date);
+
+  const value = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  return {
+    year: value("year"),
+    month: value("month"),
+    day: value("day"),
+    hour: value("hour") === "24" ? "00" : value("hour"),
+    minute: value("minute"),
   };
-  return tzMap[timezone] ?? 7 * 60;
 }
 
 /**
  * Format current time as "YYYY-MM-DDTHH:MM" in the given IANA timezone.
  */
 export function formatLocalNow(timezone?: string): string {
-  const offsetMinutes = getUtcOffsetMinutes(timezone);
-  const localMs = Date.now() + offsetMinutes * 60 * 1000;
-  const localDate = new Date(localMs);
-  const y = localDate.getUTCFullYear();
-  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(localDate.getUTCDate()).padStart(2, "0");
-  const h = String(localDate.getUTCHours()).padStart(2, "0");
-  const min = String(localDate.getUTCMinutes()).padStart(2, "0");
-  return y + "-" + m + "-" + d + "T" + h + ":" + min;
+  const { year, month, day, hour, minute } = getZonedDateTimeParts(
+    new Date(),
+    timezone
+  );
+  return `${year}-${month}-${day}T${hour}:${minute}`;
 }
 
 /**
  * Get today's date string "YYYY-MM-DD" in the region's local timezone.
  */
 export function getLocalTodayStr(timezone?: string): string {
-  const offsetMinutes = getUtcOffsetMinutes(timezone);
-  const localMs = Date.now() + offsetMinutes * 60 * 1000;
-  const localDate = new Date(localMs);
-  const y = localDate.getUTCFullYear();
-  const m = String(localDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(localDate.getUTCDate()).padStart(2, "0");
-  return y + "-" + m + "-" + d;
+  const { year, month, day } = getZonedDateTimeParts(new Date(), timezone);
+  return `${year}-${month}-${day}`;
 }
 
 /**
  * Get tomorrow's date string "YYYY-MM-DD" in the region's local timezone.
  */
 export function getLocalTomorrowStr(timezone?: string): string {
-  const offsetMinutes = getUtcOffsetMinutes(timezone);
-  const localMs = Date.now() + offsetMinutes * 60 * 1000 + 86400000;
-  const tomorrowDate = new Date(localMs);
-  const y = tomorrowDate.getUTCFullYear();
-  const m = String(tomorrowDate.getUTCMonth() + 1).padStart(2, "0");
-  const d = String(tomorrowDate.getUTCDate()).padStart(2, "0");
-  return y + "-" + m + "-" + d;
+  const tomorrow = new Date(Date.now() + 86_400_000);
+  const { year, month, day } = getZonedDateTimeParts(tomorrow, timezone);
+  return `${year}-${month}-${day}`;
 }
 
 export { DAYS, MONTHS_LONG, MONTHS_SHORT };
