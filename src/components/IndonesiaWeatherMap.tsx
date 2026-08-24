@@ -17,6 +17,17 @@ interface CityWeather {
 
 type CityWeatherMap = Record<string, CityWeather>;
 
+const LEGEND_ITEMS = [
+  { label: "Cerah", color: "#f59e0b" },
+  { label: "Cerah Berawan", color: "#60a5fa" },
+  { label: "Berawan", color: "#9ca3af" },
+  { label: "Berawan Tebal", color: "#6b7280" },
+  { label: "Hujan Ringan", color: "#818cf8" },
+  { label: "Hujan Sedang", color: "#6366f1" },
+  { label: "Hujan Lebat", color: "#4f46e5" },
+  { label: "Hujan Petir", color: "#7c3aed" },
+];
+
 interface ZoomTarget {
   lat: number;
   lng: number;
@@ -122,7 +133,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
         const map = L.map(mapContainer.current, {
           center: [-2.5, 118.0],
           zoom: 5,
-          zoomControl: false,
+          zoomControl: true,
           attributionControl: false,
           scrollWheelZoom: false,
           minZoom: 4,
@@ -188,8 +199,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
         : `<span class="weather-emoji">${getWeatherEmoji(desc)}</span>`;
 
       const popupHtml = `
-        <div style="font-family:Inter,sans-serif;font-size:13px;line-height:1.5;min-width:160px;position:relative">
-          <button class="popup-close-btn" data-adm4="${city.adm4}" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;border-radius:50%;background:#0C4A6E;color:white;border:none;font-size:16px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.2);z-index:1000;line-height:1;padding:0">×</button>
+        <div style="font-family:Inter,sans-serif;font-size:13px;line-height:1.5;min-width:160px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
             ${iconHtml}
             <div>
@@ -211,7 +221,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
         </div>
       `;
 
-      const popup = L.popup({ className: "weather-popup", closeButton: false, autoClose: true })
+      const popup = L.popup({ className: "weather-popup", autoClose: true })
         .setContent(popupHtml)
         .setLatLng([city.latitude, city.longitude]);
 
@@ -247,22 +257,6 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
 
       markersLayerRef.current.addLayer(labelMarker);
     }
-
-    // Event delegation for close buttons
-    const mapContainerEl = mapInstance.current.getContainer();
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.classList.contains('popup-close-btn')) {
-        e.stopPropagation();
-        mapInstance.current?.closePopup();
-      }
-    };
-
-    mapContainerEl.addEventListener('click', handleClick);
-
-    return () => {
-      mapContainerEl.removeEventListener('click', handleClick);
-    };
   }, [mapReady, weatherData]);
 
   // ── Legend (added once on map ready) ──
@@ -275,17 +269,6 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       legendRef.current.remove();
       legendRef.current = null;
     }
-
-    const legendItems = [
-      { label: "Cerah", color: "#f59e0b" },
-      { label: "Cerah Berawan", color: "#60a5fa" },
-      { label: "Berawan", color: "#9ca3af" },
-      { label: "Berawan Tebal", color: "#6b7280" },
-      { label: "Hujan Ringan", color: "#818cf8" },
-      { label: "Hujan Sedang", color: "#6366f1" },
-      { label: "Hujan Lebat", color: "#4f46e5" },
-      { label: "Hujan Petir", color: "#7c3aed" },
-    ];
 
     const LegendControl = L.Control.extend({
       onAdd: () => {
@@ -305,7 +288,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
             🗺️ Indikator Cuaca
           </div>
           <div style="display:flex;flex-direction:column;gap:4px">
-            ${legendItems.map((item) => `
+            ${LEGEND_ITEMS.map((item) => `
               <div style="display:flex;align-items:center;gap:6px">
                 <span style="
                   display:inline-block;
@@ -355,9 +338,6 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       pendingZoomRef.current = null;
     }
   }, [mapReady]);
-
-  const handleZoomIn = () => { mapInstance.current?.zoomIn(); };
-  const handleZoomOut = () => { mapInstance.current?.zoomOut(); };
 
   const handleRetry = () => { fetchAllWeather(); };
 
@@ -434,13 +414,6 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
             </div>
           )}
 
-          {/* Custom zoom buttons */}
-          {mapReady && (
-            <div className="absolute bottom-5 right-4 z-[1100] flex flex-col gap-[1px] leaflet-zoom-hide">
-              <button onClick={handleZoomIn} aria-label="Perbesar peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-t-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ borderBottom: '1px solid #e2e8f0', lineHeight: 1 }} type="button">+</button>
-              <button onClick={handleZoomOut} aria-label="Perkecil peta" className="w-[46px] h-[46px] flex items-center justify-center bg-white rounded-b-[14px] text-[24px] font-bold text-[#0C4A6E] hover:bg-[#f0f9ff] hover:text-[#006591] active:bg-[#dbeafe] active:scale-[0.93] shadow-[0_3px_14px_rgba(0,0,0,0.18)] cursor-pointer select-none transition-all duration-100 border-0" style={{ lineHeight: 1 }} type="button">−</button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -465,16 +438,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
         <details className="text-[12px]">
           <summary className="cursor-pointer text-text-muted font-body-sans font-medium mb-2">Indikator Cuaca</summary>
           <div className="flex flex-wrap gap-x-4 gap-y-1.5">
-            {[
-              { label: "Cerah", color: "#f59e0b" },
-              { label: "Cerah Berawan", color: "#60a5fa" },
-              { label: "Berawan", color: "#9ca3af" },
-              { label: "Berawan Tebal", color: "#6b7280" },
-              { label: "Hujan Ringan", color: "#818cf8" },
-              { label: "Hujan Sedang", color: "#6366f1" },
-              { label: "Hujan Lebat", color: "#4f46e5" },
-              { label: "Hujan Petir", color: "#7c3aed" },
-            ].map((item) => (
+            {LEGEND_ITEMS.map((item) => (
               <span key={item.label} className="flex items-center gap-1.5 font-body-sans text-text-muted">
                 <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: item.color }} />
                 {item.label}
