@@ -15,7 +15,6 @@
     "build:nearest": "node scripts/build-nearest-fallback.js"
   },
   "dependencies": {
-    "@lottiefiles/dotlottie-react": "^0.19.9",
     "fast-xml-parser": "^5.9.3",
     "leaflet": "^1.9.4",
     "next": "16.2.10",
@@ -28,10 +27,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@vitejs/plugin-react": "^6.0.3",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
-    "sharp": "^0.35.3",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.9"
