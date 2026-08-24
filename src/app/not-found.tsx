@@ -1,35 +1,31 @@
-"use client";
 import Link from "next/link";
-import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function NotFoundPage() {
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center bg-[#eef5fc] overflow-hidden px-6 pt-[12vh] md:pt-[7vh]">
-      {/* Lottie Animation */}
-      <div className="w-full max-w-[280px] md:max-w-[400px] aspect-square">
-        <DotLottieReact
-          src="https://lottie.host/ec92a786-0eb8-47fc-ad7e-59350f80f312/HjvUjVcyaI.json"
-          loop
-          autoplay
-          style={{ width: "100%", height: "100%" }}
-        />
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#eef5fc] px-6 text-center">
+      <div className="mb-6 w-full max-w-[280px] md:max-w-[380px]">
+        <svg viewBox="0 0 220 120" className="h-auto w-full" role="img" aria-label="Awan dan matahari">
+          <circle cx="164" cy="38" r="24" fill="#FDE047" />
+          <path
+            d="M28 88c-11 0-20-9-20-20s9-20 20-20c2-15 15-27 31-27 13 0 24 8 29 19 3-1 7-2 10-2 14 0 25 11 25 25s-11 25-25 25H28Z"
+            fill="#ffffff"
+            stroke="#cbd5e1"
+            strokeWidth="3"
+          />
+        </svg>
       </div>
-
-      {/* Text & button */}
-      <div className="flex flex-col items-center text-center -mt-4 md:-mt-6">
-        <h1 className="font-body-sans text-xl md:text-3xl font-bold text-gray-900 mb-2">
-          Halaman Tidak Ditemukan
-        </h1>
-        <p className="text-gray-500 text-sm md:text-base mb-6 max-w-xs">
-          Halaman yang Anda cari tidak tersedia.
-        </p>
-        <Link
-          href="/"
-          className="inline-block px-5 py-2.5 md:px-6 md:py-3 bg-gray-800 text-white rounded-full font-body-sans font-semibold hover:bg-gray-700 transition-colors shadow-md text-sm md:text-base"
-        >
-          Kembali ke Beranda
-        </Link>
-      </div>
+      <h1 className="font-body-sans text-xl font-bold text-gray-900 md:text-3xl">
+        Halaman Tidak Ditemukan
+      </h1>
+      <p className="mb-6 mt-2 max-w-xs text-sm text-gray-500 md:text-base">
+        Halaman yang Anda cari tidak tersedia.
+      </p>
+      <Link
+        href="/"
+        className="inline-block rounded-full bg-gray-800 px-5 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-gray-700 md:px-6 md:py-3 md:text-base"
+      >
+        Kembali ke Beranda
+      </Link>
     </div>
   );
 }
