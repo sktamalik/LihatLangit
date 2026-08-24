@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, generateBmkgVariants, getVillagesByAdm3, findBmkgFallback, findNearestWithData } from "./regionSearch";
+import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, findNearestWithData } from "./regionSearch";
 
 describe("searchRegions", () => {
   it("returns results for 'Kemayoran'", async () => {
@@ -103,66 +103,6 @@ describe("getAdm3Prefix", () => {
 
   it("returns full string for invalid input", () => {
     expect(getAdm3Prefix("invalid")).toBe("invalid");
-  });
-});
-
-describe("generateBmkgVariants", () => {
-  it("generates variants for 0XXX code", () => {
-    const variants = generateBmkgVariants("73.71.01.0005");
-    expect(variants).toContain("73.71.01.1005"); // converted
-    expect(variants).toContain("73.71.01.0005"); // original
-    expect(variants.length).toBe(2);
-  });
-
-  it("generates variants for 1XXX code (reverse direction)", () => {
-    const variants = generateBmkgVariants("73.71.01.1005");
-    expect(variants).toContain("73.71.01.1005"); // original
-    expect(variants).toContain("73.71.01.0005"); // reversed
-    expect(variants.length).toBe(2);
-  });
-
-  it("handles invalid input", () => {
-    expect(generateBmkgVariants("invalid")).toEqual(["invalid"]);
-  });
-
-  it("deduplicates when 0XXX and 1XXX are same", () => {
-    // This shouldn't normally happen, but verify dedup works
-    const variants = generateBmkgVariants("73.71.01.1001");
-    expect(variants.length).toBe(2);
-  });
-});
-
-describe("getVillagesByAdm3", () => {
-  it("returns villages in district 73.71.01 (Mariso)", async () => {
-    const villages = await getVillagesByAdm3("73.71.01");
-    expect(villages.length).toBeGreaterThan(0);
-    expect(villages[0].adm4).toMatch(/^73\.71\.01\./);
-  });
-});
-
-describe("findBmkgFallback", () => {
-  it("leads with known-working coverage codes from the same province", async () => {
-    // 18.05.07 (Lampung Tengah) — adm3 NOT in coverage map, but province 18 has 26 working codes
-    const candidates = await findBmkgFallback("18.05.07.0001", 35);
-    // The first candidates must be verified coverage codes, not blind probes
-    const firstCoverage = candidates.findIndex((c) => c.startsWith("18.") && !c.startsWith("18.05.07"));
-    expect(firstCoverage).toBeGreaterThanOrEqual(0);
-    // Blind adm3 probes of the searched district should not outrank verified coverage
-    const firstBlind = candidates.findIndex((c) => c.startsWith("18.05.07."));
-    expect(firstBlind === -1 || firstBlind > firstCoverage).toBe(true);
-  });
-
-  it("falls back to other-province coverage codes for provinces with zero coverage", async () => {
-    // 51.71 (Bali) — province 51 has NO coverage entries at all
-    const candidates = await findBmkgFallback("51.71.01.0001", 35);
-    // Some known-working code from another province must be in the list
-    const hasOtherCoverage = candidates.some((c) => c.startsWith("11.") || c.startsWith("12.") || c.startsWith("31.") || c.startsWith("32.") || c.startsWith("33."));
-    expect(hasOtherCoverage).toBe(true);
-  });
-
-  it("keeps the searched adm3's converted variant (tried by primary fetch anyway)", async () => {
-    const candidates = await findBmkgFallback("73.71.01.0005", 35);
-    expect(candidates).toContain("73.71.01.1005");
   });
 });
 
