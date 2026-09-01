@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { getCache, setCache } from "@/lib/cache";
 
 interface BmkgContent {
   title: string;
@@ -19,8 +20,6 @@ interface BmkgContent {
 const VALID_TYPES = ["siaran-pers", "pengumuman", "artikel"] as const;
 type ContentType = (typeof VALID_TYPES)[number];
 
-// In-memory cache per type
-const cacheMap = new Map<string, { data: BmkgContent[]; fetchedAt: number }>();
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 const monthMap: Record<string, string> = {
@@ -41,11 +40,12 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const cached = cacheMap.get(type);
+  const cacheKey = `bmkg-content:${type}`;
+  const cached = getCache<BmkgContent[]>(cacheKey);
 
   // Return cache if fresh
-  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
-    return NextResponse.json({ data: cached.data, fromCache: true });
+  if (cached.status === "fresh") {
+    return NextResponse.json({ data: cached.payload, fromCache: true });
   }
 
   try {
@@ -53,19 +53,19 @@ export async function GET(request: NextRequest) {
     const articles = parseBmkgContent(html);
 
     if (articles.length > 0) {
-      cacheMap.set(type, { data: articles, fetchedAt: Date.now() });
+      setCache(cacheKey, articles, CACHE_TTL_MS);
       return NextResponse.json({ data: articles, fromCache: false });
     }
 
-    // Parse returned 0 articles — fall back to cache
-    if (cached) {
-      return NextResponse.json({ data: cached.data, fromCache: true });
+    // Parse returned 0 articles — fall back to stale cache
+    if (cached.status === "stale") {
+      return NextResponse.json({ data: cached.payload, fromCache: true });
     }
 
     return NextResponse.json({ data: [], fromCache: false });
   } catch {
-    if (cached) {
-      return NextResponse.json({ data: cached.data, fromCache: true });
+    if (cached.status === "stale") {
+      return NextResponse.json({ data: cached.payload, fromCache: true });
     }
     return NextResponse.json({ data: [], fromCache: false });
   }
