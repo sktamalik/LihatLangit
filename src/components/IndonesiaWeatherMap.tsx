@@ -73,10 +73,8 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   // ── Fetch weather batch hanya saat section peta mendekati viewport ──
   // Sebelumnya fetch 38 kota ke BMKG terjadi di SETIAP page load — itu penyebab
   // utama rate-limit BMKG (429/403) yang bikin "Layanan BMKG sedang sibuk".
-  // Dua jalur prefetch, mana yang lebih dulu:
-  //   1. requestIdleCallback — browser idle ~2-4s setelah load; respons cached
-  //      di CDN (s-maxage=600) sehingga murah dan tidak menambah beban BMKG.
-  //   2. IntersectionObserver rootMargin 600px — user scroll cepat ke peta.
+  // Prefetch 3s setelah load (respons cached CDN, s-maxage=600, murah) PLUS
+  // IntersectionObserver rootMargin 600px untuk user yang scroll cepat ke peta.
   const weatherFetchedRef = useRef(false);
   const startFetch = useCallback(() => {
     if (weatherFetchedRef.current) return;
@@ -85,10 +83,6 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   }, [fetchAllWeather]);
 
   useEffect(() => {
-    if (typeof window.requestIdleCallback === "function") {
-      const idle = window.requestIdleCallback(startFetch, { timeout: 5000 });
-      return () => window.cancelIdleCallback(idle);
-    }
     const t = setTimeout(startFetch, 3000);
     return () => clearTimeout(t);
   }, [startFetch]);
