@@ -18,7 +18,6 @@ const DATA_CANDIDATES = [
 
 const NEAREST_CANDIDATES = [
   path.join(process.cwd(), "public", "data", "bmkg-nearest.json"),
-  path.join(process.cwd(), "src", "data", "bmkg-nearest.json"),
 ];
 
 // Lazy-loaded nearest map: adm3 → [[workingCode, tier], ...] closest first
