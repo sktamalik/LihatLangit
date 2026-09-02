@@ -45,7 +45,10 @@ export async function GET(request: NextRequest) {
 
   // Return cache if fresh
   if (cached.status === "fresh") {
-    return NextResponse.json({ data: cached.payload, fromCache: true });
+    return NextResponse.json(
+      { data: cached.payload, fromCache: true },
+      { headers: { "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600" } }
+    );
   }
 
   try {
@@ -79,7 +82,7 @@ async function fetchBmkgPage(type: ContentType): Promise<string> {
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       Accept: "text/html",
     },
-    signal: AbortSignal.timeout(10000),
+    signal: AbortSignal.timeout(6_000),
   });
 
   if (!res.ok) throw new Error(`HTTP ${res.status}`);

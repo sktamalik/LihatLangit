@@ -59,10 +59,16 @@ export async function GET(request: NextRequest) {
       } catch {
         return NextResponse.json({ error: "URL tidak valid" }, { status: 400 });
       }
-      if (!parsedUrl.hostname.endsWith(allowedHost)) {
+      if (!parsedUrl.hostname.endsWith("." + allowedHost) && parsedUrl.hostname !== allowedHost) {
         return NextResponse.json({ error: "URL tidak diizinkan" }, { status: 400 });
       }
-      const res = await fetch(detailUrl, { next: { revalidate: 300 } });
+      if (parsedUrl.protocol !== "https:" && parsedUrl.protocol !== "http:") {
+        return NextResponse.json({ error: "Protokol tidak diizinkan" }, { status: 400 });
+      }
+      const res = await fetch(detailUrl, {
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(5_000),
+      });
       if (!res.ok)
         return NextResponse.json(
           { error: "Gagal mengambil detail" },
@@ -118,6 +124,7 @@ export async function GET(request: NextRequest) {
   try {
     const res = await fetch("https://www.bmkg.go.id/alerts/nowcast/id", {
       next: { revalidate: 300 },
+      signal: AbortSignal.timeout(5_000),
     });
     if (!res.ok) return NextResponse.json({ warnings: [] });
 

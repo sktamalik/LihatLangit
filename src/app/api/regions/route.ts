@@ -53,6 +53,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json([]);
   }
 
-  const results: Region[] = await searchRegions(q);
-  return NextResponse.json(results);
+  try {
+    const results: Region[] = await searchRegions(q);
+    return NextResponse.json(results, {
+      headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400" },
+    });
+  } catch {
+    const error: ApiError = {
+      error: {
+        code: "REGION_NOT_FOUND",
+        message: "Data wilayah belum dapat dimuat.",
+      },
+    };
+    return NextResponse.json(error, { status: 502 });
+  }
 }

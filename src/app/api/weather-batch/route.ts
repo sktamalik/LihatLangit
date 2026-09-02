@@ -4,7 +4,9 @@ import { getWeatherForecast } from "@/lib/weatherService";
 import type { WeatherForecast } from "@/types/weather";
 
 const MAX_CODES = 40;
-const CONCURRENCY = 8;
+const CONCURRENCY = 5;
+// Vercel Hobby kills functions at 10s — cap total wall-clock so partial results return
+const BATCH_DEADLINE_MS = 9_000;
 
 export async function GET(request: NextRequest) {
   const codesParam = new URL(request.url).searchParams.get("adm4");
@@ -45,6 +47,7 @@ export async function GET(request: NextRequest) {
   const results: Record<string, WeatherForecast> = {};
   let rateLimited = false;
   const queue = [...codes];
+  const deadline = Date.now() + BATCH_DEADLINE_MS;
 
   async function fetchOne(adm4: string): Promise<void> {
     const result = await getWeatherForecast(adm4, {
@@ -55,7 +58,7 @@ export async function GET(request: NextRequest) {
   }
 
   async function worker(): Promise<void> {
-    while (queue.length > 0) {
+    while (queue.length > 0 && Date.now() < deadline) {
       const adm4 = queue.shift();
       if (!adm4) break;
       await fetchOne(adm4);

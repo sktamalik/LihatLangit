@@ -13,6 +13,9 @@ const BMKG_GEMPA_URL = "https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json";
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 menit — gempa data updates frequently
 
 interface GempaEntry {
+  /** BMKG returns UPPERCASE keys (Tanggal, Magnitude, Kedalaman, Wilayah, Potensi) */
+  [key: string]: string;
+  // Keep typed accessors for our own use; BMKG fields accessed via bracket notation in components
   tanggal: string;
   jam: string;
   magnitude: string;
