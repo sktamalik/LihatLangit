@@ -35,8 +35,10 @@ describe("searchRegions", () => {
     expect(results[0].village).toBe("KEMAYORAN");
   });
 
-  it("returns up to 20 results", async () => {
-    const results = await searchRegions("a");
+  it("caps results at 20", async () => {
+    // Short query must not trigger the min-2-char guard; use common 2-char query
+    const results = await searchRegions("Ci");
+    expect(results.length).toBeGreaterThan(0);
     expect(results.length).toBeLessThanOrEqual(20);
   });
 
