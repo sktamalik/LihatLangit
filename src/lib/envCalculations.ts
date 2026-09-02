@@ -3,10 +3,13 @@
  * All calculations based on weather data inputs and date/time.
  */
 
-/** Estimate AQI from humidity and temperature (simplified model) */
+/** Estimate AQI from humidity and temperature (simplified model)
+ *  Note: max value ~35, always returns "Baik". This is a placeholder
+ *  — real AQI needs PM2.5/PM10 input. */
 export function estimateAQI(temperatureC: number, humidityPct: number): { value: number; label: string; color: string } {
   const basePM25 = 15 + (humidityPct > 80 ? 20 : humidityPct > 60 ? 8 : 0) - (temperatureC > 32 ? 5 : 0);
   const aqi = Math.round(basePM25);
+  // Model max ~35; always "Baik" without real PM2.5 input
   if (aqi <= 50) return { value: aqi, label: "Baik", color: "text-green-600" };
   if (aqi <= 100) return { value: aqi, label: "Sedang", color: "text-yellow-600" };
   if (aqi <= 150) return { value: aqi, label: "Tidak Sehat", color: "text-orange-600" };
@@ -63,7 +66,9 @@ export function getMoonPhase(date: Date): { phase: string; illumination: number;
   const lunarCycle = 29.53058867;
   const daysSinceNew = ((jd - newMoon) % lunarCycle + lunarCycle) % lunarCycle; // Ensure positive
 
-  const illumination = Math.round((daysSinceNew / lunarCycle) * 100);
+  const illumination = Math.round(
+    ((1 - Math.cos(2 * Math.PI * daysSinceNew / lunarCycle)) / 2) * 100
+  );
 
   if (daysSinceNew < 1.8) return { phase: "Bulan Baru", illumination, icon: "dark_mode" };
   if (daysSinceNew < 5.5) return { phase: "Sabit Muda", illumination, icon: "bedtime" };
