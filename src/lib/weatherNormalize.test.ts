@@ -46,7 +46,7 @@ describe("normalizeBmkgForecast", () => {
     expect(typeof firstPoint!.temperatureC).toBe("number");
   });
 
-  it("returns null for empty data array", () => {
+  it("returns empty days array for empty data", () => {
     const result = normalizeBmkgForecast(emptyFixture as unknown as BmkgRawResponse);
     expect(result).not.toBeNull();
     expect(result!.days).toEqual([]);

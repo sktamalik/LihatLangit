@@ -54,19 +54,34 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   const [showIndicators, setShowIndicators] = useState(true);
 
   // ── Fetch weather for all cities ──
+  const mountedRef = useRef(true);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
+  }, []);
+
   const fetchAllWeather = useCallback(async () => {
     setIsFetching(true);
     setFetchError(false);
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
       const codes = INDONESIA_CITIES.map((c) => c.adm4).join(",");
-      const res = await fetch(`/api/weather-batch?adm4=${encodeURIComponent(codes)}`);
+      const res = await fetch(`/api/weather-batch?adm4=${encodeURIComponent(codes)}`, { signal: controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: CityWeatherMap = await res.json();
-      setWeatherData(data);
-    } catch {
-      setFetchError(true);
+      if (mountedRef.current) setWeatherData(data);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      if (mountedRef.current) setFetchError(true);
     } finally {
-      setIsFetching(false);
+      if (mountedRef.current) setIsFetching(false);
     }
   }, []);
 
@@ -210,7 +225,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
             <span>🌬️ ${windStr}</span>
           </div>
           <div style="font-size:10px;color:#94a3b8;margin-top:6px;border-top:1px solid #e2e8f0;padding-top:4px">
-            ${data?.region.village}, ${data?.region.district}
+            ${data?.region.village ?? "—"}, ${data?.region.district ?? "—"}
           </div>
         </div>
       `;
@@ -308,6 +323,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   }, [mapReady]);
 
   // ── Fly to searched region when zoomToRegion prop changes ──
+  // If map not ready yet, remember target and fly once ready.
   const pendingZoomRef = useRef<ZoomTarget | null>(null);
 
   useEffect(() => {
@@ -316,21 +332,20 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       mapInstance.current.flyTo([zoomToRegion.lat, zoomToRegion.lng], 10, {
         duration: 1.5,
       });
-    } else {
-      pendingZoomRef.current = zoomToRegion;
+      pendingZoomRef.current = null;
+      return;
     }
+    pendingZoomRef.current = zoomToRegion;
   }, [zoomToRegion, mapReady]);
 
-  // Apply pending zoom once map becomes ready
   useEffect(() => {
-    if (mapReady && pendingZoomRef.current && mapInstance.current) {
-      mapInstance.current.flyTo(
-        [pendingZoomRef.current.lat, pendingZoomRef.current.lng],
-        10,
-        { duration: 1.5 }
-      );
-      pendingZoomRef.current = null;
-    }
+    if (!mapReady || !mapInstance.current || !pendingZoomRef.current) return;
+    mapInstance.current.flyTo(
+      [pendingZoomRef.current.lat, pendingZoomRef.current.lng],
+      10,
+      { duration: 1.5 }
+    );
+    pendingZoomRef.current = null;
   }, [mapReady]);
 
   const handleRetry = () => { fetchAllWeather(); };
