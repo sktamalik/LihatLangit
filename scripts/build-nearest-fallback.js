@@ -95,27 +95,43 @@ function main() {
       scored.push({ adm3, tier: 0, score: 0 });
     }
 
-    // tier 1: same adm2
-    if (!scored.length) {
-      for (const other of byAdm2[adm2Of(adm3)] || []) {
-        if (other !== adm3) {
-          scored.push({
-            adm3: other,
-            tier: 1,
-            score: Math.abs(parseInt(other.slice(6), 10) - parseInt(adm3.slice(6), 10)),
-          });
-        }
+    // tier 1: same adm2 (collect even if tier 0 exists — more candidates)
+    for (const other of byAdm2[adm2Of(adm3)] || []) {
+      if (other !== adm3) {
+        scored.push({
+          adm3: other,
+          tier: 1,
+          score: Math.abs(parseInt(other.slice(6), 10) - parseInt(adm3.slice(6), 10)),
+        });
       }
     }
 
     // tier 2: same adm1
-    if (!scored.length) {
-      for (const other of byAdm1[adm1Of(adm3)] || []) {
+    for (const other of byAdm1[adm1Of(adm3)] || []) {
+      if (other !== adm3) {
+        scored.push({
+          adm3: other,
+          tier: 2,
+          score:
+            Math.abs(parseInt(other.slice(6), 10) - parseInt(adm3.slice(6), 10)) +
+            Math.abs(parseInt(adm2Of(other).slice(3), 10) - parseInt(adm2Of(adm3).slice(3), 10)) * 100,
+        });
+      }
+    }
+
+    // tier 3: nearest province with coverage (centroid distance)
+    const prov = parseInt(adm1Of(adm3), 10);
+    const nearestProvs = provsWorking
+      .map((p) => ({ p, d: provDist(prov, p) }))
+      .sort((x, y) => x.d - y.d)
+      .slice(0, 3);
+    for (const { p, d } of nearestProvs) {
+      for (const other of byAdm1[String(p)]) {
         if (other !== adm3) {
           scored.push({
             adm3: other,
-            tier: 2,
-            score:
+            tier: 3,
+            score: d * 1000 +
               Math.abs(parseInt(other.slice(6), 10) - parseInt(adm3.slice(6), 10)) +
               Math.abs(parseInt(adm2Of(other).slice(3), 10) - parseInt(adm2Of(adm3).slice(3), 10)) * 100,
           });
@@ -123,34 +139,12 @@ function main() {
       }
     }
 
-    // tier 3: nearest province with coverage (centroid distance)
-    if (!scored.length) {
-      const prov = parseInt(adm1Of(adm3), 10);
-      const nearestProvs = provsWorking
-        .map((p) => ({ p, d: provDist(prov, p) }))
-        .sort((x, y) => x.d - y.d)
-        .slice(0, 3);
-      for (const { p, d } of nearestProvs) {
-        for (const other of byAdm1[String(p)]) {
-          if (other !== adm3) {
-            scored.push({
-              adm3: other,
-              tier: 3,
-              score: d * 1000 +
-                Math.abs(parseInt(other.slice(6), 10) - parseInt(adm3.slice(6), 10)) +
-                Math.abs(parseInt(adm2Of(other).slice(3), 10) - parseInt(adm2Of(adm3).slice(3), 10)) * 100,
-            });
-          }
-        }
-      }
-    }
-
-    // Dedupe + sort by (tier, score), keep top 3 different adm3
+    // Dedupe + sort by (tier, score), keep top 6 different adm3 (was 3)
     const seen = new Set();
     const top = scored
       .sort((a, b) => a.tier - b.tier || a.score - b.score)
       .filter((c) => (seen.has(c.adm3) ? false : (seen.add(c.adm3), true)))
-      .slice(0, 3);
+      .slice(0, 6);
 
     if (!top.length) {
       tierCount[4]++;

@@ -14,12 +14,16 @@ const iconColors: Record<string, string> = {
   "hujan lebat": "text-blue-600", "hujan petir": "text-purple-500",
 };
 
+// Longest key first so "cerah berawan" wins over "cerah", "berawan tebal" over "berawan"
+const iconKeys = Object.keys(icons).sort((a, b) => b.length - a.length);
+const colorKeys = Object.keys(iconColors).sort((a, b) => b.length - a.length);
+
 function gi(d: string) {
-  const k = Object.keys(icons).find((x) => d.toLowerCase().includes(x));
+  const k = iconKeys.find((x) => d.toLowerCase().includes(x));
   return icons[k ?? ""] ?? "partly_cloudy_day";
 }
 function gc(d: string) {
-  const k = Object.keys(iconColors).find((x) => d.toLowerCase().includes(x));
+  const k = colorKeys.find((x) => d.toLowerCase().includes(x));
   return iconColors[k ?? ""] ?? "text-primary-container";
 }
 
@@ -53,7 +57,7 @@ function maxCloud(points: WeatherPoint[]): number | null {
 }
 function rainChance(points: WeatherPoint[]): number {
   const rainy = points.filter((p) =>
-    p.weatherDescription.toLowerCase().includes("hujan")
+    p.weatherDescription?.toLowerCase().includes("hujan") ?? false
   ).length;
   if (points.length === 0) return 0;
   return Math.round((rainy / points.length) * 100);

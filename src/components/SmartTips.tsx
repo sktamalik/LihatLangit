@@ -1,7 +1,7 @@
 "use client";
 import type { WeatherForecast } from "@/types/weather";
 export default function SmartTips({forecast}:{forecast:WeatherForecast}){
-  const p=forecast.nearestPoint??forecast.days[0]?.points[0];const isRainy=p?.weatherDescription.toLowerCase().includes("hujan");
+  const p=forecast.nearestPoint??forecast.days[0]?.points[0];const isRainy=p?.weatherDescription?.toLowerCase().includes("hujan")??false;
   return(
     <div className="bg-white rounded-[16px] p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] flex flex-col h-full">
       <h3 className="font-body-sans text-[16px] font-semibold text-text-dark mb-4 flex items-center gap-2"><span className="material-symbols-outlined text-primary text-[20px]">security</span> Rekomendasi</h3>

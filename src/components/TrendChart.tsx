@@ -42,6 +42,7 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
   const points = today.points.concat(tomorrow?.points ?? []);
   const n = points.length;
 
+  // Path arrays use fallback for continuity; dots/labels skip null slots below.
   const temps = points.map((p) => p.temperatureC ?? 25);
   const hums = points.map((p) => p.humidityPct ?? 70);
   const minT = Math.min(...temps);
@@ -158,6 +159,8 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
           {/* ── Temperature dots + labels ────────────────── */}
           {showTemp && points.map((_, i) => {
             if (n > 12 && i % 2 !== 0) return null;
+            const raw = points[i].temperatureC;
+            if (raw == null) return null; // skip fabricated fallback
             const tY = toY(temps[i], tMin, tRange);
             const cx = xS(i);
             return (
@@ -181,6 +184,8 @@ export default function TrendChart({ forecast }: { forecast: WeatherForecast }) 
           {/* ── Humidity dots + labels ──────────────────── */}
           {showHum && points.map((_, i) => {
             if (n > 12 && i % 2 !== 0) return null;
+            const raw = points[i].humidityPct;
+            if (raw == null) return null; // skip fabricated fallback
             const hY = toY(hums[i], 40, 50);
             const cx = xS(i);
             return (

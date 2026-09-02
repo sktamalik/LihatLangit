@@ -123,7 +123,7 @@ export default function WindDirection({ windDirection, windSpeedKmh, size = "md"
       {/* ── Info ── */}
       <div className="min-w-0">
         {windSpeedKmh !== null && (
-          <p className={`font-body-sans text-[${size === "lg" ? 16 : 14}]px font-bold ${getBeaufortColor(windSpeedKmh)}`}>
+          <p className={`font-body-sans ${size === "lg" ? "text-[16px]" : "text-[14px]"} font-bold ${getBeaufortColor(windSpeedKmh)}`}>
             {Math.round(windSpeedKmh)} km/j
           </p>
         )}
