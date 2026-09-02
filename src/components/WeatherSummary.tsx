@@ -84,7 +84,7 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
             <span className="material-symbols-outlined text-[20px] text-blue-500">humidity_percentage</span>
             <div>
               <p className="font-body-sans text-[10px] text-text-muted font-medium">Kelembapan</p>
-              <p className="font-body-sans text-[14px] font-bold text-text-dark">{c?.humidityPct !== null ? `${c!.humidityPct}%` : "--"}</p>
+              <p className="font-body-sans text-[14px] font-bold text-text-dark">{c?.humidityPct != null ? `${c.humidityPct}%` : "--"}</p>
             </div>
           </div>
           <div className="flex items-center gap-3 bg-white/40 rounded-xl px-3 py-2.5">
@@ -107,7 +107,7 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
         <div className="mt-4 pt-4 border-t border-white/30">
           <div className="flex items-center justify-between text-[12px] mt-2">
             <span className="text-text-muted font-body-sans">Tutupan awan</span>
-            <span className="font-body-sans font-bold text-text-dark">{c?.cloudCoverPct !== null ? `${c!.cloudCoverPct}%` : "--"}</span>
+            <span className="font-body-sans font-bold text-text-dark">{c?.cloudCoverPct != null ? `${c.cloudCoverPct}%` : "--"}</span>
           </div>
         </div>
       </div>

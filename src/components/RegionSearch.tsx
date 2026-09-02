@@ -19,6 +19,7 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const committedRef = useRef<string>("");
 
   const doSearch = useCallback(async (q: string) => {
     if (q.trim().length < 2) { setResults([]); setIsOpen(false); return; }
@@ -27,7 +28,9 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
     abortRef.current = controller;
     try {
       const res = await fetch(`/api/regions?q=${encodeURIComponent(q.trim())}`, { signal: controller.signal });
+      if (!res.ok) return;
       const data: Region[] = await res.json();
+      if (!Array.isArray(data)) return;
       setResults(data);
       setIsOpen(data.length > 0);
       setActiveIndex(-1);
@@ -36,12 +39,16 @@ export default function RegionSearch({ onSelect }: RegionSearchProps) {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
+    // Skip re-search right after a selection was committed
+    if (query === committedRef.current) return;
     debounceRef.current = setTimeout(() => doSearch(query), 250);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query, doSearch]);
 
   const commitRegion = (region: Region) => {
-    setQuery(`${region.village}, ${region.district}`);
+    const label = `${region.village}, ${region.district}`;
+    committedRef.current = label;
+    setQuery(label);
     setIsOpen(false);
     setResults([]);
     onSelect(region);
