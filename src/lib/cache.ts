@@ -8,6 +8,7 @@ interface CacheEntry<T> {
 const store = new Map<string, CacheEntry<unknown>>();
 const DEFAULT_TTL_MS = 30 * 60 * 1000;
 const DEFAULT_STALE_MS = 24 * 60 * 60 * 1000;
+const MAX_ENTRIES = 500;
 
 export function setCache<T>(
   key: string,
@@ -22,6 +23,22 @@ export function setCache<T>(
     expiresAt: now + ttlMs,
     staleUntil: now + ttlMs + staleMs,
   });
+  evictIfOverflow();
+}
+
+/** Drop expired entries; if still over cap, evict oldest (FIFO). */
+function evictIfOverflow(): void {
+  if (store.size <= MAX_ENTRIES) return;
+
+  const now = Date.now();
+  for (const [key, entry] of store) {
+    if (now >= entry.staleUntil) store.delete(key);
+  }
+
+  if (store.size > MAX_ENTRIES) {
+    const oldestKey = store.keys().next().value;
+    if (oldestKey !== undefined) store.delete(oldestKey);
+  }
 }
 
 export type CacheResult<T> =
