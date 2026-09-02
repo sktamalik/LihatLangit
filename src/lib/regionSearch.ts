@@ -64,7 +64,11 @@ let indexCache: IndexEntry[] | null = null;
 async function getIndex(): Promise<IndexEntry[]> {
   if (indexCache) return indexCache;
   if (!indexPromise) {
-    indexPromise = loadIndex();
+    indexPromise = loadIndex().catch((error) => {
+      // Reset so a transient read failure can be retried next call
+      indexPromise = null;
+      throw error;
+    });
   }
   indexCache = await indexPromise;
   return indexCache;
@@ -125,7 +129,7 @@ function score(entry: IndexEntry, query: string): number {
   }
 
   // Multi-word query: for each word, take the best-matching field,
-  // then average per matched word to reward broad matches
+  // then average per query word (penalizes partial matches, rewards full)
   let total = 0;
   let matchedWords = 0;
 
@@ -273,6 +277,7 @@ async function fetchNominatim(
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=id&zoom=14`;
     const res = await fetch(url, {
       headers: { "User-Agent": "LihatLangit/1.0 (weather dashboard)" },
+      signal: AbortSignal.timeout(3_000),
     });
     if (!res.ok) return null;
 
