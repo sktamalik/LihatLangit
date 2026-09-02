@@ -1,5 +1,5 @@
 import { isValidAdm4 } from "@/lib/adm4";
-import { fetchForecast } from "@/lib/bmkgClient";
+import { fetchForecast, type BmkgClientResult } from "@/lib/bmkgClient";
 import { getCache, setCache } from "@/lib/cache";
 import {
   findNearestWithData,
@@ -14,6 +14,9 @@ const CACHE_KEY_PREFIX = "weather:bmkg:adm4:";
 const EXACT_TIMEOUT_MS = 2_500;
 const FALLBACK_TIMEOUT_MS = 2_000;
 const TOTAL_BUDGET_MS = 6_500;
+
+// In-flight request dedup: concurrent identical adm4 share one promise
+const inflightMap = new Map<string, Promise<WeatherServiceResult>>();
 
 export type WeatherServiceResult =
   | { ok: true; forecast: WeatherForecast }
@@ -100,6 +103,27 @@ export async function getWeatherForecast(
       : serviceError("BMKG_UNAVAILABLE", "Data BMKG tidak tersedia.", true);
   }
 
+  const existing = inflightMap.get(adm4);
+  if (existing) return existing;
+
+  const promise = fetchWeatherForecast(adm4);
+  inflightMap.set(adm4, promise);
+  try {
+    return await promise;
+  } finally {
+    inflightMap.delete(adm4);
+  }
+}
+
+async function fetchWeatherForecast(
+  adm4: string
+): Promise<WeatherServiceResult> {
+  // Re-check cache (dedup may have resolved before us)
+  const cached = getCachedForecast(adm4);
+  if (cached && !("stale" in cached)) {
+    return { ok: true, forecast: cached };
+  }
+
   const region = await getRegionByAdm4(adm4);
   const startedAt = Date.now();
   const deadline = startedAt + TOTAL_BUDGET_MS;
@@ -114,7 +138,7 @@ export async function getWeatherForecast(
   for (const candidate of exactCandidates) {
     if (Date.now() >= deadline) break;
 
-    const result = await fetchForecast(candidate, EXACT_TIMEOUT_MS);
+    const result = await fetchForecast(candidate, EXACT_TIMEOUT_MS, 1);
     if (result.ok) {
       const normalized = normalizeBmkgForecast(result.data, region);
       if (normalized && normalized.days.length > 0) {
@@ -143,41 +167,58 @@ export async function getWeatherForecast(
   }
 
   if (!rateLimited && Date.now() < deadline) {
-    const nearest = await findNearestWithData(getAdm3Prefix(adm4), 3);
+    const nearest = await findNearestWithData(getAdm3Prefix(adm4), 6);
     const candidates = nearest
       .map(({ code }) => code)
       .filter((code) => code !== exactCode && code !== adm4)
-      .slice(0, 3);
+      .slice(0, 6);
 
     if (candidates.length > 0) {
-      const results = await Promise.all(
-        candidates.map(async (candidate) => ({
-          candidate,
-          result: await fetchForecast(
+      // Probe in waves: first 3, then if none work try next 3
+      const wave1 = candidates.slice(0, 3);
+      const wave2 = candidates.slice(3, 6);
+
+      for (const wave of [wave1, wave2].filter((w) => w.length > 0)) {
+        if (Date.now() >= deadline) break;
+        const results = await Promise.all(
+          wave.map(async (candidate) => ({
             candidate,
-            Math.max(500, Math.min(FALLBACK_TIMEOUT_MS, deadline - Date.now()))
-          ),
-        }))
-      );
+            result: await fetchForecast(
+              candidate,
+              Math.max(500, Math.min(FALLBACK_TIMEOUT_MS, deadline - Date.now())),
+              0
+            ),
+          }))
+        );
 
-      const hit = results.find(({ result }) => result.ok);
-      rateLimited ||= results.some(
-        ({ result }) =>
-          !result.ok &&
-          (result.error.status === 429 || result.error.status === 403)
-      );
+        const hit = results.find(
+          (entry): entry is { candidate: string; result: BmkgClientResult & { ok: true } } => {
+            if (!entry.result.ok) return false;
+            const normalized = normalizeBmkgForecast(entry.result.data, region);
+            return Boolean(normalized && normalized.days.length > 0);
+          }
+        );
+        rateLimited ||= results.some(
+          ({ result }) =>
+            !result.ok &&
+            (result.error.status === 429 || result.error.status === 403)
+        );
 
-      if (hit?.result.ok) {
-        const normalized = normalizeBmkgForecast(hit.result.data, region);
-        if (normalized && normalized.days.length > 0) {
-          const forecast = applySearchedRegion(
-            normalized,
-            region,
-            hit.candidate
-          );
-          setCache(`${CACHE_KEY_PREFIX}${adm4}`, forecast);
-          return { ok: true, forecast };
+        if (hit) {
+          const normalized = normalizeBmkgForecast(hit.result.data, region);
+          if (normalized && normalized.days.length > 0) {
+            const forecast = applySearchedRegion(
+              normalized,
+              region,
+              hit.candidate
+            );
+            setCache(`${CACHE_KEY_PREFIX}${adm4}`, forecast);
+            return { ok: true, forecast };
+          }
         }
+
+        // If rate-limited in this wave, stop probing
+        if (rateLimited) break;
       }
     }
   }
