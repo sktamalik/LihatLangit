@@ -143,7 +143,12 @@ async function fetchWeatherForecast(
     if (result.ok) {
       const normalized = normalizeBmkgForecast(result.data, region);
       if (normalized && normalized.days.length > 0) {
-        const forecast = applySearchedRegion(normalized, region);
+        // Exact match — BMKG's lokasi is authoritative for this code. Do NOT
+        // overwrite it with the (BPS-numbered) dataset entry: for split Papua
+        // provinces the same numeric string maps to a DIFFERENT city in BPS vs
+        // BMKG/Kemendagri (e.g. 91.71.01.1001 = Sorong in BPS but Jayapura in
+        // BMKG), so the override would mislabel the marker.
+        const forecast = normalized;
         setCache(`${CACHE_KEY_PREFIX}${adm4}`, forecast);
         return { ok: true, forecast };
       }
