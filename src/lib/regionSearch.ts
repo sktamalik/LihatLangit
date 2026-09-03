@@ -20,6 +20,30 @@ const NEAREST_CANDIDATES = [
   path.join(process.cwd(), "public", "data", "bmkg-nearest.json"),
 ];
 
+const COVERAGE_CANDIDATES = [
+  path.join(process.cwd(), "public", "data", "bmkg-coverage.json"),
+];
+
+// Lazy-loaded coverage map: adm3 → known-working BMKG code (from scan)
+let coverageCache: Record<string, string> | null = null;
+
+async function getCoverageMap(): Promise<Record<string, string>> {
+  if (coverageCache !== null) return coverageCache;
+  for (const p of COVERAGE_CANDIDATES) {
+    if (fs.existsSync(p)) {
+      try {
+        const raw = await fs.promises.readFile(p, "utf-8");
+        coverageCache = JSON.parse(raw);
+        return coverageCache!;
+      } catch {
+        // corrupt file — treat as empty
+      }
+    }
+  }
+  coverageCache = {};
+  return coverageCache;
+}
+
 // Lazy-loaded nearest map: adm3 → [[workingCode, tier], ...] closest first
 // (precomputed offline by scripts/build-nearest-fallback.js)
 let nearestCache: Record<string, Array<[string, number]>> | null = null;
@@ -236,6 +260,173 @@ export async function findNearestWithData(
   const map = await getNearestMap();
   const list = map[adm3] ?? [];
   return list.slice(0, limit).map(([code, tier]) => ({ code, tier }));
+}
+
+// ── Guaranteed fallback chain (called when Level N / nearest-with-data misses) ──
+
+const ADM4_RE = /^\d{2}\.\d{2}\.\d{2}\.\d{4}$/;
+
+function isValidVillage(code: string): boolean {
+  return ADM4_RE.test(code);
+}
+
+/** Generate BMKG-compatible variants (0XXX↔1XXX plus original), deduped. */
+function generateBmkgVariants(adm4: string): string[] {
+  const parts = adm4.split(".");
+  if (parts.length !== 4) return [adm4];
+  const villageNum = parseInt(parts[3], 10);
+  if (isNaN(villageNum)) return [adm4];
+
+  const variants: string[] = [];
+  if (villageNum < 1000) {
+    variants.push(`${parts[0]}.${parts[1]}.${parts[2]}.${(villageNum + 1000).toString().padStart(4, "0")}`);
+  } else if (villageNum >= 1000) {
+    variants.push(`${parts[0]}.${parts[1]}.${parts[2]}.${(villageNum - 1000).toString().padStart(4, "0")}`);
+  }
+  variants.push(adm4);
+
+  return [...new Set(variants)];
+}
+
+// Provincial capital kelurahan codes (BMKG 1XXX), derived once from the dataset
+// (kota, district 01). Reliably served by BMKG — the ultimate safety net so a
+// search never renders "Data Tidak Tersedia" while any nearby region has data.
+let capitalsCache: string[] | null = null;
+
+async function getGuaranteedCapitals(): Promise<string[]> {
+  if (capitalsCache !== null) return capitalsCache;
+  const index = await getIndex();
+  const byProv = new Map<string, string>();
+  for (const { region } of index) {
+    const adm2 = region.adm4.slice(0, 5);
+    if (!adm2.endsWith(".71")) continue; // only kota (city)
+    if (region.adm4.slice(6, 8) !== "01") continue; // prefer first district
+    const prov = region.adm4.slice(0, 2);
+    if (!byProv.has(prov)) byProv.set(prov, toBmkgAdm4(region.adm4));
+  }
+  capitalsCache = [...byProv.values()].filter(isValidVillage);
+  return capitalsCache;
+}
+
+// Province centroids (approx lat/lon) — real geographic distance for ordering
+// other-province fallbacks so a zero-coverage province falls back to the
+// NEAREST province that has data.
+const PROV_CENTROIDS: Record<string, [number, number]> = {
+  "11": [4.7, 96.5], "12": [2.2, 99.0], "13": [-0.9, 100.4], "14": [0.5, 101.5],
+  "15": [-1.6, 103.0], "16": [-3.0, 104.0], "17": [-3.6, 102.3], "18": [-5.1, 105.1],
+  "19": [-2.7, 106.3], "21": [0.9, 104.8], "31": [-6.2, 106.8], "32": [-6.9, 107.5],
+  "33": [-7.3, 110.0], "34": [-7.8, 110.4], "35": [-7.6, 112.5], "36": [-6.1, 106.0],
+  "51": [-8.4, 115.2], "52": [-8.6, 118.0], "53": [-9.7, 121.0], "61": [-0.5, 111.5],
+  "62": [-2.0, 113.5], "63": [-3.0, 115.5], "64": [0.8, 116.5], "65": [3.0, 116.5],
+  "71": [1.0, 124.9], "72": [-1.0, 121.0], "73": [-4.0, 120.0], "74": [-3.9, 122.0],
+  "75": [0.6, 122.9], "76": [-2.7, 119.2], "81": [-3.3, 129.5], "82": [0.3, 127.5],
+  "91": [-4.0, 138.5], "92": [-1.5, 132.5], "94": [-7.0, 140.0],
+};
+
+function provDistanceKm(a: string, b: string): number {
+  const ca = PROV_CENTROIDS[a];
+  const cb = PROV_CENTROIDS[b];
+  if (!ca || !cb) return Math.abs(Number(a) - Number(b)) * 100;
+  const R = 6371;
+  const dLat = ((cb[0] - ca[0]) * Math.PI) / 180;
+  const dLon = ((cb[1] - ca[1]) * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((ca[0] * Math.PI) / 180) * Math.cos((cb[0] * Math.PI) / 180) *
+    Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+/** Other province codes (excluding the searched one), nearest-first by centroid. */
+function sortedOtherProvinces(adm1: string): string[] {
+  const all = Object.keys(PROV_CENTROIDS);
+  return all
+    .filter((p) => p !== adm1)
+    .sort((a, b) => provDistanceKm(adm1, a) - provDistanceKm(adm1, b));
+}
+
+/**
+ * Broad, ordered BMKG fallback candidates for an adm4. Used when the exact
+ * code AND the precomputed nearest-with-data map both fail. Every candidate is
+ * a real, BMKG-format code (coverage-scanned, blind pattern, or dataset-derived
+ * provincial capital) — no invented codes. Ordered by reliability then
+ * proximity, with a guaranteed set of provincial capitals at the tail so a
+ * search has a "never no-data" safety net.
+ */
+export async function findBmkgFallback(
+  adm4: string,
+  maxCandidates: number = 60
+): Promise<string[]> {
+  const parts = adm4.split(".");
+  if (parts.length !== 4) return [adm4];
+  const adm1 = parts[0];
+  const adm2 = `${parts[0]}.${parts[1]}`;
+  const adm3 = getAdm3Prefix(adm4);
+
+  const [coverage, capitals] = await Promise.all([
+    getCoverageMap(),
+    getGuaranteedCapitals(),
+  ]);
+
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const add = (code: string): boolean => {
+    const c = code?.trim();
+    if (!c || !isValidVillage(c)) return false;
+    if (seen.has(c) || out.length >= maxCandidates) return false;
+    seen.add(c);
+    out.push(c);
+    return true;
+  };
+
+  // Reserve slots at the tail for the guaranteed capitals.
+  const reserved = Math.min(capitals.length, maxCandidates);
+  const budget = Math.max(0, maxCandidates - reserved);
+
+  // 1) exact code variants (0XXX↔1XXX + original)
+  for (const v of generateBmkgVariants(adm4)) add(v);
+
+  // 2) coverage-guided — same adm3, then same adm2 (city), then same adm1 (province)
+  const coverageEntries = Object.entries(coverage);
+  if (coverage[adm3]) add(coverage[adm3]);
+  for (const [a3, code] of coverageEntries) {
+    if (out.length >= budget) break;
+    if (a3 === adm3) continue;
+    if (a3.startsWith(`${adm2}.`)) add(code);
+  }
+  for (const [a3, code] of coverageEntries) {
+    if (out.length >= budget) break;
+    if (a3.startsWith(`${adm1}.`)) add(code);
+  }
+
+  // 3) blind patterns on the searched scope (some villages only exist as 2XXX)
+  if (out.length < budget) {
+    for (let n = 1001; n <= 1015; n++) { if (!add(`${adm3}.${n}`)) break; }
+    for (let n = 2001; n <= 2010; n++) { if (!add(`${adm3}.${n}`)) break; }
+  }
+  if (out.length < budget) add(`${adm2}.01.1001`); // city's first district
+  if (out.length < budget) add(`${adm1}.71.01.1001`); // provincial capital pattern
+  for (const ps of sortedOtherProvinces(adm1)) {
+    if (out.length >= budget) break;
+    add(`${ps}.01.01.1001`);
+    if (out.length < budget) add(`${ps}.71.01.1001`);
+  }
+
+  // 4) guaranteed provincial capitals (dataset-derived) — ABSOLUTE safety net
+  for (const c of capitals) add(c);
+
+  // 5) fill remaining capacity with other-province coverage codes, nearest-first
+  const otherProvCoverage = coverageEntries
+    .filter(([a3]) => !a3.startsWith(`${adm1}.`))
+    .sort(([a3a], [a3b]) =>
+      provDistanceKm(adm1, a3a.slice(0, 2)) - provDistanceKm(adm1, a3b.slice(0, 2))
+    );
+  for (const [, code] of otherProvCoverage) {
+    if (out.length >= maxCandidates) break;
+    add(code);
+  }
+
+  return out;
 }
 
 // ── Reverse geocoding via Nominatim (OpenStreetMap) ──
