@@ -13,55 +13,55 @@ export interface IndonesiaCity {
 
 export const INDONESIA_CITIES: IndonesiaCity[] = [
   // ── Sumatera ──
-  { adm4: "11.71.01.0019", name: "Banda Aceh", province: "ACEH", latitude: 5.55, longitude: 95.32, island: "Sumatera" },
-  { adm4: "12.71.01.0001", name: "Medan", province: "SUMATERA UTARA", latitude: 3.59, longitude: 98.67, island: "Sumatera" },
-  { adm4: "13.71.01.0001", name: "Padang", province: "SUMATERA BARAT", latitude: -0.95, longitude: 100.35, island: "Sumatera" },
-  { adm4: "14.71.01.0001", name: "Pekanbaru", province: "RIAU", latitude: 0.53, longitude: 101.45, island: "Sumatera" },
-  { adm4: "21.72.01.0001", name: "Tanjung Pinang", province: "KEPULAUAN RIAU", latitude: 0.92, longitude: 104.45, island: "Sumatera" },
-  { adm4: "15.71.01.0003", name: "Jambi", province: "JAMBI", latitude: -1.59, longitude: 103.61, island: "Sumatera" },
-  { adm4: "16.71.01.0006", name: "Palembang", province: "SUMATERA SELATAN", latitude: -2.99, longitude: 104.76, island: "Sumatera" },
-  { adm4: "19.71.01.0001", name: "Pangkal Pinang", province: "KEP. BANGKA BELITUNG", latitude: -2.13, longitude: 106.12, island: "Sumatera" },
-  { adm4: "17.71.01.0003", name: "Bengkulu", province: "BENGKULU", latitude: -3.80, longitude: 102.27, island: "Sumatera" },
-  { adm4: "18.71.01.0005", name: "Bandar Lampung", province: "LAMPUNG", latitude: -5.42, longitude: 105.26, island: "Sumatera" },
+  { adm4: "11.71.01.2001", name: "Banda Aceh", province: "ACEH", latitude: 5.55, longitude: 95.32, island: "Sumatera" },
+  { adm4: "12.71.01.1001", name: "Medan", province: "SUMATERA UTARA", latitude: 3.59, longitude: 98.67, island: "Sumatera" },
+  { adm4: "13.71.01.1001", name: "Padang", province: "SUMATERA BARAT", latitude: -0.95, longitude: 100.35, island: "Sumatera" },
+  { adm4: "14.71.02.1001", name: "Pekanbaru", province: "RIAU", latitude: 0.53, longitude: 101.45, island: "Sumatera" },
+  { adm4: "21.72.01.1001", name: "Tanjung Pinang", province: "KEPULAUAN RIAU", latitude: 0.92, longitude: 104.45, island: "Sumatera" },
+  { adm4: "15.71.01.1003", name: "Jambi", province: "JAMBI", latitude: -1.59, longitude: 103.61, island: "Sumatera" },
+  { adm4: "16.71.01.1006", name: "Palembang", province: "SUMATERA SELATAN", latitude: -2.99, longitude: 104.76, island: "Sumatera" },
+  { adm4: "19.71.02.1001", name: "Pangkal Pinang", province: "KEP. BANGKA BELITUNG", latitude: -2.13, longitude: 106.12, island: "Sumatera" },
+  { adm4: "17.71.01.1003", name: "Bengkulu", province: "BENGKULU", latitude: -3.80, longitude: 102.27, island: "Sumatera" },
+  { adm4: "18.71.01.1005", name: "Bandar Lampung", province: "LAMPUNG", latitude: -5.42, longitude: 105.26, island: "Sumatera" },
 
   // ── Jawa ──
-  { adm4: "31.71.01.0001", name: "Jakarta", province: "DKI JAKARTA", latitude: -6.21, longitude: 106.85, island: "Jawa" },
-  { adm4: "36.73.01.0001", name: "Serang", province: "BANTEN", latitude: -6.11, longitude: 106.15, island: "Jawa" },
-  { adm4: "32.73.01.0001", name: "Bandung", province: "JAWA BARAT", latitude: -6.92, longitude: 107.61, island: "Jawa" },
-  { adm4: "33.74.01.0001", name: "Semarang", province: "JAWA TENGAH", latitude: -6.97, longitude: 110.42, island: "Jawa" },
-  { adm4: "34.71.01.0001", name: "Yogyakarta", province: "DI YOGYAKARTA", latitude: -7.80, longitude: 110.36, island: "Jawa" },
-  { adm4: "35.78.01.0001", name: "Surabaya", province: "JAWA TIMUR", latitude: -7.25, longitude: 112.74, island: "Jawa" },
+  { adm4: "31.71.01.1001", name: "Jakarta", province: "DKI JAKARTA", latitude: -6.21, longitude: 106.85, island: "Jawa" },
+  { adm4: "36.73.01.1001", name: "Serang", province: "BANTEN", latitude: -6.11, longitude: 106.15, island: "Jawa" },
+  { adm4: "32.73.01.1001", name: "Bandung", province: "JAWA BARAT", latitude: -6.92, longitude: 107.61, island: "Jawa" },
+  { adm4: "33.74.01.1001", name: "Semarang", province: "JAWA TENGAH", latitude: -6.97, longitude: 110.42, island: "Jawa" },
+  { adm4: "34.71.01.1001", name: "Yogyakarta", province: "DI YOGYAKARTA", latitude: -7.80, longitude: 110.36, island: "Jawa" },
+  { adm4: "35.78.01.1001", name: "Surabaya", province: "JAWA TIMUR", latitude: -7.25, longitude: 112.74, island: "Jawa" },
 
   // ── Nusa Tenggara ──
-  { adm4: "51.71.01.0001", name: "Denpasar", province: "BALI", latitude: -8.65, longitude: 115.22, island: "Nusa Tenggara" },
-  { adm4: "52.71.01.0004", name: "Mataram", province: "NUSA TENGGARA BARAT", latitude: -8.58, longitude: 116.12, island: "Nusa Tenggara" },
-  { adm4: "53.71.01.0001", name: "Kupang", province: "NUSA TENGGARA TIMUR", latitude: -10.16, longitude: 123.60, island: "Nusa Tenggara" },
+  { adm4: "51.71.01.1001", name: "Denpasar", province: "BALI", latitude: -8.65, longitude: 115.22, island: "Nusa Tenggara" },
+  { adm4: "52.71.01.1004", name: "Mataram", province: "NUSA TENGGARA BARAT", latitude: -8.58, longitude: 116.12, island: "Nusa Tenggara" },
+  { adm4: "53.71.01.1001", name: "Kupang", province: "NUSA TENGGARA TIMUR", latitude: -10.16, longitude: 123.60, island: "Nusa Tenggara" },
 
   // ── Kalimantan ──
-  { adm4: "61.71.01.0002", name: "Pontianak", province: "KALIMANTAN BARAT", latitude: -0.03, longitude: 109.34, island: "Kalimantan" },
-  { adm4: "62.71.01.0004", name: "Palangka Raya", province: "KALIMANTAN TENGAH", latitude: -2.21, longitude: 113.91, island: "Kalimantan" },
-  { adm4: "63.71.01.0001", name: "Banjarmasin", province: "KALIMANTAN SELATAN", latitude: -3.32, longitude: 114.59, island: "Kalimantan" },
-  { adm4: "64.72.01.0001", name: "Samarinda", province: "KALIMANTAN TIMUR", latitude: -0.50, longitude: 117.15, island: "Kalimantan" },
+  { adm4: "61.71.01.1002", name: "Pontianak", province: "KALIMANTAN BARAT", latitude: -0.03, longitude: 109.34, island: "Kalimantan" },
+  { adm4: "62.71.01.1004", name: "Palangka Raya", province: "KALIMANTAN TENGAH", latitude: -2.21, longitude: 113.91, island: "Kalimantan" },
+  { adm4: "63.71.01.1001", name: "Banjarmasin", province: "KALIMANTAN SELATAN", latitude: -3.32, longitude: 114.59, island: "Kalimantan" },
+  { adm4: "64.72.01.1001", name: "Samarinda", province: "KALIMANTAN TIMUR", latitude: -0.50, longitude: 117.15, island: "Kalimantan" },
   { adm4: "65.02.05.0002", name: "Tanjung Selor", province: "KALIMANTAN UTARA", latitude: 2.85, longitude: 117.37, island: "Kalimantan" },
 
   // ── Sulawesi ──
-  { adm4: "73.71.01.0001", name: "Makassar", province: "SULAWESI SELATAN", latitude: -5.15, longitude: 119.42, island: "Sulawesi" },
-  { adm4: "71.71.01.0001", name: "Manado", province: "SULAWESI UTARA", latitude: 1.49, longitude: 124.84, island: "Sulawesi" },
-  { adm4: "75.71.01.0001", name: "Gorontalo", province: "GORONTALO", latitude: 0.54, longitude: 123.06, island: "Sulawesi" },
-  { adm4: "72.71.01.0004", name: "Palu", province: "SULAWESI TENGAH", latitude: -0.90, longitude: 119.86, island: "Sulawesi" },
-  { adm4: "76.04.01.0001", name: "Mamuju", province: "SULAWESI BARAT", latitude: -2.68, longitude: 118.89, island: "Sulawesi" },
-  { adm4: "74.71.01.0011", name: "Kendari", province: "SULAWESI TENGGARA", latitude: -3.98, longitude: 122.52, island: "Sulawesi" },
+  { adm4: "73.71.01.1001", name: "Makassar", province: "SULAWESI SELATAN", latitude: -5.15, longitude: 119.42, island: "Sulawesi" },
+  { adm4: "71.71.01.1001", name: "Manado", province: "SULAWESI UTARA", latitude: 1.49, longitude: 124.84, island: "Sulawesi" },
+  { adm4: "75.71.01.1001", name: "Gorontalo", province: "GORONTALO", latitude: 0.54, longitude: 123.06, island: "Sulawesi" },
+  { adm4: "72.71.01.1004", name: "Palu", province: "SULAWESI TENGAH", latitude: -0.90, longitude: 119.86, island: "Sulawesi" },
+  { adm4: "76.01.03.1001", name: "Mamuju", province: "SULAWESI BARAT", latitude: -2.68, longitude: 118.89, island: "Sulawesi" },
+  { adm4: "74.71.01.1005", name: "Kendari", province: "SULAWESI TENGGARA", latitude: -3.98, longitude: 122.52, island: "Sulawesi" },
 
   // ── Maluku ──
-  { adm4: "81.71.01.0001", name: "Ambon", province: "MALUKU", latitude: -3.70, longitude: 128.17, island: "Maluku" },
+  { adm4: "81.71.01.1006", name: "Ambon", province: "MALUKU", latitude: -3.70, longitude: 128.17, island: "Maluku" },
   { adm4: "82.72.05.0006", name: "Sofifi", province: "MALUKU UTARA", latitude: 0.73, longitude: 127.56, island: "Maluku" },
 
   // ── Papua ──
-  { adm4: "91.71.01.0003", name: "Sorong", province: "PAPUA BARAT DAYA", latitude: -0.88, longitude: 131.29, island: "Papua" },
+  { adm4: "92.71.01.1001", name: "Sorong", province: "PAPUA BARAT DAYA", latitude: -0.88, longitude: 131.29, island: "Papua" },
   { adm4: "91.05.11.0001", name: "Manokwari", province: "PAPUA BARAT", latitude: -0.87, longitude: 134.08, island: "Papua" },
-  { adm4: "94.71.01.0001", name: "Jayapura", province: "PAPUA", latitude: -2.53, longitude: 140.72, island: "Papua" },
-  { adm4: "94.04.05.0014", name: "Nabire", province: "PAPUA TENGAH", latitude: -3.37, longitude: 135.50, island: "Papua" },
-  { adm4: "94.01.01.0006", name: "Merauke", province: "PAPUA SELATAN", latitude: -8.50, longitude: 140.40, island: "Papua" },
+  { adm4: "91.71.01.1001", name: "Jayapura", province: "PAPUA", latitude: -2.53, longitude: 140.72, island: "Papua" },
+  { adm4: "94.01.01.1006", name: "Nabire", province: "PAPUA TENGAH", latitude: -3.37, longitude: 135.50, island: "Papua" },
+  { adm4: "93.01.01.1005", name: "Merauke", province: "PAPUA SELATAN", latitude: -8.50, longitude: 140.40, island: "Papua" },
   { adm4: "94.02.11.0012", name: "Wamena", province: "PAPUA PEGUNUNGAN", latitude: -4.09, longitude: 138.95, island: "Papua" },
 ];
 
