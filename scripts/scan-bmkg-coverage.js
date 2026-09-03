@@ -23,7 +23,24 @@ function bmkgGet(adm4) {
         timeout: TIMEOUT_MS,
         headers: { "User-Agent": "Mozilla/5.0 Chrome/120.0.0.0 Safari/537.36" },
       },
-      (res) => { res.resume(); resolve(res.statusCode === 429 ? "rl" : res.statusCode === 200); }
+      (res) => {
+        let body = "";
+        res.on("data", (d) => (body += d));
+        res.on("end", () => {
+          if (res.statusCode === 429) return resolve("rl");
+          if (res.statusCode !== 200) return resolve(false);
+          // 200 — only record as "working" if the forecast actually has slots
+          try {
+            const j = JSON.parse(body);
+            const hasSlots = (j.data || []).some((d) =>
+              Array.isArray(d.cuaca) && d.cuaca.flat().length > 0
+            );
+            resolve(hasSlots ? "ok" : "empty");
+          } catch {
+            resolve("empty"); // unparseable body — don't mark working
+          }
+        });
+      }
     );
     req.on("error", () => resolve(false));
     req.on("timeout", () => { req.destroy(); resolve(false); });
@@ -40,8 +57,8 @@ async function findWorkingCode(adm3) {
       process.stdout.write("\n  [429] waiting 90s...");
       await sleep(90000);
       const retry = await bmkgGet(code);
-      if (retry === true) return code;
-    } else if (result === true) {
+      if (retry === "ok") return code;
+    } else if (result === "ok") {
       return code;
     }
     await sleep(DELAY_MS);
