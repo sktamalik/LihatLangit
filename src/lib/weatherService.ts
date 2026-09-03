@@ -2,6 +2,7 @@ import { isValidAdm4 } from "@/lib/adm4";
 import { fetchForecast, type BmkgClientResult } from "@/lib/bmkgClient";
 import { getCache, setCache } from "@/lib/cache";
 import {
+  findBmkgFallback,
   findNearestWithData,
   getAdm3Prefix,
   getRegionByAdm4,
@@ -166,12 +167,15 @@ async function fetchWeatherForecast(
     if (rateLimited) break;
   }
 
+  const tried = new Set<string>([adm4, exactCode]);
+
   if (!rateLimited && Date.now() < deadline) {
     const nearest = await findNearestWithData(getAdm3Prefix(adm4), 6);
     const candidates = nearest
       .map(({ code }) => code)
-      .filter((code) => code !== exactCode && code !== adm4)
+      .filter((code) => code !== exactCode && code !== adm4 && !tried.has(code))
       .slice(0, 6);
+    candidates.forEach((c) => tried.add(c));
 
     if (candidates.length > 0) {
       // Probe in waves: first 3, then if none work try next 3
@@ -218,6 +222,58 @@ async function fetchWeatherForecast(
         }
 
         // If rate-limited in this wave, stop probing
+        if (rateLimited) break;
+      }
+    }
+
+    // ── Broad fallback chain (coverage + blind patterns + guaranteed capitals) ──
+    // Runs only when both the exact code and nearest-with-data missed. Probes in
+    // parallel batches of 5 and accepts the FIRST candidate with non-empty days
+    // so a search NEVER returns "Data Tidak Tersedia" while any nearby region
+    // has data. Aborts on 429/403 just like the nearest stage.
+    if (!rateLimited && Date.now() < deadline) {
+      const chain = await findBmkgFallback(adm4, 60);
+      const chainCandidates = chain.filter((code) => !tried.has(code));
+
+      for (let i = 0; i < chainCandidates.length && Date.now() < deadline; i += 5) {
+        const batch = chainCandidates.slice(i, i + 5);
+        const results = await Promise.all(
+          batch.map(async (candidate) => ({
+            candidate,
+            result: await fetchForecast(
+              candidate,
+              Math.max(400, Math.min(FALLBACK_TIMEOUT_MS, deadline - Date.now())),
+              0
+            ),
+          }))
+        );
+
+        const hit = results.find(
+          (entry): entry is { candidate: string; result: BmkgClientResult & { ok: true } } => {
+            if (!entry.result.ok) return false;
+            const normalized = normalizeBmkgForecast(entry.result.data, region);
+            return Boolean(normalized && normalized.days.length > 0);
+          }
+        );
+        rateLimited ||= results.some(
+          ({ result }) =>
+            !result.ok &&
+            (result.error.status === 429 || result.error.status === 403)
+        );
+
+        if (hit) {
+          const normalized = normalizeBmkgForecast(hit.result.data, region);
+          if (normalized && normalized.days.length > 0) {
+            const forecast = applySearchedRegion(
+              normalized,
+              region,
+              hit.candidate
+            );
+            setCache(`${CACHE_KEY_PREFIX}${adm4}`, forecast);
+            return { ok: true, forecast };
+          }
+        }
+
         if (rateLimited) break;
       }
     }
