@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, findNearestWithData } from "./regionSearch";
+import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, findNearestWithData, findBmkgFallback } from "./regionSearch";
 
 describe("searchRegions", () => {
   it("returns results for 'Kemayoran'", async () => {
@@ -131,5 +131,34 @@ describe("findNearestWithData", () => {
 
   it("returns empty for unknown adm3", async () => {
     expect(await findNearestWithData("99.99.99")).toEqual([]);
+  });
+});
+
+describe("findBmkgFallback", () => {
+  it("starts with the exact code variants (0XXX→1XXX conversion)", async () => {
+    // 73.71.01.0005 → BMKG variant 73.71.01.1005 should be among the first
+    const candidates = await findBmkgFallback("73.71.01.0005");
+    expect(candidates[0]).toMatch(/^\d{2}\.\d{2}\.\d{2}\.\d{4}$/);
+    expect(candidates).toContain("73.71.01.1005");
+  });
+
+  it("always includes a guaranteed provincial capital (zero-coverage province, Bali 51)", async () => {
+    const candidates = await findBmkgFallback("51.01.01.1001");
+    // Denpasar capital (51.71.x) must be in the list as the safety net
+    expect(candidates.some((c) => c.startsWith("51.71."))).toBe(true);
+  });
+
+  it("contains coverage codes from the same province", async () => {
+    // 18.71.04.0005 (Lampung) — province 18 has coverage entries
+    const candidates = await findBmkgFallback("18.71.04.0005");
+    expect(candidates.some((c) => c.startsWith("18."))).toBe(true);
+  });
+
+  it("returns only valid adm4 codes and respects the cap", async () => {
+    const candidates = await findBmkgFallback("62.05.01.0001", 20);
+    expect(candidates.length).toBeLessThanOrEqual(20);
+    for (const c of candidates) {
+      expect(c).toMatch(/^\d{2}\.\d{2}\.\d{2}\.\d{4}$/);
+    }
   });
 });
