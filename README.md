@@ -14,31 +14,46 @@
 </p>
 
 <p align="center">
-  <a href="#fitur"><strong>Jelajahi Fitur</strong></a> ·
+  <a href="#tujuan-proyek"><strong>Tujuan</strong></a> ·
+  <a href="#fitur"><strong>Fitur</strong></a> ·
+  <a href="#tech-stack"><strong>Tech Stack</strong></a> ·
   <a href="#cara-menjalankan"><strong>Coba Sekarang</strong></a> ·
   <a href="#arsitektur"><strong>Arsitektur</strong></a> ·
   <a href="#api-endpoint"><strong>API</strong></a>
 </p>
 
+## 🎯 Tujuan Proyek
+
+LihatLangit dibangun untuk menyediakan platform prakiraan cuaca modern, cepat, dan terpercaya bagi masyarakat Indonesia berbasis data resmi BMKG:
+
+- **Cakupan Wilayah Luas**: Akses prakiraan cuaca hingga tingkat desa/kelurahan (80.534 wilayah administrasi Indonesia).
+- **Anti-Data Kosong**: Menggunakan sistem *multi-tier fallback chain* (varian kode, kecamatan, koordinat terdekat, kabupaten/kota, hingga ibu kota provinsi) agar informasi cuaca selalu tersedia.
+- **Pusat Informasi Terpadu**: Integrasi prakiraan cuaca 3 harian, peringatan dini ekstrem (*nowcast*), gempa bumi terkini (M 5.0+ & dirasakan), kondisi gelombang laut, hingga metrik lingkungan (UV & tutupan awan).
+- **Akses Publik Optimal**: Desain antarmuka *sky-theme glassmorphism* responsif dan halaman detail cuaca per kota yang teroptimasi SEO (`/cuaca/[slug]`).
+
+<br>
+
 ## ✨ Fitur
 
-| Fitur                          | Deskripsi                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------ |
-| **🔍 Pencarian Wilayah**       | Cari provinsi, kota, kecamatan, hingga desa/kelurahan dari database lokal      |
-| **📍 Geolokasi**               | Deteksi otomatis wilayah terdekat via browser geolocation                      |
-| **🌡️ Ringkasan Cuaca**         | Suhu, kondisi langit, kelembapan, kecepatan angin, tutupan awan, jarak pandang |
-| **📅 Prakiraan 3 Hari**        | Setiap slot 3 jam dengan tab Hari Ini, Besok, dan Lusa                         |
-| **📈 Grafik Tren**             | Visualisasi suhu, kelembapan, dan tekanan udara dalam grafik interaktif        |
-| **🗺️ Peta Interaktif**         | Peta cuaca seluruh Indonesia dengan marker suhu dan kondisi cuaca tiap kota    |
-| **⚠️ Peringatan Dini**         | Nowcast BMKG — peringatan cuaca ekstrem real-time langsung dari BMKG           |
-| **🌊 Kondisi Laut**            | Tinggi gelombang, kecepatan angin laut, dan arah angin                         |
-| **☀️🌙 Info Matahari & Bulan** | Waktu terbit, terbenam, fase bulan, dan durasi siang                           |
-| **🌿 Metrik Lingkungan**       | Indeks UV, jarak pandang, tutupan awan, tekanan udara                          |
-| **💡 Tips Pintar**             | Rekomendasi aktivitas berdasarkan kondisi cuaca terkini                        |
-| **📰 Berita BMKG**             | Siaran pers dan informasi terkini dari BMKG                                    |
-| **👥 Laporan Komunitas**       | Fitur laporan cuaca dari pengguna                                              |
-| **📱 Responsif**               | Tampilan optimal di desktop, tablet, dan mobile                                |
-| **🎨 Sky Theme UI**            | Glassmorphism, palet sky-blue, animasi awan & burung, pixel-art sun            |
+| Fitur                                      | Deskripsi                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------ |
+| **🔍 Pencarian Wilayah**                   | Cari provinsi, kota, kecamatan, hingga desa/kelurahan dari database lokal      |
+| **📍 Geolokasi**                           | Deteksi otomatis wilayah terdekat via browser geolocation                      |
+| **🌡️ Ringkasan Cuaca**                     | Suhu, kondisi langit, kelembapan, kecepatan angin, tutupan awan, jarak pandang |
+| **📅 Prakiraan 3 Hari**                    | Setiap slot 3 jam dengan tab Hari Ini, Besok, dan Lusa                         |
+| **📈 Grafik Tren**                         | Visualisasi suhu, kelembapan, dan tekanan udara dalam grafik interaktif        |
+| **🗺️ Peta Interaktif**                     | Peta cuaca seluruh Indonesia dengan marker suhu dan kondisi cuaca tiap kota    |
+| **⚠️ Peringatan Dini**                     | Nowcast BMKG — peringatan cuaca ekstrem real-time langsung dari BMKG           |
+| **🌋 Info Gempa Bumi**                     | Gempa bumi terkini (M 5.0+ & dirasakan) dari BMKG AutoTEWS real-time            |
+| **🌊 Kondisi Laut**                        | Tinggi gelombang, kecepatan angin laut, dan arah angin                         |
+| **☀️🌙 Info Matahari & Bulan**             | Waktu terbit, terbenam, fase bulan, dan durasi siang                           |
+| **🌿 Metrik Lingkungan**                   | Indeks UV, jarak pandang, tutupan awan, tekanan udara                          |
+| **💡 Tips Pintar**                         | Rekomendasi aktivitas berdasarkan kondisi cuaca terkini                        |
+| **🧭 Halaman SEO Kota (`/cuaca/[slug]`)**  | Halaman cuaca kota berbasis SSG/ISR dengan metadata lengkap dan JSON-LD        |
+| **📰 Berita BMKG**                         | Siaran pers dan informasi terkini dari BMKG                                    |
+| **👥 Laporan Komunitas**                   | Fitur laporan cuaca dari pengguna                                              |
+| **📱 Responsif**                           | Tampilan optimal di desktop, tablet, dan mobile                                |
+| **🎨 Sky Theme UI**                        | Glassmorphism, palet sky-blue, animasi awan & burung, pixel-art sun            |
 
 <br>
 
@@ -62,7 +77,6 @@
 | **[Vitest](https://vitest.dev/)**                                             | Unit testing — cepat dan native ESM                   |
 | **[ESLint](https://eslint.org/)**                                             | Linting dengan konfigurasi Next.js                    |
 | **[fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser)** | Parsing XML data BMKG & CAP alerts                    |
-| **[Zod](https://zod.dev/)**                                                   | Validasi skema data runtime                           |
 
 <br>
 
@@ -108,13 +122,16 @@ npm run lint
 # Jalankan test
 npm run test        # one-shot
 npm run test:watch  # watch mode
+
+# Build pemetaan fallback koordinat BMKG terdekat (generator)
+npm run build:nearest
 ```
 
 <br>
 
 ## 🏗️ Arsitektur
 
-Alur data: **Browser → Edge Middleware (rate limit) → API Routes → Library → BMKG API**, dengan data lokal (`regions-adm4.json`, `bmkg-coverage.json`, `bmkg-nearest.json`) sebagai penopang fallback saat BMKG tidak punya data atau sedang rate-limit.
+Alur data: **Browser → Edge Middleware (rate limit) → API Routes → Weather Service → BMKG API**, dengan data lokal (`regions-adm4.json`, `bmkg-coverage.json`, `bmkg-nearest.json`) sebagai penopang fallback saat BMKG tidak punya data untuk kode desa tertentu atau sedang limit.
 
 **Flowchart:**
 
@@ -124,7 +141,15 @@ Alur data: **Browser → Edge Middleware (rate limit) → API Routes → Library
 
 ![Arsitektur LihatLangit — Excalidraw](docs/flowchart.excalidraw.png)
 
-Penjelasan lebih detail ada di [docs/architecture.md](docs/architecture.md).
+### Multi-Tier Fallback Chain BMKG
+
+Tidak semua desa/kelurahan (`adm4`) memiliki stasiun cuaca langsung di endpoint publik BMKG. LihatLangit menerapkan mekanisme fallback berjenjang agar hasil cuaca tidak pernah kosong:
+
+1. **Direct Match & Code Variants**: Cek varian penomoran BMKG (`0XXX`, `1XXX`, `2XXX`).
+2. **Kecamatan (`adm3`)**: Cari desa terdaftar dengan data aktif di kecamatan yang sama via `bmkg-coverage.json`.
+3. **Geospasial Terdekat**: Titik observasi BMKG aktif terdekat via `bmkg-nearest.json`.
+4. **Kabupaten/Kota (`adm2`)**: Titik aktif lain dalam kabupaten/kota yang sama.
+5. **Guaranteed Provincial Capitals**: Jaring pengaman ibu kota provinsi jika seluruh tingkat di atas gagal.
 
 <br>
 
@@ -166,6 +191,10 @@ Mengambil prakiraan cuaca untuk kode wilayah `adm4` dari BMKG.
 ### `GET /api/weather-batch?adm4={kode1},{kode2},...`
 
 Data cuaca multiple kota sekaligus — digunakan untuk peta interaktif.
+
+### `GET /api/gempa`
+
+Mengambil data gempa bumi terkini (M 5.0+ dan dirasakan) dari BMKG AutoTEWS. Cache diperbarui setiap 5 menit.
 
 ### `GET /api/warnings`
 
