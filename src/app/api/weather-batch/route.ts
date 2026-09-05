@@ -20,7 +20,7 @@ type CitySummary = {
 };
 
 // In-memory cache server-side agar batch tidak membebani BMKG di setiap request pengguna
-let globalBatchCache: Record<string, CitySummary> = {};
+const globalBatchCache: Record<string, CitySummary> = {};
 let lastBatchTimestamp = 0;
 
 export async function GET(request: NextRequest) {
