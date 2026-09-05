@@ -9,7 +9,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { searchRegions, reverseGeocode } from "@/lib/regionSearch";
+import { searchRegions, reverseGeocode, findNearestRegionsWithData } from "@/lib/regionSearch";
 import type { Region, ApiError } from "@/types/weather";
 
 export async function GET(request: NextRequest) {
@@ -17,6 +17,13 @@ export async function GET(request: NextRequest) {
   const q = searchParams.get("q");
   const lat = searchParams.get("lat");
   const lon = searchParams.get("lon");
+  const fallbackFor = searchParams.get("fallbackFor");
+
+  // Fallback regions with data for a given adm4
+  if (fallbackFor) {
+    const nearby = await findNearestRegionsWithData(fallbackFor, 4);
+    return NextResponse.json(nearby);
+  }
 
   // Nearest region by coordinates
   if (lat !== null && lon !== null) {
