@@ -47,17 +47,25 @@ export default function DashboardClient() {
   const prevAdm4Ref = useRef<string | null>(null);
 
   // ── Riwayat & Favorit Lokasi (localStorage) ──
-  const [recentRegions, setRecentRegions] = useState<Region[]>([]);
-  const [favoriteRegions, setFavoriteRegions] = useState<Region[]>([]);
-
-  useEffect(() => {
+  const [recentRegions, setRecentRegions] = useState<Region[]>(() => {
+    if (typeof window === "undefined" || !window.localStorage) return [];
     try {
-      const storedRecents = localStorage.getItem("lihatlangit_recent_regions");
-      if (storedRecents) setRecentRegions(JSON.parse(storedRecents));
-      const storedFavs = localStorage.getItem("lihatlangit_fav_regions");
-      if (storedFavs) setFavoriteRegions(JSON.parse(storedFavs));
-    } catch { /* ignore */ }
-  }, []);
+      const stored = window.localStorage.getItem("lihatlangit_recent_regions");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const [favoriteRegions, setFavoriteRegions] = useState<Region[]>(() => {
+    if (typeof window === "undefined" || !window.localStorage) return [];
+    try {
+      const stored = window.localStorage.getItem("lihatlangit_fav_regions");
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
 
   const saveRecentRegion = useCallback((region: Region) => {
     setRecentRegions((prev) => {
