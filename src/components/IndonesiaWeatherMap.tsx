@@ -38,6 +38,27 @@ interface IndonesiaWeatherMapProps {
   zoomToRegion?: ZoomTarget | null;
 }
 
+function getStoredWeatherCache(): CityWeatherMap | null {
+  if (typeof window === "undefined" || !window.localStorage) return null;
+  try {
+    const stored = window.localStorage.getItem("lihatlangit_map_batch");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        !Array.isArray(parsed) &&
+        Object.keys(parsed).length > 0
+      ) {
+        return parsed as CityWeatherMap;
+      }
+    }
+  } catch {
+    // Abaikan jika storage diblokir di browser privat
+  }
+  return null;
+}
+
 /** Peta cuaca seluruh Indonesia dengan indikator warna seperti BMKG */
 export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -48,8 +69,8 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   const legendRef = useRef<L.Control | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [loadError, setLoadError] = useState(false);
-  const [weatherData, setWeatherData] = useState<CityWeatherMap | null>(null);
-  const [isFetching, setIsFetching] = useState(true);
+  const [weatherData, setWeatherData] = useState<CityWeatherMap | null>(getStoredWeatherCache);
+  const [isFetching, setIsFetching] = useState<boolean>(() => !getStoredWeatherCache());
   const [fetchError, setFetchError] = useState(false);
   const [showIndicators, setShowIndicators] = useState(true);
 
@@ -63,28 +84,6 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       mountedRef.current = false;
       abortRef.current?.abort();
     };
-  }, []);
-
-  // ── Client-side cache: render instan tanpa loading kosong ──
-  useEffect(() => {
-    try {
-      if (typeof window === "undefined" || !window.localStorage) return;
-      const stored = window.localStorage.getItem("lihatlangit_map_batch");
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          !Array.isArray(parsed) &&
-          Object.keys(parsed).length > 0
-        ) {
-          setWeatherData(parsed as CityWeatherMap);
-          setIsFetching(false);
-        }
-      }
-    } catch {
-      // Abaikan jika storage diblokir di browser privat
-    }
   }, []);
 
   const fetchAllWeather = useCallback(async () => {
