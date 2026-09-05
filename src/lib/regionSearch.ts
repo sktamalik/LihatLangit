@@ -262,6 +262,31 @@ export async function findNearestWithData(
   return list.slice(0, limit).map(([code, tier]) => ({ code, tier }));
 }
 
+/**
+ * Get nearest Region objects that have BMKG data for fallback suggestions in UI.
+ */
+export async function findNearestRegionsWithData(
+  adm4: string,
+  limit: number = 3
+): Promise<Region[]> {
+  const adm3 = getAdm3Prefix(adm4);
+  const candidates = await findNearestWithData(adm3, limit * 2);
+  const results: Region[] = [];
+  const seenAdm4 = new Set<string>();
+
+  for (const { code } of candidates) {
+    if (code === adm4 || seenAdm4.has(code)) continue;
+    const reg = await getRegionByAdm4(code);
+    if (reg) {
+      seenAdm4.add(reg.adm4);
+      results.push(reg);
+      if (results.length >= limit) break;
+    }
+  }
+
+  return results;
+}
+
 // ── Guaranteed fallback chain (called when Level N / nearest-with-data misses) ──
 
 const ADM4_RE = /^\d{2}\.\d{2}\.\d{2}\.\d{4}$/;

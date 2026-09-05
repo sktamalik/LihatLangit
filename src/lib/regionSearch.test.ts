@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, findNearestWithData, findBmkgFallback } from "./regionSearch";
+import { searchRegions, getRegionByAdm4, toBmkgAdm4, getAdm3Prefix, findNearestWithData, findNearestRegionsWithData, findBmkgFallback } from "./regionSearch";
 
 describe("searchRegions", () => {
   it("returns results for 'Kemayoran'", async () => {
@@ -131,6 +131,18 @@ describe("findNearestWithData", () => {
 
   it("returns empty for unknown adm3", async () => {
     expect(await findNearestWithData("99.99.99")).toEqual([]);
+  });
+});
+
+describe("findNearestRegionsWithData", () => {
+  it("returns Region objects for an adm4 code", async () => {
+    const nearby = await findNearestRegionsWithData("32.01.01.0001", 3);
+    expect(Array.isArray(nearby)).toBe(true);
+    for (const r of nearby) {
+      expect(r.adm4).toBeDefined();
+      expect(r.village).toBeDefined();
+      expect(r.city).toBeDefined();
+    }
   });
 });
 
