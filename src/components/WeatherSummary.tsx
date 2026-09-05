@@ -45,7 +45,13 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
             </div>
             <div>
               <p className="font-body-sans text-[11px] text-text-muted font-medium uppercase tracking-wider">Cuaca Saat Ini</p>
-              <p className="font-body-sans text-[14px] text-text-dark font-semibold">{region.city}</p>
+              <p className="font-body-sans text-[14px] text-text-dark font-semibold">{region.village ? `${region.village}, ${region.city}` : region.city}</p>
+              {forecast.fallbackFrom && forecast.fallbackFrom !== region.village && (
+                <p className="font-body-sans text-[11px] text-primary flex items-center gap-0.5 mt-0.5 font-medium">
+                  <span className="material-symbols-outlined text-[13px]">near_me</span>
+                  Data stasiun terdekat: {forecast.fallbackFrom}
+                </p>
+              )}
             </div>
           </div>
           <div className="px-2.5 py-1 rounded-full bg-white/60 backdrop-blur-sm">
