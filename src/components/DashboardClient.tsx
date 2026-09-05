@@ -44,6 +44,61 @@ export default function DashboardClient() {
   const userInitiatedZoomRef = useRef(false);
   const prevAdm4Ref = useRef<string | null>(null);
 
+  // ── Riwayat & Favorit Lokasi (localStorage) ──
+  const [recentRegions, setRecentRegions] = useState<Region[]>([]);
+  const [favoriteRegions, setFavoriteRegions] = useState<Region[]>([]);
+
+  useEffect(() => {
+    try {
+      const storedRecents = localStorage.getItem("lihatlangit_recent_regions");
+      if (storedRecents) setRecentRegions(JSON.parse(storedRecents));
+      const storedFavs = localStorage.getItem("lihatlangit_fav_regions");
+      if (storedFavs) setFavoriteRegions(JSON.parse(storedFavs));
+    } catch { /* ignore */ }
+  }, []);
+
+  const saveRecentRegion = useCallback((region: Region) => {
+    setRecentRegions((prev) => {
+      const filtered = prev.filter((r) => r.adm4 !== region.adm4);
+      const updated = [region, ...filtered].slice(0, 4);
+      try {
+        localStorage.setItem("lihatlangit_recent_regions", JSON.stringify(updated));
+      } catch { /* ignore */ }
+      return updated;
+    });
+  }, []);
+
+  const toggleFavoriteRegion = useCallback((region: Region) => {
+    setFavoriteRegions((prev) => {
+      const exists = prev.some((r) => r.adm4 === region.adm4);
+      const updated = exists
+        ? prev.filter((r) => r.adm4 !== region.adm4)
+        : [region, ...prev].slice(0, 6);
+      try {
+        localStorage.setItem("lihatlangit_fav_regions", JSON.stringify(updated));
+      } catch { /* ignore */ }
+      return updated;
+    });
+  }, []);
+
+  const [copiedLink, setCopiedLink] = useState(false);
+  const handleCopyShareLink = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (selectedRegion) {
+      url.searchParams.set("adm4", selectedRegion.adm4);
+      url.searchParams.delete("q");
+    }
+    navigator.clipboard.writeText(url.toString()).then(() => {
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    });
+  }, [selectedRegion]);
+
+  const isCurrentFavorite = selectedRegion
+    ? favoriteRegions.some((r) => r.adm4 === selectedRegion.adm4)
+    : false;
+
   // ── Intersection observer: track which section is visible ──
   // Only track top-level sections (hero, app-preview, peta-cuaca, features, berita-bmkg).
   // Do NOT observe nested divs like #hero-search or #peringatan-dini — they'd hijack
@@ -97,9 +152,10 @@ export default function DashboardClient() {
 
   const handleSearchAndSelect = useCallback((region: Region) => {
     userInitiatedZoomRef.current = true;
+    saveRecentRegion(region);
     searchAndSelect(region);
     setSearchNotif({ village: region.village, district: region.district });
-  }, [searchAndSelect]);
+  }, [searchAndSelect, saveRecentRegion]);
 
   const handleGeolocation = useCallback(() => {
     userInitiatedZoomRef.current = true;
@@ -262,6 +318,86 @@ export default function DashboardClient() {
               <span className="material-symbols-outlined text-outline mr-3 text-[24px]">search</span>
               <RegionSearch onSelect={handleSearchAndSelect} />
             </div>
+
+            {/* Quick action bar: Lokasi terpilih, Favorite toggle & Bagikan Link */}
+            {selectedRegion && (
+              <div className="flex flex-wrap items-center justify-between gap-2 mt-3 px-3 text-xs text-on-surface-variant font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="text-text-muted">Wilayah aktif:</span>
+                  <span className="font-semibold text-text-dark">
+                    {selectedRegion.village ? `${selectedRegion.village}, ${selectedRegion.district}` : selectedRegion.city}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleFavoriteRegion(selectedRegion)}
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full border transition-all cursor-pointer ${
+                      isCurrentFavorite
+                        ? "bg-amber-50 border-amber-300 text-amber-600 font-semibold"
+                        : "bg-white border-outline/30 hover:bg-surface-container text-on-surface-variant"
+                    }`}
+                    title={isCurrentFavorite ? "Hapus dari favorit" : "Simpan ke favorit"}
+                  >
+                    <span className="material-symbols-outlined text-[15px]">
+                      {isCurrentFavorite ? "star" : "star_border"}
+                    </span>
+                    {isCurrentFavorite ? "Favorit" : "Simpan"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCopyShareLink}
+                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white border border-outline/30 hover:bg-surface-container text-on-surface-variant transition-all cursor-pointer"
+                    title="Salin tautan wilayah ini"
+                  >
+                    <span className="material-symbols-outlined text-[15px]">
+                      {copiedLink ? "check" : "share"}
+                    </span>
+                    {copiedLink ? "Tersalin!" : "Bagikan"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Quick chips: Favorit & Riwayat */}
+            {(favoriteRegions.length > 0 || recentRegions.length > 0) && (
+              <div className="flex flex-wrap items-center gap-3 mt-3 px-3 text-xs">
+                {favoriteRegions.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-text-muted font-medium flex items-center gap-0.5">
+                      <span className="material-symbols-outlined text-amber-500 text-[14px]">star</span> Favorit:
+                    </span>
+                    {favoriteRegions.map((fav) => (
+                      <button
+                        key={fav.adm4}
+                        type="button"
+                        onClick={() => handleSearchAndSelect(fav)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 font-medium transition-colors cursor-pointer border border-amber-300/40"
+                      >
+                        <span>{fav.village || fav.district || fav.city}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {recentRegions.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="text-text-muted font-medium flex items-center gap-0.5">
+                      <span className="material-symbols-outlined text-text-muted text-[14px]">history</span> Terakhir:
+                    </span>
+                    {recentRegions.map((rec) => (
+                      <button
+                        key={rec.adm4}
+                        type="button"
+                        onClick={() => handleSearchAndSelect(rec)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-medium transition-colors cursor-pointer"
+                      >
+                        <span>{rec.village || rec.district || rec.city}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
 
