@@ -15,9 +15,23 @@ import type { Region, ApiError } from "@/types/weather";
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q");
+  const adm4 = searchParams.get("adm4");
   const lat = searchParams.get("lat");
   const lon = searchParams.get("lon");
   const fallbackFor = searchParams.get("fallbackFor");
+
+  // Get specific region by adm4
+  if (adm4) {
+    const { getRegionByAdm4 } = await import("@/lib/regionSearch");
+    const reg = await getRegionByAdm4(adm4);
+    if (!reg) {
+      return NextResponse.json(
+        { error: { code: "REGION_NOT_FOUND", message: "Wilayah tidak ditemukan." } },
+        { status: 404 }
+      );
+    }
+    return NextResponse.json(reg);
+  }
 
   // Fallback regions with data for a given adm4
   if (fallbackFor) {
