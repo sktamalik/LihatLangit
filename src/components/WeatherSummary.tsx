@@ -2,6 +2,7 @@
 import { useState } from "react";
 import type { WeatherForecast } from "@/types/weather";
 import WindDirection from "@/components/WindDirection";
+import { useWarnings } from "@/lib/useWarnings";
 
 function calcFeelsLike(tempC: number, rh: number): number {
   // Heat Index (Rothfusz regression) for temp ≥ 27°C
@@ -29,6 +30,7 @@ function getWeatherTheme(desc: string) {
 export default function WeatherSummary({ forecast }: { forecast: WeatherForecast }) {
   const [copied, setCopied] = useState(false);
   const { region, nearestPoint, days } = forecast;
+  const { matchedWarning } = useWarnings(region);
   const c = nearestPoint ?? days[0]?.points[0];
   const theme = getWeatherTheme(c?.weatherDescription ?? "");
 
@@ -102,6 +104,40 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
             </p>
           </div>
         </div>
+
+        {/* Peringatan Dini Cuaca BMKG Kontekstual */}
+        {matchedWarning && (
+          <div className="mb-4 p-3 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-950 flex items-start gap-2.5 shadow-xs">
+            <span className="material-symbols-outlined text-amber-600 text-[20px] shrink-0 mt-0.5">
+              warning
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-bold text-[11px] text-amber-900 uppercase tracking-wider">
+                    Peringatan Dini BMKG
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded text-[10px] font-semibold bg-amber-200/80 text-amber-900">
+                    {matchedWarning.matchLevel === "district"
+                      ? "Wilayah Kecamatan"
+                      : matchedWarning.matchLevel === "city"
+                      ? "Kota / Kabupaten"
+                      : "Provinsi"}
+                  </span>
+                </div>
+                <a
+                  href="#peringatan-dini"
+                  className="text-[11px] text-amber-800 hover:text-amber-950 font-semibold underline shrink-0 whitespace-nowrap"
+                >
+                  Detail ↗
+                </a>
+              </div>
+              <p className="text-[12px] text-amber-950/90 font-medium mt-1 leading-snug">
+                {matchedWarning.warning.title}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="w-full h-px bg-white/50 my-4" />
