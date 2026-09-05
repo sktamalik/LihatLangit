@@ -3,9 +3,9 @@ import { isValidAdm4 } from "./adm4";
 
 const BMKG_BASE_URL = "https://api.bmkg.go.id/publik/prakiraan-cuaca";
 const USER_AGENTS = [
-  "LihatLangit/2.0 (weather-dashboard; +https://lihatlangit.vercel.app)",
-  "Mozilla/5.0 (compatible; LihatLangit/2.0; +https://lihatlangit.vercel.app)",
-  "LihatLangit/2.0 (BMKG weather proxy; +https://lihatlangit.vercel.app)",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:135.0) Gecko/20100101 Firefox/135.0",
 ];
 
 export type BmkgClientError = {
@@ -49,7 +49,8 @@ export async function fetchForecast(
         `${BMKG_BASE_URL}?adm4=${encodeURIComponent(adm4)}`,
         {
           headers: {
-            Accept: "application/json",
+            Accept: "application/json, text/plain, */*",
+            "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
             "User-Agent": ua,
           },
           signal: AbortSignal.timeout(timeoutMs),
@@ -62,11 +63,13 @@ export async function fetchForecast(
           message: `BMKG returned HTTP ${response.status}`,
           status: response.status,
         };
-        // Don't retry 4xx except 429/403
-        if (response.status < 400 || response.status === 429 || response.status === 403) {
-          continue;
+        // 4xx errors (404, 429 rate limit, 403 forbidden) must NOT retry immediately to avoid hammering
+        if (response.status >= 400 && response.status < 500) {
+          return { ok: false, error: lastError };
         }
-        return { ok: false, error: lastError };
+        // Only 5xx server errors retry with a brief backoff
+        await new Promise((r) => setTimeout(r, 300));
+        continue;
       }
 
       let data: BmkgRawResponse;
