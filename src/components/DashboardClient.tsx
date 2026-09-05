@@ -23,7 +23,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import SearchNotif from "@/components/SearchNotif";
 import type { SearchNotifState } from "@/components/SearchNotif";
 import SectionDots from "@/components/SectionDots";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useWarnings } from "@/lib/useWarnings";
@@ -36,7 +36,14 @@ const IndonesiaWeatherMap = dynamic(
 );
 import type { ErrorCode, Region } from "@/types/weather";
 
+const emptySubscribe = () => () => {};
+
 export default function DashboardClient() {
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
   const { state, selectedRegion, searchAndSelect, retry, requestGeolocation } = useWeather();
   const { matchedWarning } = useWarnings(selectedRegion);
   const [activeSection, setActiveSection] = useState<string>("hero");
@@ -105,7 +112,7 @@ export default function DashboardClient() {
     });
   }, [selectedRegion]);
 
-  const isCurrentFavorite = selectedRegion
+  const isCurrentFavorite = isMounted && selectedRegion
     ? favoriteRegions.some((r) => r.adm4 === selectedRegion.adm4)
     : false;
 
@@ -380,7 +387,7 @@ export default function DashboardClient() {
             )}
 
             {/* Quick chips: Favorit & Riwayat */}
-            {(favoriteRegions.length > 0 || recentRegions.length > 0) && (
+            {isMounted && (favoriteRegions.length > 0 || recentRegions.length > 0) && (
               <div className="flex flex-wrap items-center gap-3 mt-3 px-3 text-xs">
                 {favoriteRegions.length > 0 && (
                   <div className="flex flex-wrap items-center gap-1.5">
