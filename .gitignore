@@ -43,5 +43,7 @@ next-env.d.ts
 # graphify — generated knowledge graph output (rebuild locally)
 graphify-out/
 
-# local coding-agent permissions
+# local coding-agent permissions and artifacts
 .claude/
+.agents/
+.playwright-mcp/
