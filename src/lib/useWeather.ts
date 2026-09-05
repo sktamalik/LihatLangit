@@ -74,10 +74,62 @@ export function useWeather() {
     };
   }, [fetchWeather]);
 
-  // Auto-load Makassar
+  // Auto-load: periksa query param (?adm4=... atau ?q=...) di URL terlebih dahulu, fallback ke Makassar
   useEffect(() => {
     if (!initialFetchDone.current) {
       initialFetchDone.current = true;
+
+      if (typeof window !== "undefined") {
+        const params = new URLSearchParams(window.location.search);
+        const paramAdm4 = params.get("adm4");
+        const paramQ = params.get("q");
+
+        if (paramAdm4) {
+          fetch(`/api/regions?adm4=${encodeURIComponent(paramAdm4)}`)
+            .then((res) => (res.ok ? res.json() : null))
+            .then((reg: Region | null) => {
+              if (reg && reg.adm4) {
+                currentAdm4Ref.current = reg.adm4;
+                setSelectedRegion(reg);
+                fetchWeather(reg.adm4);
+                return;
+              }
+              // Jika fetch region gagal, coba langsung fetchWeather dengan adm4
+              currentAdm4Ref.current = paramAdm4;
+              fetchWeather(paramAdm4);
+            })
+            .catch(() => {
+              currentAdm4Ref.current = paramAdm4;
+              fetchWeather(paramAdm4);
+            });
+          return;
+        }
+
+        if (paramQ) {
+          fetch(`/api/regions?q=${encodeURIComponent(paramQ)}`)
+            .then((res) => (res.ok ? res.json() : []))
+            .then((regions: Region[]) => {
+              if (Array.isArray(regions) && regions.length > 0) {
+                const first = regions[0];
+                currentAdm4Ref.current = first.adm4;
+                setSelectedRegion(first);
+                fetchWeather(first.adm4);
+                return;
+              }
+              // Fallback jika q tidak menghasilkan apa pun
+              currentAdm4Ref.current = DEFAULT_REGION.adm4;
+              setSelectedRegion(DEFAULT_REGION);
+              fetchWeather(DEFAULT_REGION.adm4);
+            })
+            .catch(() => {
+              currentAdm4Ref.current = DEFAULT_REGION.adm4;
+              setSelectedRegion(DEFAULT_REGION);
+              fetchWeather(DEFAULT_REGION.adm4);
+            });
+          return;
+        }
+      }
+
       currentAdm4Ref.current = DEFAULT_REGION.adm4;
       setSelectedRegion(DEFAULT_REGION);
       fetchWeather(DEFAULT_REGION.adm4);
@@ -87,6 +139,15 @@ export function useWeather() {
   const searchAndSelect = useCallback(async (region: Region) => {
     currentAdm4Ref.current = region.adm4;
     setSelectedRegion(region);
+
+    // Sync query param ke URL secara silent tanpa full reload
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("adm4", region.adm4);
+      url.searchParams.delete("q");
+      window.history.replaceState({}, "", url.toString());
+    }
+
     await fetchWeather(region.adm4);
   }, [fetchWeather]);
 
