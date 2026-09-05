@@ -26,6 +26,7 @@ import SectionDots from "@/components/SectionDots";
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useWarnings } from "@/lib/useWarnings";
 
 // Lazy-load peta: JS + fetch weather-batch (38 kota) hanya dimuat saat dibutuhkan.
 // ssr:false karena Leaflet butuh window — sekaligus mencegah hammer BMKG di load awal.
@@ -37,6 +38,7 @@ import type { ErrorCode, Region } from "@/types/weather";
 
 export default function DashboardClient() {
   const { state, selectedRegion, searchAndSelect, retry, requestGeolocation } = useWeather();
+  const { matchedWarning } = useWarnings(selectedRegion);
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchNotif, setSearchNotif] = useState<SearchNotifState | null>(null);
@@ -322,11 +324,21 @@ export default function DashboardClient() {
             {/* Quick action bar: Lokasi terpilih, Favorite toggle & Bagikan Link */}
             {selectedRegion && (
               <div className="flex flex-wrap items-center justify-between gap-2 mt-3 px-3 text-xs text-on-surface-variant font-medium">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-text-muted">Wilayah aktif:</span>
                   <span className="font-semibold text-text-dark">
                     {selectedRegion.village ? `${selectedRegion.village}, ${selectedRegion.district}` : selectedRegion.city}
                   </span>
+                  {matchedWarning && (
+                    <a
+                      href="#peringatan-dini"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-semibold hover:bg-amber-200 transition-colors no-underline"
+                      title={matchedWarning.warning.title}
+                    >
+                      <span className="material-symbols-outlined text-[13px] text-amber-600">warning</span>
+                      <span>Waspada Cuaca</span>
+                    </a>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -412,7 +424,14 @@ export default function DashboardClient() {
                 <a onClick={() => scrollTo("hero")} className="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium cursor-pointer no-underline"><span className="material-symbols-outlined text-[20px] text-text-muted">dashboard</span> Dashboard</a>
                 <a onClick={() => scrollTo("prakiraan-hari-ini")} className="flex items-center gap-3 px-3 py-2 rounded-lg bg-accent-container/50 text-accent font-medium font-body-sans text-[14px] cursor-pointer no-underline"><span className="material-symbols-outlined text-[20px]">pin_drop</span> Prakiraan</a>
                 <a onClick={() => scrollTo("peta-cuaca")} className="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium cursor-pointer no-underline"><span className="material-symbols-outlined text-[20px] text-text-muted">map</span> Peta Cuaca</a>
-                <a onClick={() => scrollTo("peringatan-dini")} className="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium cursor-pointer no-underline"><span className="material-symbols-outlined text-[20px] text-text-muted">warning</span> Peringatan</a>
+                <a onClick={() => scrollTo("peringatan-dini")} className="flex items-center justify-between px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-colors font-body-sans text-[14px] font-medium cursor-pointer no-underline">
+                  <span className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-[20px] text-text-muted">warning</span> Peringatan
+                  </span>
+                  {matchedWarning && (
+                    <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse-soft" title="Peringatan aktif untuk wilayah ini" />
+                  )}
+                </a>
               </nav>
             </div>
             <div className="flex-grow bg-white p-6 md:p-8 flex flex-col">
@@ -432,7 +451,21 @@ export default function DashboardClient() {
                   <div className="border border-grass-green/20 bg-grass-green/5 rounded-lg p-4 flex justify-between items-center mb-8">
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-grass-green text-[24px]">verified</span>
-                      <div><h3 className="font-body-sans text-[15px] font-semibold text-grass-green">{state.forecast.region.village}, {state.forecast.region.district}</h3><p className="font-body-sans text-[13px] text-on-surface-variant">{state.forecast.nearestPoint?.weatherDescription ?? "Data tersedia"}</p>{state.forecast.fallbackFrom && state.forecast.fallbackFrom !== state.forecast.region.village && <p className="font-body-sans text-[12px] text-primary mt-0.5 flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">near_me</span>Data dari wilayah terdekat: {state.forecast.fallbackFrom}</p>}</div>
+                      <div>
+                        <h3 className="font-body-sans text-[15px] font-semibold text-grass-green">{state.forecast.region.village}, {state.forecast.region.district}</h3>
+                        <p className="font-body-sans text-[13px] text-on-surface-variant">{state.forecast.nearestPoint?.weatherDescription ?? "Data tersedia"}</p>
+                        {state.forecast.fallbackFrom && state.forecast.fallbackFrom !== state.forecast.region.village && (
+                          <p className="font-body-sans text-[12px] text-primary mt-0.5 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[14px]">near_me</span>Data dari wilayah terdekat: {state.forecast.fallbackFrom}
+                          </p>
+                        )}
+                        {matchedWarning && (
+                          <p className="font-body-sans text-[12px] text-amber-700 mt-0.5 flex items-center gap-1 font-medium">
+                            <span className="material-symbols-outlined text-[14px] text-amber-600">warning</span>
+                            Peringatan BMKG aktif ({matchedWarning.warning.region})
+                          </p>
+                        )}
+                      </div>
                     </div>
                     <span className="px-3 py-1 bg-error-container text-on-error-container rounded-md font-body-sans text-[12px] font-medium">{state.forecast.nearestPoint?.temperatureC != null ? `${Math.round(state.forecast.nearestPoint.temperatureC)}°C` : "--"}</span>
                   </div>
@@ -496,7 +529,7 @@ export default function DashboardClient() {
             <ScrollReveal delay={500}><div className="w-full"><EarthquakeWarning /></div></ScrollReveal>
             {/* Peringatan Dini — full width */}
             <ScrollReveal delay={600}>
-              <div id="peringatan-dini" className="w-full"><WarningBanner /></div>
+              <div id="peringatan-dini" className="w-full"><WarningBanner selectedRegion={selectedRegion} /></div>
             </ScrollReveal>
           </div>
         )}
