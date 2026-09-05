@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import type { WarningItem } from "@/app/api/warnings/route";
 import type { Region } from "@/types/weather";
 
@@ -84,17 +84,10 @@ export function matchWarningForRegion(
 }
 
 export function useWarnings(region?: Region | null) {
-  const [warnings, setWarnings] = useState<WarningItem[]>(cachedWarnings || []);
-  const [loading, setLoading] = useState<boolean>(!cachedWarnings);
+  const [warnings, setWarnings] = useState<WarningItem[]>(() => cachedWarnings || []);
+  const [loading, setLoading] = useState<boolean>(() => !cachedWarnings);
 
-  const fetchWarnings = async (force = false) => {
-    const now = Date.now();
-    if (!force && cachedWarnings && now - lastFetchTime < CACHE_TTL_MS) {
-      setWarnings(cachedWarnings);
-      setLoading(false);
-      return;
-    }
-
+  const fetchWarnings = useCallback(async () => {
     try {
       const res = await fetch("/api/warnings");
       if (res.ok) {
@@ -109,12 +102,44 @@ export function useWarnings(region?: Region | null) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchWarnings();
-    const interval = setInterval(() => fetchWarnings(true), CACHE_TTL_MS);
-    return () => clearInterval(interval);
+    let active = true;
+    const now = Date.now();
+    if (!cachedWarnings || now - lastFetchTime >= CACHE_TTL_MS) {
+      fetch("/api/warnings")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!active || !data) return;
+          const items = data.warnings ?? [];
+          cachedWarnings = items;
+          lastFetchTime = Date.now();
+          setWarnings(items);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+    }
+
+    const interval = setInterval(() => {
+      fetch("/api/warnings")
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!active || !data) return;
+          const items = data.warnings ?? [];
+          cachedWarnings = items;
+          lastFetchTime = Date.now();
+          setWarnings(items);
+        })
+        .catch(() => {});
+    }, CACHE_TTL_MS);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
 
   const matched = useMemo(() => {
@@ -125,6 +150,6 @@ export function useWarnings(region?: Region | null) {
     warnings,
     loading,
     matchedWarning: matched,
-    refetch: () => fetchWarnings(true),
+    refetch: fetchWarnings,
   };
 }
