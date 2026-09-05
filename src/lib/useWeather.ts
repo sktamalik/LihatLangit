@@ -30,10 +30,10 @@ const REFRESH_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
 
 export function useWeather() {
   const [state, setState] = useState<DashboardState>({ status: "loading" });
-  const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<Region | null>(DEFAULT_REGION);
   const abortRef = useRef<AbortController | null>(null);
   const initialFetchDone = useRef(false);
-  const currentAdm4Ref = useRef<string | null>(null);
+  const currentAdm4Ref = useRef<string | null>(DEFAULT_REGION.adm4);
   const refreshTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchWeather = useCallback(async (adm4: string, silent = false) => {
@@ -131,8 +131,9 @@ export function useWeather() {
       }
 
       currentAdm4Ref.current = DEFAULT_REGION.adm4;
-      setSelectedRegion(DEFAULT_REGION);
-      fetchWeather(DEFAULT_REGION.adm4);
+      queueMicrotask(() => {
+        fetchWeather(DEFAULT_REGION.adm4);
+      });
     }
   }, [fetchWeather]);
 
