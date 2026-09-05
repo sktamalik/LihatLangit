@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import type { WeatherForecast } from "@/types/weather";
 import WindDirection from "@/components/WindDirection";
 
@@ -26,9 +27,20 @@ function getWeatherTheme(desc: string) {
 }
 
 export default function WeatherSummary({ forecast }: { forecast: WeatherForecast }) {
+  const [copied, setCopied] = useState(false);
   const { region, nearestPoint, days } = forecast;
   const c = nearestPoint ?? days[0]?.points[0];
   const theme = getWeatherTheme(c?.weatherDescription ?? "");
+
+  const handleShare = () => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("adm4", region.adm4);
+    url.searchParams.delete("q");
+    navigator.clipboard.writeText(url.toString());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className={`bg-gradient-to-br ${theme.gradient} rounded-[20px] p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] flex flex-col h-full relative overflow-hidden`}>
@@ -54,8 +66,18 @@ export default function WeatherSummary({ forecast }: { forecast: WeatherForecast
               )}
             </div>
           </div>
-          <div className="px-2.5 py-1 rounded-full bg-white/60 backdrop-blur-sm">
-            <span className="font-body-sans text-[10px] text-text-muted font-medium">{c?.localDateTime ? new Date(c.localDateTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleShare}
+              title="Salin tautan cuaca wilayah ini"
+              className="px-2.5 py-1 rounded-full bg-white/60 hover:bg-white text-text-dark backdrop-blur-sm transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-medium"
+            >
+              <span className="material-symbols-outlined text-[14px]">{copied ? "check" : "share"}</span>
+              <span>{copied ? "Tersalin" : "Bagikan"}</span>
+            </button>
+            <div className="px-2.5 py-1 rounded-full bg-white/60 backdrop-blur-sm">
+              <span className="font-body-sans text-[10px] text-text-muted font-medium">{c?.localDateTime ? new Date(c.localDateTime).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</span>
+            </div>
           </div>
         </div>
 
