@@ -70,6 +70,29 @@ export function getCache<T>(key: string): CacheResult<T> {
   return { status: "miss" };
 }
 
+export function findCacheByPrefix<T>(prefix: string): CacheResult<T> {
+  const now = Date.now();
+  for (const [key, entry] of store) {
+    if (key.startsWith(prefix)) {
+      if (now < entry.expiresAt) {
+        return {
+          status: "fresh",
+          payload: entry.payload as T,
+          fetchedAt: entry.fetchedAt,
+        };
+      }
+      if (now < entry.staleUntil) {
+        return {
+          status: "stale",
+          payload: entry.payload as T,
+          fetchedAt: entry.fetchedAt,
+        };
+      }
+    }
+  }
+  return { status: "miss" };
+}
+
 export function clearCache(): void {
   store.clear();
 }

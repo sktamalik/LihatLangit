@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { setCache, getCache, clearCache } from "./cache";
+import { setCache, getCache, clearCache, findCacheByPrefix } from "./cache";
 
 interface TestPayload {
   value: number;
@@ -58,5 +58,17 @@ describe("cache", () => {
       expect(result.fetchedAt).toBeDefined();
       expect(new Date(result.fetchedAt).toISOString()).toBe(result.fetchedAt);
     }
+  });
+
+  it("finds cached item by prefix", () => {
+    setCache<TestPayload>("weather:bmkg:adm4:31.71.01.1001", { value: 100 }, 3600_000);
+    const found = findCacheByPrefix<TestPayload>("weather:bmkg:adm4:31.71.01");
+    expect(found.status).toBe("fresh");
+    if (found.status === "fresh") {
+      expect(found.payload.value).toBe(100);
+    }
+
+    const notFound = findCacheByPrefix<TestPayload>("weather:bmkg:adm4:99.99");
+    expect(notFound.status).toBe("miss");
   });
 });
