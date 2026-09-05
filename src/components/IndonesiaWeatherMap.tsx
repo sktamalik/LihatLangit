@@ -65,6 +65,22 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
     };
   }, []);
 
+  // ── Client-side cache: render instan tanpa loading kosong ──
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("lihatlangit_map_batch");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
+          setWeatherData(parsed);
+          setIsFetching(false);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const fetchAllWeather = useCallback(async () => {
     setIsFetching(true);
     setFetchError(false);
@@ -76,7 +92,14 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       const res = await fetch(`/api/weather-batch?adm4=${encodeURIComponent(codes)}`, { signal: controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: CityWeatherMap = await res.json();
-      if (mountedRef.current) setWeatherData(data);
+      if (mountedRef.current && Object.keys(data).length > 0) {
+        setWeatherData(data);
+        try {
+          localStorage.setItem("lihatlangit_map_batch", JSON.stringify(data));
+        } catch {
+          // ignore
+        }
+      }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       if (mountedRef.current) setFetchError(true);
@@ -85,11 +108,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
     }
   }, []);
 
-  // ── Fetch weather batch hanya saat section peta mendekati viewport ──
-  // Sebelumnya fetch 38 kota ke BMKG terjadi di SETIAP page load — itu penyebab
-  // utama rate-limit BMKG (429/403) yang bikin "Layanan BMKG sedang sibuk".
-  // Prefetch 3s setelah load (respons cached CDN, s-maxage=600, murah) PLUS
-  // IntersectionObserver rootMargin 600px untuk user yang scroll cepat ke peta.
+  // ── Fetch weather batch hanya saat peta mendekati viewport atau saat zoomToRegion aktif ──
   const weatherFetchedRef = useRef(false);
   const startFetch = useCallback(() => {
     if (weatherFetchedRef.current) return;
@@ -97,15 +116,17 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
     void fetchAllWeather();
   }, [fetchAllWeather]);
 
+  // Jika user bernavigasi langsung ke peta atau memilih wilayah untuk zoom di peta
   useEffect(() => {
-    const t = setTimeout(startFetch, 3000);
-    return () => clearTimeout(t);
-  }, [startFetch]);
+    if (zoomToRegion) {
+      startFetch();
+    }
+  }, [zoomToRegion, startFetch]);
 
   useEffect(() => {
     if (weatherFetchedRef.current) return;
     const el = document.getElementById("peta-cuaca");
-    if (!el) return; // jalur idle-callback tetap jalan sebagai fallback
+    if (!el) return;
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {
@@ -113,8 +134,8 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
           observer.disconnect();
         }
       },
-      // 600px early — fetch sudah jalan sebelum peta benar-benar kelihatan
-      { rootMargin: "600px 0px" }
+      // 300px early — fetch dimulai saat user scroll mendekati peta
+      { rootMargin: "300px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -460,7 +481,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       {/* Footer attribution */}
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-[10px] md:text-[11px] text-text-muted font-body-sans">
-          Data prakiraan cuaca dari BMKG — lingkaran berwarna menunjukkan kondisi cuaca terkini di setiap ibukota provinsi
+          Data prakiraan cuaca dari BMKG, ingkaran berwarna menunjukkan kondisi cuaca terkini di setiap ibukota provinsi
         </p>
         <p className="text-[10px] md:text-[11px] text-text-muted font-body-sans">
           Sumber: <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" className="text-primary-container hover:underline">data.bmkg.go.id</a>
