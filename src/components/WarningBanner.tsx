@@ -1,26 +1,17 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
-import type { WarningItem, WarningDetail } from "@/app/api/warnings/route";
+import { useState, useMemo } from "react";
+import type { WarningDetail } from "@/app/api/warnings/route";
+import type { Region } from "@/types/weather";
 import { formatDateTimeShort } from "@/lib/time";
+import { useWarnings } from "@/lib/useWarnings";
 
-export default function WarningBanner() {
-  const [warnings, setWarnings] = useState<WarningItem[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function WarningBanner({ selectedRegion }: { selectedRegion?: Region | null }) {
+  const { warnings, loading, matchedWarning } = useWarnings(selectedRegion);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, WarningDetail>>({});
   const [filter, setFilter] = useState<string>("semua");
   const [showAll, setShowAll] = useState(false);
-
-  const fetchWarnings = () => {
-    fetch("/api/warnings").then((r) => r.json()).then((data) => { setWarnings(data.warnings ?? []); setLoading(false); }).catch(() => setLoading(false));
-  };
-
-  useEffect(() => {
-    fetchWarnings();
-    const timer = setInterval(fetchWarnings, 5 * 60 * 1000); // refresh every 5 min
-    return () => clearInterval(timer);
-  }, []);
 
   const loadDetail = async (link: string) => {
     if (details[link]) return;
@@ -50,6 +41,30 @@ export default function WarningBanner() {
           <a href="https://www.bmkg.go.id/alerts/nowcast/id" target="_blank" rel="noopener noreferrer" className="text-[11px] sm:text-[12px] text-primary-container hover:underline font-body-sans shrink-0 whitespace-nowrap">Sumber ↗</a>
         </div>
       </div>
+
+      {/* Notifikasi Peringatan untuk Wilayah Aktif */}
+      {matchedWarning && (
+        <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-400/40 text-amber-950 flex flex-wrap items-center justify-between gap-2.5 text-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="material-symbols-outlined text-amber-600 text-[18px] shrink-0">my_location</span>
+            <span className="leading-snug">
+              Peringatan cuaca aktif terdeteksi untuk wilayah Anda: <strong>{matchedWarning.warning.region}</strong> ({matchedWarning.matchLevel === "district" ? "Kecamatan" : matchedWarning.matchLevel === "city" ? "Kota/Kab" : "Provinsi"}).
+            </span>
+          </div>
+          {filter !== matchedWarning.warning.region && (
+            <button
+              onClick={() => {
+                setFilter(matchedWarning.warning.region);
+                setExpanded(matchedWarning.warning.link);
+                loadDetail(matchedWarning.warning.link);
+              }}
+              className="px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-900 font-semibold shrink-0 cursor-pointer transition-colors"
+            >
+              Tampilkan Wilayah Ini
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="space-y-2">
         {displayed.map((w) => (
