@@ -27,15 +27,19 @@ export default function WeatherErrorState({
 }) {
   const [nearbyRegions, setNearbyRegions] = useState<Region[]>([]);
   const [loadingNearby, setLoadingNearby] = useState(false);
+  const canHaveFallback = Boolean(
+    selectedRegion?.adm4 && (code === "BMKG_UNAVAILABLE" || code === "EMPTY_FORECAST")
+  );
 
   useEffect(() => {
     if (!selectedRegion?.adm4 || (code !== "BMKG_UNAVAILABLE" && code !== "EMPTY_FORECAST")) {
-      setNearbyRegions([]);
       return;
     }
 
     let active = true;
-    setLoadingNearby(true);
+    queueMicrotask(() => {
+      if (active) setLoadingNearby(true);
+    });
     fetch(`/api/regions?fallbackFor=${encodeURIComponent(selectedRegion.adm4)}`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data: Region[]) => {
@@ -54,6 +58,8 @@ export default function WeatherErrorState({
       active = false;
     };
   }, [selectedRegion?.adm4, code]);
+
+  const displayedNearby = canHaveFallback ? nearbyRegions : [];
 
   return (
     <div className="card-surface rounded-[12px] p-6 md:p-8 flex flex-col items-center text-center animate-fade-in-up">
@@ -78,14 +84,14 @@ export default function WeatherErrorState({
       </p>
 
       {/* Wilayah terdekat yang datanya siap */}
-      {nearbyRegions.length > 0 && onSelectRegion && (
+      {displayedNearby.length > 0 && onSelectRegion && (
         <div className="w-full max-w-md mb-6 bg-surface-container-low/60 border border-outline/15 rounded-xl p-4 text-left">
           <p className="font-body-sans text-[13px] font-semibold text-text-dark flex items-center gap-1.5 mb-2.5">
             <span className="material-symbols-outlined text-primary text-[18px]">near_me</span>
             Lihat cuaca wilayah terdekat dengan data lengkap:
           </p>
           <div className="flex flex-col gap-2">
-            {nearbyRegions.map((reg) => (
+            {displayedNearby.map((reg) => (
               <button
                 key={reg.adm4}
                 onClick={() => onSelectRegion(reg)}
