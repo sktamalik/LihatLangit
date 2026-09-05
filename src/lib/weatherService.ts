@@ -1,6 +1,6 @@
 import { isValidAdm4 } from "@/lib/adm4";
 import { fetchForecast, type BmkgClientResult } from "@/lib/bmkgClient";
-import { getCache, setCache } from "@/lib/cache";
+import { getCache, setCache, findCacheByPrefix } from "@/lib/cache";
 import {
   findBmkgFallback,
   findNearestWithData,
@@ -286,6 +286,31 @@ async function fetchWeatherForecast(
 
   if (cached) {
     return { ok: true, forecast: cached.stale };
+  }
+
+  // Graceful fallback ke cache wilayah terdekat (kecamatan/kota) jika BMKG sibuk/error
+  if (region) {
+    const adm3Prefix = getAdm3Prefix(adm4);
+    const nearbyDistrict = findCacheByPrefix<WeatherForecast>(`${CACHE_KEY_PREFIX}${adm3Prefix}`);
+    if (nearbyDistrict.status !== "miss") {
+      const fallback = applySearchedRegion(
+        nearbyDistrict.payload,
+        region,
+        nearbyDistrict.payload.region.village || nearbyDistrict.payload.region.district
+      );
+      return { ok: true, forecast: withCachedFlags(fallback, "stale") };
+    }
+
+    const adm2Prefix = adm4.slice(0, 5);
+    const nearbyCity = findCacheByPrefix<WeatherForecast>(`${CACHE_KEY_PREFIX}${adm2Prefix}`);
+    if (nearbyCity.status !== "miss") {
+      const fallback = applySearchedRegion(
+        nearbyCity.payload,
+        region,
+        nearbyCity.payload.region.city || nearbyCity.payload.region.village
+      );
+      return { ok: true, forecast: withCachedFlags(fallback, "stale") };
+    }
   }
 
   return serviceError(
