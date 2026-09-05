@@ -36,7 +36,7 @@ const IndonesiaWeatherMap = dynamic(
 import type { ErrorCode, Region } from "@/types/weather";
 
 export default function DashboardClient() {
-  const { state, searchAndSelect, retry, requestGeolocation } = useWeather();
+  const { state, selectedRegion, searchAndSelect, retry, requestGeolocation } = useWeather();
   const [activeSection, setActiveSection] = useState<string>("hero");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchNotif, setSearchNotif] = useState<SearchNotifState | null>(null);
@@ -282,7 +282,15 @@ export default function DashboardClient() {
             <div className="flex-grow bg-white p-6 md:p-8 flex flex-col">
               <h2 className="font-body-sans text-[20px] font-semibold text-text-dark mb-6">{state.status === "ready" ? state.forecast.region.district : "Selamat Datang"}</h2>
               {state.status === "loading" && <WeatherLoadingState />}
-              {state.status === "error" && <WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} />}
+              {state.status === "error" && (
+                <WeatherErrorState
+                  code={state.error.code as ErrorCode}
+                  message={state.error.message}
+                  onRetry={retry}
+                  selectedRegion={selectedRegion}
+                  onSelectRegion={handleSearchAndSelect}
+                />
+              )}
               {state.status === "ready" && (
                 <>
                   <div className="border border-grass-green/20 bg-grass-green/5 rounded-lg p-4 flex justify-between items-center mb-8">
@@ -361,7 +369,15 @@ export default function DashboardClient() {
           <div className="px-5 md:px-20 py-12 w-full max-w-5xl mx-auto"><WeatherLoadingState /></div>
         )}
         {state.status === "error" && (
-          <div className="px-5 md:px-20 py-12 w-full max-w-5xl mx-auto"><WeatherErrorState code={state.error.code as ErrorCode} message={state.error.message} onRetry={retry} /></div>
+          <div className="px-5 md:px-20 py-12 w-full max-w-5xl mx-auto">
+            <WeatherErrorState
+              code={state.error.code as ErrorCode}
+              message={state.error.message}
+              onRetry={retry}
+              selectedRegion={selectedRegion}
+              onSelectRegion={handleSearchAndSelect}
+            />
+          </div>
         )}
       </main>
 
