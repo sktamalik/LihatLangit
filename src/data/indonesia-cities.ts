@@ -42,7 +42,7 @@ export const INDONESIA_CITIES: IndonesiaCity[] = [
   { adm4: "62.71.01.1004", name: "Palangka Raya", province: "KALIMANTAN TENGAH", latitude: -2.21, longitude: 113.91, island: "Kalimantan" },
   { adm4: "63.71.01.1001", name: "Banjarmasin", province: "KALIMANTAN SELATAN", latitude: -3.32, longitude: 114.59, island: "Kalimantan" },
   { adm4: "64.72.01.1001", name: "Samarinda", province: "KALIMANTAN TIMUR", latitude: -0.50, longitude: 117.15, island: "Kalimantan" },
-  { adm4: "65.02.05.0002", name: "Tanjung Selor", province: "KALIMANTAN UTARA", latitude: 2.85, longitude: 117.37, island: "Kalimantan" },
+  { adm4: "65.01.01.1001", name: "Tanjung Selor", province: "KALIMANTAN UTARA", latitude: 2.85, longitude: 117.37, island: "Kalimantan" },
 
   // ── Sulawesi ──
   { adm4: "73.71.01.1001", name: "Makassar", province: "SULAWESI SELATAN", latitude: -5.15, longitude: 119.42, island: "Sulawesi" },
@@ -54,7 +54,7 @@ export const INDONESIA_CITIES: IndonesiaCity[] = [
 
   // ── Maluku ──
   { adm4: "81.71.01.1006", name: "Ambon", province: "MALUKU", latitude: -3.70, longitude: 128.17, island: "Maluku" },
-  { adm4: "82.72.05.0006", name: "Sofifi", province: "MALUKU UTARA", latitude: 0.73, longitude: 127.56, island: "Maluku" },
+  { adm4: "82.72.01.1001", name: "Sofifi", province: "MALUKU UTARA", latitude: 0.73, longitude: 127.56, island: "Maluku" },
 
   // ── Papua ──
   { adm4: "92.71.01.1001", name: "Sorong", province: "PAPUA BARAT DAYA", latitude: -0.88, longitude: 131.29, island: "Papua" },
