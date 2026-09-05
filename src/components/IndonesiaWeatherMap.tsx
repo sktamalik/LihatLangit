@@ -68,16 +68,22 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
   // ── Client-side cache: render instan tanpa loading kosong ──
   useEffect(() => {
     try {
-      const stored = localStorage.getItem("lihatlangit_map_batch");
+      if (typeof window === "undefined" || !window.localStorage) return;
+      const stored = window.localStorage.getItem("lihatlangit_map_batch");
       if (stored) {
         const parsed = JSON.parse(stored);
-        if (parsed && typeof parsed === "object" && Object.keys(parsed).length > 0) {
-          setWeatherData(parsed);
+        if (
+          parsed &&
+          typeof parsed === "object" &&
+          !Array.isArray(parsed) &&
+          Object.keys(parsed).length > 0
+        ) {
+          setWeatherData(parsed as CityWeatherMap);
           setIsFetching(false);
         }
       }
     } catch {
-      // ignore
+      // Abaikan jika storage diblokir di browser privat
     }
   }, []);
 
@@ -92,10 +98,18 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
       const res = await fetch(`/api/weather-batch?adm4=${encodeURIComponent(codes)}`, { signal: controller.signal });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data: CityWeatherMap = await res.json();
-      if (mountedRef.current && Object.keys(data).length > 0) {
+      if (
+        mountedRef.current &&
+        data &&
+        typeof data === "object" &&
+        !Array.isArray(data) &&
+        Object.keys(data).length > 0
+      ) {
         setWeatherData(data);
         try {
-          localStorage.setItem("lihatlangit_map_batch", JSON.stringify(data));
+          if (typeof window !== "undefined" && window.localStorage) {
+            window.localStorage.setItem("lihatlangit_map_batch", JSON.stringify(data));
+          }
         } catch {
           // ignore
         }
@@ -246,7 +260,7 @@ export default function IndonesiaWeatherMap({ zoomToRegion }: IndonesiaWeatherMa
             <span>🌬️ ${windStr}</span>
           </div>
           <div style="font-size:10px;color:#94a3b8;margin-top:6px;border-top:1px solid #e2e8f0;padding-top:4px">
-            ${data?.region.village ?? "—"}, ${data?.region.district ?? "—"}
+            ${data?.region?.village ?? "—"}, ${data?.region?.district ?? "—"}
           </div>
         </div>
       `;
